@@ -1,0 +1,11 @@
+# General
+.*
+._*
+bin/
+tmp/
+*.log
+!.posh
+!.gitignore
+!.posh.yaml
+!.editorconfig
+!.golangci.yml
