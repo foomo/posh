@@ -1,17 +1,26 @@
 package util
 
 import (
-	"context"
+	"path"
+	"strings"
 
-	"github.com/foomo/posh/pkg/config"
-	"github.com/foomo/posh/pkg/plugin"
-	"github.com/spf13/viper"
+	"github.com/go-git/go-git/v5"
+	giturls "github.com/whilp/git-urls"
 )
 
-func LoadPlugin(ctx context.Context, m *plugin.Manager) (plugin.Plugin, error) {
-	var cfg config.Plugin
-	if err := viper.UnmarshalKey("plugin", &cfg); err != nil {
-		return nil, err
+func GitRemoteURL() (string, error) {
+	r, err := git.PlainOpen(".")
+	if err != nil {
+		return "", err
 	}
-	return m.BuildAndLoadPlugin(ctx, cfg.Source, cfg.Provider)
+
+	if value, err := r.Remote("origin"); err != nil {
+		return "", err
+	} else if len(value.Config().URLs) == 0 {
+		return "", nil
+	} else if value, err := giturls.Parse(value.Config().URLs[0]); err != nil {
+		return "", err
+	} else {
+		return value.Hostname() + "/" + strings.TrimSuffix(value.Path, path.Ext(value.Path)), nil
+	}
 }

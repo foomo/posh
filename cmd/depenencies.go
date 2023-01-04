@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"github.com/foomo/posh/internal/util"
+	intconfig "github.com/foomo/posh/internal/config"
+	intplugin "github.com/foomo/posh/internal/plugin"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -11,15 +12,21 @@ import (
 var dependenciesCmd = &cobra.Command{
 	Use:           "dependencies",
 	Short:         "Run dependency validations",
-	SilenceErrors: true,
 	SilenceUsage:  true,
+	SilenceErrors: true,
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		if err := intconfig.Load(l, flagConfig); err != nil {
+			return err
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var cfg config.Dependencies
 		if err := viper.UnmarshalKey("dependencies", &cfg); err != nil {
 			return err
 		}
 
-		plg, err := util.LoadPlugin(cmd.Context(), m)
+		plg, err := intplugin.Load(cmd.Context(), l)
 		if err != nil {
 			return err
 		}

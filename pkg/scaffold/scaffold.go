@@ -1,11 +1,10 @@
 package scaffold
 
 import (
+	"context"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -16,9 +15,10 @@ import (
 
 type (
 	Scaffold struct {
-		l     log.Logger
-		dry   bool
-		force bool
+		l           log.Logger
+		dry         bool
+		override    bool
+		directories []Directory
 	}
 	Option func(*Scaffold) error
 )
@@ -34,9 +34,9 @@ func WithDry(v bool) Option {
 	}
 }
 
-func WithForce(v bool) Option {
+func WithOverride(v bool) Option {
 	return func(o *Scaffold) error {
-		o.force = v
+		o.override = v
 		return nil
 	}
 }
@@ -48,15 +48,22 @@ func WithLogger(v log.Logger) Option {
 	}
 }
 
+func WithDirectories(v ...Directory) Option {
+	return func(o *Scaffold) error {
+		o.directories = append(o.directories, v...)
+		return nil
+	}
+}
+
 // ------------------------------------------------------------------------------------------------
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
 
 func New(opts ...Option) (*Scaffold, error) {
 	inst := &Scaffold{
-		l:     log.NewFmt(),
-		dry:   false,
-		force: false,
+		l:        log.NewFmt(),
+		dry:      false,
+		override: false,
 	}
 	for _, opt := range opts {
 		if opt != nil {
@@ -68,72 +75,117 @@ func New(opts ...Option) (*Scaffold, error) {
 	return inst, nil
 }
 
-func (s *Scaffold) Render(source fs.FS, target string, vars any) error {
-	// validate target
+// ------------------------------------------------------------------------------------------------
+// ~ Public methods
+// ------------------------------------------------------------------------------------------------
+
+func (s *Scaffold) Render(ctx context.Context) error {
+	if err := s.renderDirectories(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ------------------------------------------------------------------------------------------------
+// ~ Private methods
+// ------------------------------------------------------------------------------------------------
+func (s *Scaffold) scaffoldDir(target string) error {
+	s.l.Info("mkdir:", s.filename(target))
 	if stat, err := os.Stat(target); errors.Is(err, os.ErrNotExist) {
-		s.l.Print("scaffold:", target)
 		if err := os.MkdirAll(target, os.ModePerm); err != nil {
-			return errors.Wrapf(err, "failed to create target folder (%s)", target)
+			return err
 		}
 	} else if err != nil {
 		return errors.Wrapf(err, "failed to stat target folder (%s)", target)
 	} else if !stat.IsDir() {
 		return fmt.Errorf("target not a directory (%s)", target)
 	}
+	return nil
+}
 
-	// iterate source
-	if err := fs.WalkDir(source, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return errors.Wrapf(err, "failed to walk fs dir")
+func (s *Scaffold) scaffoldTemplate(target string, tpl *template.Template, data any) error {
+	s.l.Info("file:", s.filename(target))
+	file, err := os.Create(target)
+	if err != nil {
+		return errors.Wrapf(err, "failed to create target file (%s)", target)
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			s.l.Warnf("failed to close file: %s", err.Error())
 		}
+	}()
+	return tpl.Execute(file, data)
+}
 
-		filename := filepath.Join(target, strings.ReplaceAll(path, "$", ""))
+func (s *Scaffold) printTemplate(msg, target string, tpl *template.Template, data any) error {
+	border := strings.Repeat("-", 80)
+	s.l.Infof("%s\n%s: %s\n%s", border, msg, target, border)
+	return tpl.Execute(os.Stdout, data)
+}
 
-		if path == "." {
+func (s *Scaffold) renderDirectories() error {
+	for _, directory := range s.directories {
+		if err := s.renderDirectory(directory); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *Scaffold) renderDirectory(directory Directory) error {
+	s.l.Info("scaffolding directory:", directory.Target)
+
+	if err := s.scaffoldDir(directory.Target); err != nil {
+		return err
+	}
+
+	if err := fs.WalkDir(directory.Source, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		} else if path == "." {
 			return nil
 		} else if d.IsDir() {
-			s.l.Print("scaffold:", filename)
-			return os.MkdirAll(filename, os.ModePerm)
+			return s.scaffoldDir(s.filename(path))
+		}
+
+		filename := s.filename(path)
+
+		tpl, err := template.New(d.Name()).Funcs(sprig.FuncMap()).ParseFS(directory.Source, path)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse source file (%s)", path)
+		}
+
+		if s.dry {
+			return s.printTemplate("file", filename, tpl, directory.Data)
+		} else if exists, err := s.fileExists(filename); err != nil {
+			return s.printTemplate(err.Error(), filename, tpl, directory.Data)
+		} else if exists && !s.override {
+			return s.printTemplate("file exists", filename, tpl, directory.Data)
 		} else {
-			tpl, err := template.New(d.Name()).Funcs(sprig.FuncMap()).ParseFS(source, path)
-			if err != nil {
-				return err
-			}
-
-			if stat, err := os.Stat(filename); errors.Is(err, fs.ErrNotExist) {
-				// all good
-			} else if err != nil {
-				return errors.Wrapf(err, "failed to stat target (%s)", filename)
-			} else if stat.IsDir() {
-				return fmt.Errorf("target file is an existing directory (%s)", filename)
-			} else if !s.force {
-				return fmt.Errorf("target file already exists (%s)", filename)
-			}
-
-			var out io.Writer
-			if s.dry {
-				out = os.Stdout
-			} else {
-				s.l.Print("scaffold:", filename)
-				if file, err := os.Create(filename); err != nil {
-					return errors.Wrapf(err, "failed to create target file (%s)", filename)
-				} else {
-					out = file
-					defer func() {
-						_ = file.Close()
-					}()
-				}
-			}
-
-			if err := tpl.Execute(out, vars); err != nil {
-				return errors.Wrapf(err, "failed to render target file (%s)", filename)
-			}
-
-			return nil
+			return s.scaffoldTemplate(filename, tpl, directory.Data)
 		}
 	}); err != nil {
-		return errors.Wrapf(err, "failed to render scaffold to %s", target)
+		return errors.Wrapf(err, "failed to render scaffold to %s", directory.Target)
 	}
 
 	return nil
+}
+
+func (s *Scaffold) fileExists(target string) (bool, error) {
+	if stat, err := os.Stat(target); errors.Is(err, fs.ErrNotExist) {
+		return false, nil
+	} else if err != nil {
+		return false, errors.Wrapf(err, "failed to stat target (%s)", target)
+	} else if stat.IsDir() {
+		return true, fmt.Errorf("target file is an existing directory (%s)", target)
+	} else {
+		return true, nil
+	}
+}
+
+func (s *Scaffold) filename(v string) string {
+	v = strings.ReplaceAll(v, "$", "")
+	v = strings.TrimSuffix(v, ".gotext")
+	v = strings.TrimSuffix(v, ".gohtml")
+	return v
 }

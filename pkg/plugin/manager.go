@@ -9,19 +9,8 @@ import (
 	"plugin"
 	"strings"
 
-	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
 	"github.com/pkg/errors"
-)
-
-type (
-	Plugin interface {
-		Prompt(ctx context.Context, cfg config.Prompt) error
-		Execute(ctx context.Context, args []string) error
-		Packages(ctx context.Context, cfg []config.Package) error
-		Dependencies(ctx context.Context, cfg config.Dependencies) error
-	}
-	Provider func(l log.Logger) (Plugin, error)
 )
 
 type Manager struct {
@@ -46,23 +35,34 @@ func NewManager(l log.Logger) (*Manager, error) {
 // ------------------------------------------------------------------------------------------------
 
 func (m *Manager) BuildAndLoadPlugin(ctx context.Context, filename, provider string) (Plugin, error) {
+	if err := m.Tidy(ctx, filename); err != nil {
+		return nil, err
+	}
 	if err := m.Build(ctx, filename); err != nil {
 		return nil, err
 	}
 	return m.LoadPlugin(filename, provider)
 }
 
+func (m *Manager) Tidy(ctx context.Context, filename string) error {
+	m.l.Debug("tidying:", filename)
+	cmd := exec.CommandContext(ctx, "go", "mod", "tidy")
+	cmd.Dir = filepath.Dir(filename)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return errors.Wrap(err, string(output))
+	}
+	return nil
+}
+
 func (m *Manager) Build(ctx context.Context, filename string) error {
 	m.l.Debug("building:", filename)
-
-	dir := filepath.Dir(filename)
 	base := path.Base(filename)
 	cmd := exec.CommandContext(ctx, "go", "build",
 		"-buildmode=plugin",
 		"-o", strings.ReplaceAll(base, ".go", ".so"),
 		base,
 	)
-	cmd.Dir = dir
+	cmd.Dir = filepath.Dir(filename)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		return errors.Wrap(err, string(output))
 	}

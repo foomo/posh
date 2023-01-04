@@ -65,7 +65,7 @@ func New(l log.Logger, cache cache.Cache, opts ...Option) (*OnePassword, error) 
 		}
 	}
 	if client, err := connect.NewClientFromEnvironment(); err != nil {
-		l.Debug("not able to create connect client", err.Error())
+		l.Debug("connect client:", err.Error())
 	} else {
 		inst.connect = client
 	}
