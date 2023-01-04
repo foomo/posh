@@ -1,0 +1,33 @@
+# Build customization
+builds:
+  - binary: posh
+    main: ./main.go
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X internal/version/version.Version={{.Version}}
+      - -s -w -X internal/version/version.CommitHash={{.FullCommit}}
+      - -s -w -X internal/version/version.BuildTimestamp={{.Timestamp}}
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+# .goreleaser.yml
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+
+# Reporitory to push the tap to.
+brews:
+  - tap:
+      owner: foomo
+      name: homebrew-foomo
+    caveats: "posh help"
+    homepage: "https://github.com/foomo/posh"
+    description: "Project Oriented SHELL"

@@ -1,4 +1,4 @@
-package util
+package git
 
 import (
 	"path"
@@ -8,7 +8,7 @@ import (
 	giturls "github.com/whilp/git-urls"
 )
 
-func GitRemoteURL() (string, error) {
+func OriginURL() (string, error) {
 	r, err := git.PlainOpen(".")
 	if err != nil {
 		return "", err

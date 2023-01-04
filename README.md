@@ -20,7 +20,7 @@ $ cd your/project
 $ posh init
 ```
 
-This will generate the standard layout for posh which can be changed as required through `.posh.yaml`.
+This will generate the standard layout for posh which can be changed as required through `.posh.yml`.
 
 Once initialized you can start posh through:
 

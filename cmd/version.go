@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-
+	intversion "github.com/foomo/posh/internal/version"
 	"github.com/spf13/cobra"
 )
-
-const Version = "develop"
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
@@ -14,7 +11,8 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version",
 	Long:  `If unsure which version of the CLI you are using, you can use this command to print the version of the CLI.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(Version)
+		l.Debugf("%s (%s)", intversion.CommitHash, intversion.BuildTimestamp)
+		l.Print(intversion.Version)
 	},
 }
 

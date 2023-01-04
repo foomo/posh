@@ -5,7 +5,7 @@ import (
 	"path"
 
 	"github.com/foomo/posh/embed"
-	"github.com/foomo/posh/internal/util"
+	"github.com/foomo/posh/internal/git"
 	"github.com/foomo/posh/pkg/env"
 	"github.com/foomo/posh/pkg/scaffold"
 	"github.com/spf13/cobra"
@@ -28,10 +28,11 @@ Posh init must be run inside of a go module (please run "go mod init <MODNAME> f
 		data := map[string]interface{}{}
 
 		// define module
-		if gitRemoteURL, err := util.GitRemoteURL(); err == nil {
-			data["module"] = gitRemoteURL
-		} else {
+		if value, err := git.OriginURL(); err != nil {
+			l.Debug("failed to retrieve git origin url:", err.Error())
 			data["module"] = path.Base(os.Getenv(env.ProjectRoot))
+		} else {
+			data["module"] = value
 		}
 
 		fs, err := embed.Scaffold("init")
