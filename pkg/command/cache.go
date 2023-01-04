@@ -19,7 +19,10 @@ type Cache struct {
 	cache cache.Cache
 }
 
-// NewCache command
+// ------------------------------------------------------------------------------------------------
+// ~ Constructor
+// ------------------------------------------------------------------------------------------------
+
 func NewCache(l log.Logger, cache cache.Cache) *Cache {
 	inst := &Cache{
 		l:     l,
@@ -40,7 +43,6 @@ func NewCache(l log.Logger, cache cache.Cache) *Cache {
 			},
 		},
 	}
-
 	return inst
 }
 

@@ -5,6 +5,7 @@ bin/
 tmp/
 *.log
 !.posh
+!.github
 !.gitignore
 !.posh.yaml
 !.editorconfig

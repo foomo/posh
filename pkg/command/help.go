@@ -11,15 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-type (
-	Help struct {
-		l        log.Logger
-		name     string
-		commands Commands
-	}
-
-	HelpOption func(*Help)
-)
+type Help struct {
+	l        log.Logger
+	name     string
+	commands Commands
+}
 
 // ------------------------------------------------------------------------------------------------
 // ~ Constructor

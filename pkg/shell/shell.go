@@ -37,7 +37,7 @@ func New(ctx context.Context, l log.Logger, inputs ...interface{}) *Shell {
 			args = append(args, fmt.Sprintf("%v", args))
 		}
 	}
-	cmd := exec.CommandContext(ctx, "/bin/sh", "-c")
+	cmd := exec.CommandContext(ctx, "sh", "-c")
 	cmd.Env = os.Environ()
 	return &Shell{
 		l:      l,
@@ -58,7 +58,7 @@ func (s *Shell) Args(args ...string) *Shell {
 	return s
 }
 
-func (s *Shell) Env(env []string) *Shell {
+func (s *Shell) Env(env ...string) *Shell {
 	s.cmd.Env = append(s.cmd.Env, env...)
 	return s
 }
@@ -96,7 +96,6 @@ func (s *Shell) Output() ([]byte, error) {
 	return s.cmd.Output()
 }
 
-// Wait ...
 func (s *Shell) Wait() error {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
