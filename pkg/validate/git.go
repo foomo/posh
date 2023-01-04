@@ -49,7 +49,7 @@ func GitUserEmail(pattern string) GitRule {
 				return nil, errors.Wrap(err, string(output))
 			} else if output := trim(string(output)); !reg.MatchString(output) {
 				return nil, errors.New(`
-Please configure your github email to match the pattern "` + pattern + ` instead of "` + string(output) + `".
+Please configure your github email to match the pattern "` + pattern + ` instead of "` + output + `".
 
 $ git config user.email "max.muster@dev.null"
 `)

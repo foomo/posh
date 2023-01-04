@@ -12,6 +12,7 @@ import (
 	"github.com/foomo/posh/pkg/prompt"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/shell"
+	"github.com/foomo/posh/pkg/util/suggests"
 )
 
 // GoMod command
@@ -76,7 +77,7 @@ func (c *GoMod) Description() string {
 	return "run go mod"
 }
 
-func (c *GoMod) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) (suggests []prompt.Suggest) {
+func (c *GoMod) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
 	return c.parser.Complete(ctx, r)
 }
 
@@ -169,15 +170,13 @@ func (c *GoMod) outdated(ctx context.Context, r *readline.Readline) error {
 	return nil
 }
 
-func (c *GoMod) completePaths(ctx context.Context, p *tree.Root, r *readline.Readline) (suggest []prompt.Suggest) {
-	for _, value := range c.paths() {
-		suggest = append(suggest, prompt.Suggest{Text: value})
-	}
-	return suggest
+func (c *GoMod) completePaths(ctx context.Context, p *tree.Root, r *readline.Readline) []prompt.Suggest {
+	return suggests.List(c.paths())
 }
 
+//nolint:forcetypeassert
 func (c *GoMod) paths() []string {
-	return c.cache.Get("paths", func() interface{} {
+	return c.cache.Get("paths", func() any {
 		var ret []string
 		if err := fastwalk.Walk(&fastwalk.Config{
 			Follow: false,

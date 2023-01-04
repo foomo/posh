@@ -225,8 +225,8 @@ func (op *OnePassword) Render(ctx context.Context, source string) ([]byte, error
 				"quote": func(v string) string {
 					return "'" + v + "'"
 				},
-				"replace": func(old, new, v string) string {
-					return strings.ReplaceAll(v, old, new)
+				"replace": func(o, n, v string) string {
+					return strings.ReplaceAll(v, o, n)
 				},
 				"base64": func(v string) string {
 					return base64.StdEncoding.EncodeToString([]byte(v))
@@ -275,8 +275,9 @@ func (op *OnePassword) RenderFileTo(ctx context.Context, source, target string) 
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
 
+//nolint:forcetypeassert
 func (op *OnePassword) clientGet(ctx context.Context, vaultUUID string, itemUUID string) map[string]string {
-	return op.cache.Get(strings.Join([]string{vaultUUID, itemUUID}, "#"), func() interface{} {
+	return op.cache.Get(strings.Join([]string{vaultUUID, itemUUID}, "#"), func() any {
 		ret := map[string]string{}
 		var v struct {
 			Vault struct {
@@ -317,8 +318,9 @@ func (op *OnePassword) clientGet(ctx context.Context, vaultUUID string, itemUUID
 	}).(map[string]string)
 }
 
+//nolint:forcetypeassert
 func (op *OnePassword) connectGet(vaultUUID, itemUUID string) map[string]string {
-	return op.cache.Get(strings.Join([]string{vaultUUID, itemUUID}, "#"), func() interface{} {
+	return op.cache.Get(strings.Join([]string{vaultUUID, itemUUID}, "#"), func() any {
 		ret := map[string]string{}
 		var item *onepassword.Item
 		if op.uuidRegex.Match([]byte(itemUUID)) {

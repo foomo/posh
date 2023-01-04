@@ -56,7 +56,7 @@ func (c *Cache) Description() string {
 	return "manage the internal cache"
 }
 
-func (c *Cache) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) (suggests []prompt.Suggest) {
+func (c *Cache) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
 	return c.tree.Complete(ctx, r)
 }
 
@@ -89,18 +89,18 @@ func (c *Cache) clear(ctx context.Context, r *readline.Readline) error {
 func (c *Cache) list(ctx context.Context, r *readline.Readline) error {
 	// Create a fork of the default table, fill it with data and print it.
 	// Data can also be generated and inserted later.
-	tree := pterm.LeveledList{}
+	list := pterm.LeveledList{}
 	for ns, value := range c.cache.List() {
-		tree = append(tree, pterm.LeveledListItem{Level: 0, Text: ns})
+		list = append(list, pterm.LeveledListItem{Level: 0, Text: ns})
 		for _, k := range value.Keys() {
-			tree = append(tree, pterm.LeveledListItem{Level: 1, Text: k})
+			list = append(list, pterm.LeveledListItem{Level: 1, Text: k})
 			if c.l.Level() == log.LevelTrace {
-				tree = append(tree, pterm.LeveledListItem{Level: 2, Text: fmt.Sprintf("%v", value.Get(k, nil))})
+				list = append(list, pterm.LeveledListItem{Level: 2, Text: fmt.Sprintf("%v", value.Get(k, nil))})
 			}
 		}
 	}
 	// Generate tree from LeveledList.
-	root := putils.TreeFromLeveledList(tree)
+	root := putils.TreeFromLeveledList(list)
 
 	// Render TreePrinter
 	return pterm.DefaultTree.WithRoot(root).Render()

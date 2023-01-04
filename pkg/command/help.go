@@ -45,7 +45,8 @@ func (c *Help) Description() string {
 	return "print help"
 }
 
-func (c *Help) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) (suggests []prompt.Suggest) {
+func (c *Help) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
+	var suggests []prompt.Suggest
 	switch {
 	case r.Args().LenLte(1):
 		for _, value := range c.list() {

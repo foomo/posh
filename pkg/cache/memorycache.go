@@ -7,7 +7,7 @@ func (c MemoryCache) Clear(namespace string) {
 		for key := range c {
 			delete(c, key)
 		}
-	} else if _, ok := c[namespace]; ok {
+	} else {
 		delete(c, namespace)
 	}
 }

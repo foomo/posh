@@ -73,7 +73,7 @@ func (c *Command) Description() string {
 	return "run go mod"
 }
 
-func (c *Command) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) (suggests []prompt.Suggest) {
+func (c *Command) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
 	return c.parser.Complete(ctx, r)
 }
 

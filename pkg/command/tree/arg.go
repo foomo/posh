@@ -11,5 +11,5 @@ type Arg struct {
 	Name     string
 	Repeat   bool
 	Optional bool
-	Suggest  func(ctx context.Context, parser *Root, args *readline.Readline) (suggest []prompt.Suggest)
+	Suggest  func(ctx context.Context, parser *Root, args *readline.Readline) []prompt.Suggest
 }

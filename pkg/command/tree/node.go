@@ -19,7 +19,6 @@ type Node struct {
 	Description      string
 	Commands         []*Node
 	Execute          func(ctx context.Context, args *readline.Readline) error
-	//Suggest     func(ctx context.Context, parser *Parser, args *prompt.Args) (suggest []prompt.Suggest)
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -46,7 +45,8 @@ func (c *Node) setFlags(r *readline.Readline, parse bool) error {
 	return nil
 }
 
-func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readline, i int) (suggest []prompt.Suggest) {
+func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readline, i int) []prompt.Suggest {
+	var suggest []prompt.Suggest
 	localArgs := r.Args()[i:]
 	if len(c.Commands) > 0 && len(localArgs) <= 1 {
 		for _, command := range c.Commands {
@@ -64,16 +64,20 @@ func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readl
 	return suggest
 }
 
-func (c *Node) completeFlags(r *readline.Readline) (suggest []prompt.Suggest) {
-	for _, f := range r.AllFlags() {
-		suggest = append(suggest, prompt.Suggest{Text: "--" + f.Name, Description: f.Usage})
+func (c *Node) completeFlags(r *readline.Readline) []prompt.Suggest {
+	allFlags := r.AllFlags()
+	suggest := make([]prompt.Suggest, len(allFlags))
+	for i, f := range allFlags {
+		suggest[i] = prompt.Suggest{Text: "--" + f.Name, Description: f.Usage}
 	}
 	return suggest
 }
 
-func (c *Node) completePassThroughFlags(r *readline.Readline) (suggest []prompt.Suggest) {
-	for _, f := range r.AllPassThroughFlags() {
-		suggest = append(suggest, prompt.Suggest{Text: "--" + f.Name, Description: f.Usage})
+func (c *Node) completePassThroughFlags(r *readline.Readline) []prompt.Suggest {
+	allPassThroughFlags := r.AllPassThroughFlags()
+	suggest := make([]prompt.Suggest, len(allPassThroughFlags))
+	for i, f := range allPassThroughFlags {
+		suggest[i] = prompt.Suggest{Text: "--" + f.Name, Description: f.Usage}
 	}
 	return suggest
 }

@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/foomo/fender/fend"
-	"github.com/foomo/posh/pkg/cache"
 	"github.com/foomo/posh/pkg/command"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
@@ -12,16 +13,16 @@ import (
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/foomo/posh/pkg/prompt"
 	"github.com/foomo/posh/pkg/prompt/history"
+	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/validate"
 )
 
 type Plugin struct {
 	l        log.Logger
-	c        cache.Cache
 	commands command.Commands
 }
 
-func New(l log.Logger) (plugin.Plugin, error) {
+func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
 	inst := &Plugin{
 		l:        l,
 		commands: command.Commands{},
@@ -32,6 +33,7 @@ func New(l log.Logger) (plugin.Plugin, error) {
 		command.NewExit(l),
 		command.NewHelp(l, inst.commands),
 	)
+
 	return inst, nil
 }
 

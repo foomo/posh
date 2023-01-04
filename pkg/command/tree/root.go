@@ -32,7 +32,8 @@ func (p *Root) Execute(ctx context.Context, r *readline.Readline) error {
 	return nil
 }
 
-func (p *Root) Complete(ctx context.Context, r *readline.Readline) (suggests []prompt.Suggest) {
+func (p *Root) Complete(ctx context.Context, r *readline.Readline) []prompt.Suggest {
+	var suggests []prompt.Suggest
 	switch r.Mode() {
 	case readline.ModeArgs:
 		if r.Args().LenLte(1) {
@@ -73,6 +74,8 @@ func (p *Root) Complete(ctx context.Context, r *readline.Readline) (suggests []p
 		sort.Slice(suggests, func(i, j int) bool {
 			return suggests[i].Text < suggests[j].Text
 		})
+	case readline.ModeAdditionalArgs:
+		// do nothing
 	}
 	return suggests
 }

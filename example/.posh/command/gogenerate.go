@@ -11,6 +11,7 @@ import (
 	"github.com/foomo/posh/pkg/prompt"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/shell"
+	"github.com/foomo/posh/pkg/util/suggests"
 	"github.com/pkg/errors"
 )
 
@@ -46,11 +47,12 @@ func (c *GoGenerate) Description() string {
 	return "run go generate on generate.go files"
 }
 
-func (c *GoGenerate) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) (suggests []prompt.Suggest) {
+func (c *GoGenerate) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
+	var ret []prompt.Suggest
 	if r.Args().LenLte(1) {
-		suggests = c.completePaths()
+		ret = c.completePaths()
 	}
-	return nil
+	return ret
 }
 
 func (c *GoGenerate) Validate(ctx context.Context, r *readline.Readline) error {
@@ -102,15 +104,13 @@ Examples:
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
 
-func (c *GoGenerate) completePaths() (suggest []prompt.Suggest) {
-	for _, value := range c.paths() {
-		suggest = append(suggest, prompt.Suggest{Text: value})
-	}
-	return suggest
+func (c *GoGenerate) completePaths() []prompt.Suggest {
+	return suggests.List(c.paths())
 }
 
+//nolint:forcetypeassert
 func (c *GoGenerate) paths() []string {
-	return c.cache.Get("paths", func() interface{} {
+	return c.cache.Get("paths", func() any {
 		var ret []string
 		if err := fastwalk.Walk(&fastwalk.Config{
 			Follow: false,

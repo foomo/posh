@@ -15,6 +15,7 @@ import (
 	"github.com/foomo/posh/pkg/ownbrew"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/foomo/posh/pkg/prompt"
+	"github.com/foomo/posh/pkg/prompt/check"
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/validate"
@@ -27,7 +28,7 @@ type Plugin struct {
 	commands command.Commands
 }
 
-func New(l log.Logger) (plugin.Plugin, error) {
+func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
 	inst := &Plugin{
 		l:        l,
 		c:        cache.MemoryCache{},
@@ -66,11 +67,19 @@ func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {
 		prompt.WithContext(ctx),
 		prompt.WithCommands(p.commands),
 		prompt.WithCheckers(
-			func(ctx context.Context, l log.Logger) (name, note string, ok bool) {
-				return "one", "", true
+			func(ctx context.Context, l log.Logger) check.Info {
+				return check.Info{
+					Name:   "one",
+					Note:   "all good",
+					Status: check.StatusSuccess,
+				}
 			},
-			func(ctx context.Context, l log.Logger) (name, note string, ok bool) {
-				return "two", "please install", false
+			func(ctx context.Context, l log.Logger) check.Info {
+				return check.Info{
+					Name:   "two",
+					Note:   "please take some action",
+					Status: check.StatusFailure,
+				}
 			},
 		),
 		prompt.WithFileHistory(

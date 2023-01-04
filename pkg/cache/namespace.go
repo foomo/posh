@@ -5,8 +5,8 @@ import (
 )
 
 type Namespace interface {
-	Get(key string, cb func() interface{}) interface{}
+	Get(key string, cb func() any) any
 	Keys() []string
 	Delete(key string)
-	GetSuggests(key string, cb func() interface{}) []prompt.Suggest
+	GetSuggests(key string, cb func() any) []prompt.Suggest
 }

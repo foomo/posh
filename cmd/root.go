@@ -29,26 +29,26 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "posh",
-	Short: "Start the Project Oriented Shell",
-	Long:  `Start the Project Oriented Shell in interactive mode.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// use the hypothetical UnknownArgs() pflag API
-		fmt.Println(args)
-		return
-
-	},
+	Short: "Project Oriented Shell (posh)",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	code := 0
+
+	// handle interrupt
 	osInterrupt := make(chan os.Signal, 1)
 	signal.Notify(osInterrupt, os.Interrupt)
 	ctx, cancel := context.WithCancel(context.Background())
+
+	// handle defer
 	defer func() {
 		signal.Stop(osInterrupt)
 		cancel()
+		os.Exit(code)
 	}()
+
 	go func() {
 		<-osInterrupt
 		l.Debug("received interrupt")
@@ -57,10 +57,9 @@ func Execute() {
 
 	if err := rootCmd.ExecuteContext(ctx); errors.Is(err, context.Canceled) {
 		l.Warn(err.Error())
-		os.Exit(0)
 	} else if err != nil {
 		l.Error(err.Error())
-		os.Exit(1)
+		code = 1
 	}
 }
 

@@ -112,11 +112,7 @@ func (h *File) read(ctx context.Context) ([]string, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	var lines []string
-	for _, line := range strings.Split(string(b), "\n") {
-		lines = append(lines, line)
-	}
-	return lines, nil
+	return strings.Split(string(b), "\n"), nil
 }
 
 func (h *File) write(ctx context.Context, lines []string) error {
@@ -130,7 +126,7 @@ func (h *File) write(ctx context.Context, lines []string) error {
 			h.l.Warnf("failed to unlock on history file (%s): %s", h.filename, err.Error())
 		}
 	}()
-	return os.WriteFile(h.filename, []byte(strings.Join(lines, "\n")), 0644)
+	return os.WriteFile(h.filename, []byte(strings.Join(lines, "\n")), 0600)
 }
 
 func (h *File) unique(lines []string) []string {

@@ -114,6 +114,13 @@ func WithFilter(v Filter) Option {
 	}
 }
 
+func WithPromptOptions(v ...prompt.Option) Option {
+	return func(o *Prompt) error {
+		o.promptOptions = v
+		return nil
+	}
+}
+
 // ------------------------------------------------------------------------------------------------
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
@@ -166,23 +173,28 @@ func (s *Prompt) Run() error {
 	p := prompt.New(
 		s.execute,
 		s.complete,
-		prompt.OptionTitle(s.title),
-		prompt.OptionPrefix(s.prefix),
-		prompt.OptionPrefixTextColor(prompt.Cyan),
-		prompt.OptionInputTextColor(prompt.DefaultColor),
-		prompt.OptionCompletionWordSeparator(completer.FilePathCompletionSeparator),
-		prompt.OptionHistoryIgnoreDuplicates(),
-		prompt.OptionHistory(histories),
-		// macos alt+left fix
-		prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
-			ASCIICode: []byte{0x1b, 0x62},
-			Fn:        prompt.GoLeftWord,
-		}),
-		// macos alt+right fix
-		prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
-			ASCIICode: []byte{0x1b, 0x66},
-			Fn:        prompt.GoRightWord,
-		}),
+		append(
+			[]prompt.Option{
+				prompt.OptionTitle(s.title),
+				prompt.OptionPrefix(s.prefix),
+				prompt.OptionPrefixTextColor(prompt.Cyan),
+				prompt.OptionInputTextColor(prompt.DefaultColor),
+				prompt.OptionCompletionWordSeparator(completer.FilePathCompletionSeparator),
+				prompt.OptionHistoryIgnoreDuplicates(),
+				prompt.OptionHistory(histories),
+				// macos alt+left fix
+				prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
+					ASCIICode: []byte{0x1b, 0x62},
+					Fn:        prompt.GoLeftWord,
+				}),
+				// macos alt+right fix
+				prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
+					ASCIICode: []byte{0x1b, 0x66},
+					Fn:        prompt.GoRightWord,
+				}),
+			},
+			s.promptOptions...,
+		)...,
 	)
 
 	if err := s.flair(s.title); err != nil {
