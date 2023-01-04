@@ -8,7 +8,7 @@ Install the latest release of the cli:
 
 ````bash
 $ brew update
-$ brew install brew install foomo/posh
+$ brew install brew install foomo/foomo/posh
 ````
 
 ## Usage

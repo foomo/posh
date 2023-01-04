@@ -5,9 +5,10 @@ builds:
     env:
       - CGO_ENABLED=0
     ldflags:
-      - -s -w -X internal/version/version.Version={{.Version}}
-      - -s -w -X internal/version/version.CommitHash={{.FullCommit}}
-      - -s -w -X internal/version/version.BuildTimestamp={{.Timestamp}}
+      - -s -w
+      - -X github.com/foomo/posh/internal/version.Version={{.Version}}
+      - -X github.com/foomo/posh/internal/version.CommitHash={{.FullCommit}}
+      - -X github.com/foomo/posh/internal/version.BuildTimestamp={{.Timestamp}}
     goos:
       - windows
       - darwin
