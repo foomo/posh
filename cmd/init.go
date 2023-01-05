@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	initCmdFlagDry bool
+	initCmdFlagDry      bool
+	initCmdFlagOverride bool
 )
 
 // initCmd represents the init command
@@ -41,8 +42,9 @@ Posh init must be run inside of a go module (please run "go mod init <MODNAME> f
 		}
 
 		sc, err := scaffold.New(
-			scaffold.WithLogger(l),
+			l,
 			scaffold.WithDry(initCmdFlagDry),
+			scaffold.WithOverride(initCmdFlagOverride),
 			scaffold.WithDirectories(scaffold.Directory{
 				Source: fs,
 				Target: os.Getenv(env.ProjectRoot),
@@ -60,4 +62,5 @@ Posh init must be run inside of a go module (please run "go mod init <MODNAME> f
 func init() {
 	rootCmd.AddCommand(initCmd)
 	initCmd.Flags().BoolVar(&initCmdFlagDry, "dry", false, "don't render files")
+	initCmd.Flags().BoolVar(&initCmdFlagOverride, "override", false, "override existing files")
 }

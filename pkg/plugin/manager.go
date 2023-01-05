@@ -24,7 +24,7 @@ type Manager struct {
 
 func NewManager(l log.Logger) (*Manager, error) {
 	inst := &Manager{
-		l:       l,
+		l:       l.Named("plugin"),
 		plugins: map[string]*plugin.Plugin{},
 	}
 	return inst, nil

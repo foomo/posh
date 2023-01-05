@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	pkgcommand "{{.module}}/posh/pkg/command"
 	"github.com/foomo/fender/fend"
 	"github.com/foomo/posh/pkg/command"
 	"github.com/foomo/posh/pkg/config"
@@ -12,6 +13,7 @@ import (
 	"github.com/foomo/posh/pkg/ownbrew"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/foomo/posh/pkg/prompt"
+	"github.com/foomo/posh/pkg/prompt/check"
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/validate"
@@ -36,6 +38,7 @@ func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
 	inst.commands.Add(
 		command.NewExit(l),
 		command.NewHelp(l, inst.commands),
+		pkgcommand.NewWelcome(l),
 	)
 
 	return inst, nil
@@ -44,6 +47,21 @@ func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
 // ------------------------------------------------------------------------------------------------
 // ~ Public methods
 // ------------------------------------------------------------------------------------------------
+
+func (p *Plugin) Brew(ctx context.Context, cfg config.Ownbrew) error {
+	brew, err := ownbrew.New(p.l,
+		ownbrew.WithDry(cfg.Dry),
+		ownbrew.WithBinDir(cfg.BinDir),
+		ownbrew.WithTapDir(cfg.TapDir),
+		ownbrew.WithTempDir(cfg.TempDir),
+		ownbrew.WithCellarDir(cfg.CellarDir),
+		ownbrew.WithPackages(cfg.Packages...),
+	)
+	if err != nil {
+		return err
+	}
+	return brew.Install(ctx)
+}
 
 func (p *Plugin) Dependencies(ctx context.Context, cfg config.Dependencies) error {
 	var fends []fend.Fend
@@ -56,16 +74,6 @@ func (p *Plugin) Dependencies(ctx context.Context, cfg config.Dependencies) erro
 		return fendErr
 	}
 	return nil
-}
-
-func (p *Plugin) Packages(ctx context.Context, cfg []config.Package) error {
-	brew, err := ownbrew.New(p.l,
-		ownbrew.WithPackages(cfg...),
-	)
-	if err != nil {
-		return err
-	}
-	return brew.Install(ctx)
 }
 
 func (p *Plugin) Execute(ctx context.Context, args []string) error {
@@ -93,6 +101,15 @@ func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {
 		prompt.WithPrefix(cfg.Prefix),
 		prompt.WithContext(ctx),
 		prompt.WithCommands(p.commands),
+		prompt.WithCheckers(
+			func(ctx context.Context, l log.Logger) check.Info {
+				return check.Info{
+					Name:   "example",
+					Note:   "all good",
+					Status: check.StatusSuccess,
+				}
+			},
+		),
 		prompt.WithFileHistory(
 			history.FileWithLimit(cfg.History.Limit),
 			history.FileWithFilename(cfg.History.Filename),

@@ -2,8 +2,12 @@ package log
 
 type Logger interface {
 	Level() Level
+	IsLevel(level Level) bool
+	Named(name string) Logger
 	Print(a ...interface{})
 	Printf(format string, a ...interface{})
+	Success(a ...interface{})
+	Successf(format string, a ...interface{})
 	Debug(a ...interface{})
 	Debugf(format string, a ...interface{})
 	Info(a ...interface{})

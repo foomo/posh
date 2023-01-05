@@ -43,7 +43,7 @@ func NewGoMod(l log.Logger, cache cache.Cache) *GoMod {
 		Name: "gomod",
 		Nodes: []*tree.Node{
 			{
-				Name:        "tidy",
+				Name:        "tidy", // docker prod stae
 				Description: "run go mod tidy",
 				Args:        []*tree.Arg{pathArg},
 				Execute:     inst.tidy,

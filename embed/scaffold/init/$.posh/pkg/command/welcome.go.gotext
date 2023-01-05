@@ -1,0 +1,58 @@
+package command
+
+import (
+	"context"
+	"io/fs"
+	"path"
+
+	"github.com/charlievieth/fastwalk"
+	"github.com/foomo/posh/pkg/cache"
+	"github.com/foomo/posh/pkg/command/tree"
+	"github.com/foomo/posh/pkg/log"
+	"github.com/foomo/posh/pkg/prompt"
+	"github.com/foomo/posh/pkg/readline"
+	"github.com/foomo/posh/pkg/shell"
+	"github.com/foomo/posh/pkg/util/suggests"
+)
+
+type Welcome struct {
+	l    log.Logger
+	name string
+}
+
+// ------------------------------------------------------------------------------------------------
+// ~ Constructor
+// ------------------------------------------------------------------------------------------------
+
+func NewWelcome(l log.Logger, cache cache.Cache) *Welcome {
+	inst := &Welcome{
+		l: l,
+		name: "welcome",
+	}
+	return inst
+}
+
+// ------------------------------------------------------------------------------------------------
+// ~ Public methods
+// ------------------------------------------------------------------------------------------------
+
+func (c *Welcome) Name() string {
+	return c.name
+}
+
+func (c *Welcome) Description() string {
+	return "print a welcome message"
+}
+
+func (c *Welcome) Execute(ctx context.Context, r *readline.Readline) error {
+	c.l.Success("Hi, thanks for using posh!")
+	return nil
+}
+
+func (c *Welcome) Help() string {
+	return `Print a welcome message
+
+Usage:
+  welcome
+`
+}

@@ -8,9 +8,13 @@ import (
 	"github.com/spf13/viper"
 )
 
-// packagesCmd represents the dependencies command
-var packagesCmd = &cobra.Command{
-	Use:           "packages",
+var (
+	brewCmdFlagDry bool
+)
+
+// brewCmd represents the dependencies command
+var brewCmd = &cobra.Command{
+	Use:           "brew",
 	Short:         "Check and install required packages.",
 	SilenceUsage:  true,
 	SilenceErrors: true,
@@ -21,20 +25,22 @@ var packagesCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var cfg []config.Package
-		if err := viper.UnmarshalKey("packages", &cfg); err != nil {
+		var cfg config.Ownbrew
+		if err := viper.UnmarshalKey("ownbrew", &cfg); err != nil {
 			return err
 		}
+		cfg.Dry = brewCmdFlagDry
 
 		plg, err := intplugin.Load(cmd.Context(), l)
 		if err != nil {
 			return err
 		}
 
-		return plg.Packages(cmd.Context(), cfg)
+		return plg.Brew(cmd.Context(), cfg)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(packagesCmd)
+	rootCmd.AddCommand(brewCmd)
+	brewCmd.Flags().BoolVar(&brewCmdFlagDry, "dry", false, "don't execute scripts")
 }

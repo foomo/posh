@@ -40,7 +40,7 @@ func New(ctx context.Context, l log.Logger, inputs ...interface{}) *Shell {
 	cmd := exec.CommandContext(ctx, "sh", "-c")
 	cmd.Env = os.Environ()
 	return &Shell{
-		l:      l,
+		l:      l.Named("shell"),
 		cmd:    cmd,
 		args:   args,
 		Stdin:  os.Stdin,
@@ -119,7 +119,7 @@ func (s *Shell) Wait() error {
 // ------------------------------------------------------------------------------------------------
 
 func (s *Shell) debug() {
-	s.l.Debugf(`"Executing:
+	s.l.Debug(`"Executing:
 $ %s
 
 Directory: %s

@@ -46,7 +46,7 @@ func WithRegex(v *regexp.Regexp) Option {
 
 func New(l log.Logger, opts ...Option) (*Readline, error) {
 	inst := &Readline{
-		l:     l,
+		l:     l.Named("readline"),
 		regex: regexp.MustCompile(`[^\s"']+|"([^"]*)"|'([^']*)'|(\s$)`),
 	}
 	for _, opt := range opts {
@@ -288,6 +288,7 @@ func (a *FlagSet) GetString(name string) string {
 		return f.Value.String()
 	}
 }
+
 func (a *FlagSet) GetInt64(name string) int64 {
 	if value := a.GetString(name); value == "" {
 		return 0
@@ -317,6 +318,7 @@ func (a *FlagSet) GetBool(name string) bool {
 		return v
 	}
 }
+
 func (a *FlagSet) flagIsSet(name string) bool {
 	found := false
 	if fs := a.FlagSet; fs != nil {

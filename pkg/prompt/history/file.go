@@ -30,7 +30,7 @@ type (
 
 func NewFile(l log.Logger, opts ...FileOption) (*File, error) {
 	inst := &File{
-		l:            l,
+		l:            l.Named("history"),
 		limit:        100,
 		filename:     ".posh/history",
 		lockFilename: ".posh/history.lock",
