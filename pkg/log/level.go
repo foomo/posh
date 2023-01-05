@@ -42,5 +42,4 @@ func (l Level) String() string {
 	default:
 		return ""
 	}
-
 }
