@@ -18,7 +18,7 @@ jobs:
         with:
           go-version-file: go.mod
       - id: app_token
-        uses: tibdex/github-app-token@1
+        uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.TOKEN_APP_ID }}
           private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
