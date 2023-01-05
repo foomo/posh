@@ -6,6 +6,7 @@ require (
 	github.com/1Password/connect-sdk-go v1.5.0
 	github.com/Masterminds/semver/v3 v3.2.0
 	github.com/Masterminds/sprig/v3 v3.2.3
+	github.com/alecthomas/chroma v0.10.0
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/foomo/fender v0.4.4
 	github.com/go-git/go-git/v5 v5.5.1
@@ -27,6 +28,7 @@ require (
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/cloudflare/circl v1.1.0 // indirect
 	github.com/containerd/console v1.0.3 // indirect
+	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect

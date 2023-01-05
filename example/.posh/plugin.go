@@ -6,13 +6,13 @@ import (
 	"strings"
 
 	"github.com/foomo/fender/fend"
-	command2 "github.com/foomo/posh/example/posh/command"
+	pkgcommand "github.com/foomo/posh/example/posh/pkg/command"
 	"github.com/foomo/posh/integration/onepassword"
+	"github.com/foomo/posh/integration/ownbrew"
 	"github.com/foomo/posh/pkg/cache"
 	"github.com/foomo/posh/pkg/command"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
-	"github.com/foomo/posh/pkg/ownbrew"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/foomo/posh/pkg/prompt"
 	"github.com/foomo/posh/pkg/prompt/check"
@@ -32,7 +32,7 @@ type Plugin struct {
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
 
-func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
+func New(l log.Logger) (plugin.Plugin, error) {
 	inst := &Plugin{
 		l:        l,
 		c:        cache.MemoryCache{},
@@ -40,23 +40,25 @@ func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
 	}
 
 	var (
-		err               error
-		onePasswordCfg    onepassword.Config
-		onePasswordClient *onepassword.OnePassword
+		err            error
+		onePassword    *onepassword.OnePassword
+		onePasswordCfg onepassword.Config
 	)
 
 	// load configurations
 	l.Must(viper.UnmarshalKey("onePassword", &onePasswordCfg))
 
 	// create dependency instances
-	onePasswordClient, err = onepassword.New(l, inst.c, onepassword.WithTokenFilename(onePasswordCfg.TokenFilename))
-	l.Must(err)
+	onePassword, err = onepassword.New(l, inst.c, onepassword.WithTokenFilename(onePasswordCfg.TokenFilename))
+	if err != nil {
+		return nil, err
+	}
 
 	// add commands
 	inst.commands.Add(
-		command2.NewGoMod(l, inst.c),
-		command2.NewGoGenerate(l, inst.c),
-		onepassword.NewCommand(l, onePasswordCfg, onePasswordClient),
+		pkgcommand.NewGoMod(l, inst.c),
+		pkgcommand.NewGoGenerate(l, inst.c),
+		onepassword.NewCommand(l, onePasswordCfg, onePassword),
 		command.NewCache(l, inst.c),
 		command.NewExit(l),
 		command.NewHelp(l, inst.commands),
@@ -67,6 +69,21 @@ func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
 // ------------------------------------------------------------------------------------------------
 // ~ Public methods
 // ------------------------------------------------------------------------------------------------
+
+func (p *Plugin) Brew(ctx context.Context, cfg config.Ownbrew) error {
+	brew, err := ownbrew.New(p.l,
+		ownbrew.WithDry(cfg.Dry),
+		ownbrew.WithBinDir(cfg.BinDir),
+		ownbrew.WithTapDir(cfg.TapDir),
+		ownbrew.WithTempDir(cfg.TempDir),
+		ownbrew.WithCellarDir(cfg.CellarDir),
+		ownbrew.WithPackages(cfg.Packages...),
+	)
+	if err != nil {
+		return err
+	}
+	return brew.Install(ctx)
+}
 
 func (p *Plugin) Dependencies(ctx context.Context, cfg config.Dependencies) error {
 	var fends []fend.Fend
@@ -82,16 +99,6 @@ func (p *Plugin) Dependencies(ctx context.Context, cfg config.Dependencies) erro
 		return fendErr
 	}
 	return nil
-}
-
-func (p *Plugin) Packages(ctx context.Context, cfg []config.Package) error {
-	brew, err := ownbrew.New(p.l,
-		ownbrew.WithPackages(cfg...),
-	)
-	if err != nil {
-		return err
-	}
-	return brew.Install(ctx)
 }
 
 func (p *Plugin) Execute(ctx context.Context, args []string) error {

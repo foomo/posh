@@ -127,7 +127,7 @@ func WithPromptOptions(v ...prompt.Option) Option {
 
 func New(l log.Logger, opts ...Option) (*Prompt, error) {
 	inst := &Prompt{
-		l:        l,
+		l:        l.Named("prompt"),
 		ctx:      context.Background(),
 		title:    "posh",
 		prefix:   "> ",

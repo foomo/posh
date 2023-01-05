@@ -26,3 +26,20 @@ func GetLevel(v string) Level {
 		return LevelInfo
 	}
 }
+
+func (l Level) String() string {
+	switch l {
+	case LevelTrace:
+		return "trace"
+	case LevelDebug:
+		return "debug"
+	case LevelInfo:
+		return "info"
+	case LevelWarn:
+		return "warn"
+	case LevelError:
+		return "error"
+	default:
+		return ""
+	}
+}

@@ -143,7 +143,7 @@ func (op *OnePassword) SignIn(ctx context.Context, account string) error {
 	} else if err := os.Setenv(fmt.Sprintf("OP_SESSION_%s", account), token); err != nil {
 		return err
 	} else {
-		op.l.Infof(`If you need op outside the shell, run:
+		op.l.Info(`If you need op outside the shell, run:
 
 $ export OP_SESSION_%s=%s
 `, account, token)
@@ -155,7 +155,7 @@ $ export OP_SESSION_%s=%s
 		} else if err := os.WriteFile(op.tokenFilename, []byte(fmt.Sprintf("OP_SESSION_%s=%s\n", account, token)), 0600); err != nil {
 			return err
 		} else {
-			op.l.Infof(`Session env has been stored for your convenience at:
+			op.l.Info(`Session env has been stored for your convenience at:
 
 %s
 `, op.tokenFilename)
@@ -350,11 +350,11 @@ func (op *OnePassword) watch(account string) {
 		go func() {
 			for {
 				if ok, err := op.Session(account); err != nil {
-					op.l.Warnf("\n1password session keep alive failed for '%s' (%s)", account, err.Error())
+					op.l.Warn("\n1password session keep alive failed for '%s' (%s)", account, err.Error())
 					op.watching[account] = false
 					return
 				} else if !ok {
-					op.l.Warnf("\n1password session keep alive failed for '%s'", account)
+					op.l.Warn("\n1password session keep alive failed for '%s'", account)
 					op.watching[account] = false
 					return
 				}

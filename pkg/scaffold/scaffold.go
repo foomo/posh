@@ -1,14 +1,17 @@
 package scaffold
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
+	"github.com/alecthomas/chroma/quick"
 	"github.com/foomo/posh/pkg/log"
 	"github.com/pkg/errors"
 )
@@ -41,13 +44,6 @@ func WithOverride(v bool) Option {
 	}
 }
 
-func WithLogger(v log.Logger) Option {
-	return func(o *Scaffold) error {
-		o.l = v
-		return nil
-	}
-}
-
 func WithDirectories(v ...Directory) Option {
 	return func(o *Scaffold) error {
 		o.directories = append(o.directories, v...)
@@ -59,9 +55,9 @@ func WithDirectories(v ...Directory) Option {
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
 
-func New(opts ...Option) (*Scaffold, error) {
+func New(l log.Logger, opts ...Option) (*Scaffold, error) {
 	inst := &Scaffold{
-		l:        log.NewFmt(),
+		l:        l.Named("scaffold"),
 		dry:      false,
 		override: false,
 	}
@@ -111,7 +107,7 @@ func (s *Scaffold) scaffoldTemplate(target string, tpl *template.Template, data 
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
-			s.l.Warnf("failed to close file: %s", err.Error())
+			s.l.Warn("failed to close file: %s", err.Error())
 		}
 	}()
 	return tpl.Execute(file, data)
@@ -119,8 +115,13 @@ func (s *Scaffold) scaffoldTemplate(target string, tpl *template.Template, data 
 
 func (s *Scaffold) printTemplate(msg, target string, tpl *template.Template, data any) error {
 	border := strings.Repeat("-", 80)
-	s.l.Infof("%s\n%s: %s\n%s", border, msg, target, border)
-	return tpl.Execute(os.Stdout, data)
+	s.l.Infof("\n%s\n%s: %s\n%s", border, msg, target, border)
+
+	var out bytes.Buffer
+	if err := tpl.Execute(&out, data); err != nil {
+		return err
+	}
+	return quick.Highlight(os.Stdout, out.String(), filepath.Ext(target), "terminal", "monokai")
 }
 
 func (s *Scaffold) renderDirectories() error {

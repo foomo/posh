@@ -15,8 +15,10 @@ require (
 	atomicgo.dev/keyboard v0.2.8 // indirect
 	github.com/1Password/connect-sdk-go v1.5.0 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
+	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/c-bata/go-prompt v0.2.6 // indirect
 	github.com/containerd/console v1.0.3 // indirect
+	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
