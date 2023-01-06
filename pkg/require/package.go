@@ -1,4 +1,4 @@
-package validate
+package require
 
 import (
 	"context"
@@ -14,17 +14,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-type DependenciesPackageRule func(ctx context.Context, l log.Logger, v config.DependenciesPackage) rule.Rule
+type PackageRule func(ctx context.Context, l log.Logger, v config.RequirePackage) rule.Rule
 
-func DependenciesPackages(ctx context.Context, l log.Logger, v []config.DependenciesPackage) []fend.Fend {
+func Packages(ctx context.Context, l log.Logger, v []config.RequirePackage) []fend.Fend {
 	ret := make([]fend.Fend, len(v))
 	for i, vv := range v {
-		ret[i] = DependenciesPackage(ctx, l, vv, DependenciesPackageExists, DependenciesPackageVersion)
+		ret[i] = Package(ctx, l, vv, PackageExists, PackageVersion)
 	}
 	return ret
 }
 
-func DependenciesPackage(ctx context.Context, l log.Logger, v config.DependenciesPackage, rules ...DependenciesPackageRule) fend.Fend {
+func Package(ctx context.Context, l log.Logger, v config.RequirePackage, rules ...PackageRule) fend.Fend {
 	return func() []rule.Rule {
 		ret := make([]rule.Rule, len(rules))
 		for i, r := range rules {
@@ -34,7 +34,7 @@ func DependenciesPackage(ctx context.Context, l log.Logger, v config.Dependencie
 	}
 }
 
-func DependenciesPackageExists(ctx context.Context, l log.Logger, v config.DependenciesPackage) rule.Rule {
+func PackageExists(ctx context.Context, l log.Logger, v config.RequirePackage) rule.Rule {
 	return func() (*rule.Error, error) {
 		l.Debug("validate package exists:", v.String())
 		if output, err := exec.LookPath(v.Name); err != nil {
@@ -49,7 +49,7 @@ func DependenciesPackageExists(ctx context.Context, l log.Logger, v config.Depen
 	}
 }
 
-func DependenciesPackageVersion(ctx context.Context, l log.Logger, v config.DependenciesPackage) rule.Rule {
+func PackageVersion(ctx context.Context, l log.Logger, v config.RequirePackage) rule.Rule {
 	return func() (*rule.Error, error) {
 		l.Debug("validate package version:", v.String())
 		if output, err := exec.CommandContext(ctx, "sh", "-c", v.Command).CombinedOutput(); err != nil {

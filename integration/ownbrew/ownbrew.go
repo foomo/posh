@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alecthomas/chroma/quick"
 	"github.com/foomo/posh/pkg/log"
+	"github.com/foomo/posh/pkg/util/prints"
 	"github.com/pkg/errors"
 )
 
@@ -194,7 +194,7 @@ func (o *Ownbrew) installLocal(ctx context.Context, pkg Package) error {
 		if value, err := os.ReadFile(filename); err != nil {
 			return errors.Wrap(err, "failed to read file")
 		} else {
-			o.print(filename, string(value))
+			prints.Code(o.l, filename, string(value), "sh")
 		}
 		return nil
 	}
@@ -250,7 +250,7 @@ func (o *Ownbrew) installRemote(ctx context.Context, pkg Package) error {
 		if value, err := io.ReadAll(resp.Body); err != nil {
 			return err
 		} else {
-			o.print(url, string(value))
+			prints.Code(o.l, url, string(value), "sh")
 		}
 		return nil
 	}
@@ -277,15 +277,6 @@ func (o *Ownbrew) installRemote(ctx context.Context, pkg Package) error {
 	}
 
 	return nil
-}
-
-func (o *Ownbrew) print(source, value string) {
-	border := strings.Repeat("-", 80)
-	o.l.Infof("\n%s\n%s\n%s", border, source, border)
-	if err := quick.Highlight(os.Stdout, value, "sh", "terminal", "monokai"); err != nil {
-		o.l.Debug(err.Error())
-		o.l.Print(value)
-	}
 }
 
 func (o *Ownbrew) localTapExists(filename string) (bool, error) {

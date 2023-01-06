@@ -1,13 +1,12 @@
 package readline
 
 import (
-	"flag"
 	"fmt"
 	"regexp"
-	"strconv"
 	"sync"
 
 	"github.com/foomo/posh/pkg/log"
+	"github.com/spf13/pflag"
 )
 
 type (
@@ -219,30 +218,30 @@ func (a *Readline) IsModeAdditional() bool {
 	return a.Mode() == ModeAdditionalArgs
 }
 
-func (a *Readline) AllFlags() []*flag.Flag {
-	var ret []*flag.Flag
+func (a *Readline) AllFlags() []*pflag.Flag {
+	var ret []*pflag.Flag
 	if fs := a.FlagSet(); fs != nil {
-		fs.VisitAll(func(f *flag.Flag) {
+		fs.VisitAll(func(f *pflag.Flag) {
 			ret = append(ret, f)
 		})
 	}
 	return ret
 }
 
-func (a *Readline) VisitedFlags() []*flag.Flag {
-	var ret []*flag.Flag
+func (a *Readline) VisitedFlags() []*pflag.Flag {
+	var ret []*pflag.Flag
 	if fs := a.FlagSet(); fs != nil {
-		fs.Visit(func(f *flag.Flag) {
+		fs.Visit(func(f *pflag.Flag) {
 			ret = append(ret, f)
 		})
 	}
 	return ret
 }
 
-func (a *Readline) AllPassThroughFlags() []*flag.Flag {
-	var ret []*flag.Flag
+func (a *Readline) AllPassThroughFlags() []*pflag.Flag {
+	var ret []*pflag.Flag
 	if fs := a.PassThroughFlagSet(); fs != nil {
-		fs.VisitAll(func(f *flag.Flag) {
+		fs.VisitAll(func(f *pflag.Flag) {
 			ret = append(ret, f)
 		})
 	}
@@ -263,70 +262,4 @@ func (a *Readline) reset() {
 	a.passThroughFlags = nil
 	a.passThroughFlagSet = nil
 	a.additionalArgs = nil
-}
-
-type FlagSet struct {
-	*flag.FlagSet
-}
-
-func NewFlagSet(handler func(set *FlagSet)) *FlagSet {
-	inst := &FlagSet{
-		FlagSet: flag.NewFlagSet("readline", flag.ContinueOnError),
-	}
-	if handler != nil {
-		handler(inst)
-	}
-	return inst
-}
-
-func (a *FlagSet) GetString(name string) string {
-	if f := a.FlagSet.Lookup(name); f == nil {
-		return ""
-	} else if !a.flagIsSet(name) {
-		return f.DefValue
-	} else {
-		return f.Value.String()
-	}
-}
-
-func (a *FlagSet) GetInt64(name string) int64 {
-	if value := a.GetString(name); value == "" {
-		return 0
-	} else if v, err := strconv.ParseInt(value, 10, 64); err != nil {
-		return 0
-	} else {
-		return v
-	}
-}
-
-func (a *FlagSet) GetFloat64(name string) float64 {
-	if value := a.GetString(name); value == "" {
-		return 0
-	} else if v, err := strconv.ParseFloat(value, 64); err != nil {
-		return 0
-	} else {
-		return v
-	}
-}
-
-func (a *FlagSet) GetBool(name string) bool {
-	if value := a.GetString(name); value == "" {
-		return false
-	} else if v, err := strconv.ParseBool(value); err != nil {
-		return false
-	} else {
-		return v
-	}
-}
-
-func (a *FlagSet) flagIsSet(name string) bool {
-	found := false
-	if fs := a.FlagSet; fs != nil {
-		fs.Visit(func(f *flag.Flag) {
-			if f.Name == name {
-				found = true
-			}
-		})
-	}
-	return found
 }

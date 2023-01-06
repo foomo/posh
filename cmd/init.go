@@ -5,9 +5,9 @@ import (
 	"path"
 
 	"github.com/foomo/posh/embed"
-	"github.com/foomo/posh/internal/git"
+	scaffold2 "github.com/foomo/posh/integration/scaffold"
+	"github.com/foomo/posh/internal/util/git"
 	"github.com/foomo/posh/pkg/env"
-	"github.com/foomo/posh/pkg/scaffold"
 	"github.com/spf13/cobra"
 )
 
@@ -41,11 +41,11 @@ Posh init must be run inside of a go module (please run "go mod init <MODNAME> f
 			return err
 		}
 
-		sc, err := scaffold.New(
+		sc, err := scaffold2.New(
 			l,
-			scaffold.WithDry(initCmdFlagDry),
-			scaffold.WithOverride(initCmdFlagOverride),
-			scaffold.WithDirectories(scaffold.Directory{
+			scaffold2.WithDry(initCmdFlagDry),
+			scaffold2.WithOverride(initCmdFlagOverride),
+			scaffold2.WithDirectories(scaffold2.Directory{
 				Source: fs,
 				Target: os.Getenv(env.ProjectRoot),
 				Data:   data,

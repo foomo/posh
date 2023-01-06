@@ -5,7 +5,13 @@ import "github.com/c-bata/go-prompt"
 type MemoryNamespace map[string]interface{}
 
 func (c MemoryNamespace) Delete(key string) {
-	delete(c, key)
+	if key == "" {
+		for key := range c {
+			delete(c, key)
+		}
+	} else {
+		delete(c, key)
+	}
 }
 
 func (c MemoryNamespace) Get(key string, cb func() interface{}) interface{} {

@@ -11,8 +11,8 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
-	"github.com/alecthomas/chroma/quick"
 	"github.com/foomo/posh/pkg/log"
+	"github.com/foomo/posh/pkg/util/prints"
 	"github.com/pkg/errors"
 )
 
@@ -85,6 +85,7 @@ func (s *Scaffold) Render(ctx context.Context) error {
 // ------------------------------------------------------------------------------------------------
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
+
 func (s *Scaffold) scaffoldDir(target string) error {
 	s.l.Info("mkdir:", s.filename(target))
 	if stat, err := os.Stat(target); errors.Is(err, os.ErrNotExist) {
@@ -114,14 +115,12 @@ func (s *Scaffold) scaffoldTemplate(target string, tpl *template.Template, data 
 }
 
 func (s *Scaffold) printTemplate(msg, target string, tpl *template.Template, data any) error {
-	border := strings.Repeat("-", 80)
-	s.l.Infof("\n%s\n%s: %s\n%s", border, msg, target, border)
-
 	var out bytes.Buffer
 	if err := tpl.Execute(&out, data); err != nil {
 		return err
 	}
-	return quick.Highlight(os.Stdout, out.String(), filepath.Ext(target), "terminal", "monokai")
+	prints.Code(s.l, fmt.Sprintf("%s: %s", msg, target), out.String(), filepath.Ext(target))
+	return nil
 }
 
 func (s *Scaffold) renderDirectories() error {
