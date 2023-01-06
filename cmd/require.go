@@ -8,10 +8,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-// dependenciesCmd represents the dependencies command
-var dependenciesCmd = &cobra.Command{
-	Use:           "dependencies",
-	Short:         "Run dependency validations",
+// requireCmd represents the require command
+var requireCmd = &cobra.Command{
+	Use:           "require",
+	Short:         "Validate configured requirements",
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
@@ -21,8 +21,8 @@ var dependenciesCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var cfg config.Dependencies
-		if err := viper.UnmarshalKey("dependencies", &cfg); err != nil {
+		var cfg config.Require
+		if err := viper.UnmarshalKey("require", &cfg); err != nil {
 			return err
 		}
 
@@ -31,10 +31,10 @@ var dependenciesCmd = &cobra.Command{
 			return err
 		}
 
-		return plg.Dependencies(cmd.Context(), cfg)
+		return plg.Require(cmd.Context(), cfg)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(dependenciesCmd)
+	rootCmd.AddCommand(requireCmd)
 }
