@@ -6,12 +6,13 @@ on:
       - v*.*.*
   workflow_dispatch:
 
+env:
+  GOFLAGS: -mod=readonly
+  GOPROXY: https://proxy.golang.org
+
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      GOFLAGS: -mod=readonly
-      GOPROXY: https://proxy.golang.org
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3

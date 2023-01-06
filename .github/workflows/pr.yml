@@ -1,6 +1,8 @@
 name: Pull requests
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -29,9 +31,6 @@ jobs:
     strategy:
       matrix:
         gomod: ${{ fromJson(needs.matrix.outputs.gomod) }}
-    env:
-      GOFLAGS: -mod=readonly
-      GOPROXY: https://proxy.golang.org
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
