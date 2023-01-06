@@ -2,34 +2,55 @@ package command
 
 import (
 	"context"
-	"io/fs"
-	"path"
 
-	"github.com/charlievieth/fastwalk"
-	"github.com/foomo/posh/pkg/cache"
-	"github.com/foomo/posh/pkg/command/tree"
+	"{{.module}}/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
-	"github.com/foomo/posh/pkg/prompt"
 	"github.com/foomo/posh/pkg/readline"
-	"github.com/foomo/posh/pkg/shell"
-	"github.com/foomo/posh/pkg/util/suggests"
+	"github.com/spf13/viper"
 )
 
-type Welcome struct {
-	l    log.Logger
-	name string
+type (
+	Welcome struct {
+		l         log.Logger
+		cfg       config.Welcome
+		name      string
+		configKey string
+	}
+	WelcomeOption func(*Welcome) error
+)
+
+// ------------------------------------------------------------------------------------------------
+// ~ Options
+// ------------------------------------------------------------------------------------------------
+
+func WelcomeWithConfigKey(v string) WelcomeOption {
+	return func(o *Welcome) error {
+		o.configKey = v
+		return nil
+	}
 }
 
 // ------------------------------------------------------------------------------------------------
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
 
-func NewWelcome(l log.Logger, cache cache.Cache) *Welcome {
+func NewWelcome(l log.Logger, opts ...WelcomeOption) (*Welcome, error) {
 	inst := &Welcome{
-		l: l,
-		name: "welcome",
+		l:         l,
+		name:      "welcome",
+		configKey: "welcome",
 	}
-	return inst
+	for _, opt := range opts {
+		if opt != nil {
+			if err := opt(inst); err != nil {
+				return nil, err
+			}
+		}
+	}
+	if err := viper.UnmarshalKey(inst.configKey, &inst.cfg); err != nil {
+		return nil, err
+	}
+	return inst, nil
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -45,7 +66,7 @@ func (c *Welcome) Description() string {
 }
 
 func (c *Welcome) Execute(ctx context.Context, r *readline.Readline) error {
-	c.l.Success("Hi, thanks for using posh!")
+	c.l.Success(c.cfg.Message)
 	return nil
 }
 

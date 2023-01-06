@@ -20,9 +20,9 @@ var versionCmd = &cobra.Command{
 			buildTime = time.Unix(value, 0).String()
 		}
 		if l.IsLevel(log.LevelDebug) {
-			l.Print("v%s, Commit: %s, BuildTime: %s", intversion.Version, intversion.CommitHash, buildTime)
+			l.Printf("v%s, Commit: %s, BuildTime: %s", intversion.Version, intversion.CommitHash, buildTime)
 		} else {
-			l.Print("v%s", intversion.Version)
+			l.Printf("v%s", intversion.Version)
 		}
 	},
 }

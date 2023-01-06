@@ -1,4 +1,4 @@
-package validate
+package require
 
 import (
 	"context"
@@ -11,17 +11,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-type DependenciesScriptRule func(ctx context.Context, l log.Logger, v config.DependenciesScript) rule.Rule
+type ScriptRule func(ctx context.Context, l log.Logger, v config.RequireScript) rule.Rule
 
-func DependenciesScripts(ctx context.Context, l log.Logger, v []config.DependenciesScript) []fend.Fend {
+func Scripts(ctx context.Context, l log.Logger, v []config.RequireScript) []fend.Fend {
 	ret := make([]fend.Fend, len(v))
 	for i, vv := range v {
-		ret[i] = DependenciesScript(ctx, l, vv, DependenciesScriptStatus)
+		ret[i] = Script(ctx, l, vv, ScriptStatus)
 	}
 	return ret
 }
 
-func DependenciesScript(ctx context.Context, l log.Logger, v config.DependenciesScript, rules ...DependenciesScriptRule) fend.Fend {
+func Script(ctx context.Context, l log.Logger, v config.RequireScript, rules ...ScriptRule) fend.Fend {
 	return func() []rule.Rule {
 		ret := make([]rule.Rule, len(rules))
 		for i, r := range rules {
@@ -31,7 +31,7 @@ func DependenciesScript(ctx context.Context, l log.Logger, v config.Dependencies
 	}
 }
 
-func DependenciesScriptStatus(ctx context.Context, l log.Logger, v config.DependenciesScript) rule.Rule {
+func ScriptStatus(ctx context.Context, l log.Logger, v config.RequireScript) rule.Rule {
 	return func() (*rule.Error, error) {
 		l.Debug("validate script status:", v.String())
 		if output, err := exec.CommandContext(ctx, "sh", "-c", v.Command).CombinedOutput(); err != nil {

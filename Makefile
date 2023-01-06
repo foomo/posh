@@ -51,6 +51,17 @@ lint.super:
 		-v $(PWD):/tmp/lint \
 		github/super-linter
 
+.PHONY: install
+## Run go install
+install:
+	@go install main.go
+	@mv "${GOPATH}/bin/main" "${GOPATH}/bin/posh"
+
+.PHONY: install.debug
+## Run go install with debug
+install.debug:
+	@go install -gcflags "all=-N -l" main.go
+
 ## === Utils ===
 
 ## Show help text

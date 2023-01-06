@@ -8,6 +8,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alecthomas/chroma v0.10.0
 	github.com/c-bata/go-prompt v0.2.6
+	github.com/charlievieth/fastwalk v1.0.1
 	github.com/foomo/fender v0.4.4
 	github.com/go-git/go-git/v5 v5.5.1
 	github.com/gofrs/flock v0.8.1
@@ -15,6 +16,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pterm/pterm v0.12.51
 	github.com/spf13/cobra v1.6.1
+	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
 	github.com/whilp/git-urls v1.0.0
 )
@@ -66,7 +68,6 @@ require (
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect

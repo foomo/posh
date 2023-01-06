@@ -14,6 +14,14 @@ func (a Args) At(v int) string {
 	}
 }
 
+func (a Args) Shift() (string, Args) {
+	if a.HasIndex(0) {
+		return a[0], a[1:]
+	} else {
+		return "", nil
+	}
+}
+
 func (a Args) Empty() bool {
 	return a == nil || a.LenIs(0)
 }
