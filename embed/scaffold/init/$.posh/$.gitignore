@@ -1,4 +1,4 @@
 *.so
 *.lock
 tmp/
-config/
+/config/

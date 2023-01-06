@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	pkgcommand "{{.module}}/posh/pkg/command"
+	pkgconfig "{{.module}}/posh/pkg/config"
 	"github.com/foomo/fender/fend"
 	"github.com/foomo/posh/pkg/command"
 	"github.com/foomo/posh/pkg/config"
@@ -16,7 +17,8 @@ import (
 	"github.com/foomo/posh/pkg/prompt/check"
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
-	"github.com/foomo/posh/pkg/validate"
+	"github.com/foomo/posh/pkg/require"
+	"github.com/spf13/viper"
 )
 
 type Plugin struct {
@@ -38,8 +40,14 @@ func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
 	inst.commands.Add(
 		command.NewExit(l),
 		command.NewHelp(l, inst.commands),
-		pkgcommand.NewWelcome(l),
 	)
+
+	// Welcome
+	if cmd, err := pkgcommand.NewWelcome(l); err != nil {
+		return nil, err
+	} else {
+		inst.commands.Add(cmd)
+	}
 
 	return inst, nil
 }
@@ -63,17 +71,12 @@ func (p *Plugin) Brew(ctx context.Context, cfg config.Ownbrew) error {
 	return brew.Install(ctx)
 }
 
-func (p *Plugin) Dependencies(ctx context.Context, cfg config.Dependencies) error {
-	var fends []fend.Fend
-	fends = append(fends, validate.DependenciesEnvs(p.l, cfg.Envs)...)
-	fends = append(fends, validate.DependenciesScripts(ctx, p.l, cfg.Scripts)...)
-	fends = append(fends, validate.DependenciesPackages(ctx, p.l, cfg.Packages)...)
-	if fendErr, err := fend.First(fends...); err != nil {
-		return err
-	} else if fendErr != nil {
-		return fendErr
-	}
-	return nil
+func (p *Plugin) Require(ctx context.Context, cfg config.Dependencies) error {
+	return require.First(p.l,
+		require.Envs(p.l, cfg.Envs),
+		require.Packages(ctx, p.l, cfg.Packages),
+		require.Scripts(ctx, p.l, cfg.Scripts),
+	)
 }
 
 func (p *Plugin) Execute(ctx context.Context, args []string) error {

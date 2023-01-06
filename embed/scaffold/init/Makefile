@@ -2,19 +2,19 @@
 
 ## === Tasks ===
 
-.PHONY: dependencies
+.PHONY: brew
+## Install packages
+brew:
+	@posh brew
+
+.PHONY: require
 ## Validate dependencies
-dependencies:
-	@posh dependencies
+require:
+	@posh require
 
 .PHONY: shell
-## Install project specific packages
-packages:
-	@posh packages
-
-.PHONY: shell
-## Start the interactive
-shell: dependencies packages
+## Start the interactive shell
+shell: require brew
 	@posh prompt
 
 ## === Utils ===
@@ -22,31 +22,31 @@ shell: dependencies packages
 ## Show help text
 help:
 	@awk '{ \
-			if ($$0 ~ /^.PHONY: [a-zA-Z\-\_0-9]+$$/) { \
-				helpCommand = substr($$0, index($$0, ":") + 2); \
-				if (helpMessage) { \
-					printf "\033[36m%-23s\033[0m %s\n", \
-						helpCommand, helpMessage; \
-					helpMessage = ""; \
-				} \
-			} else if ($$0 ~ /^[a-zA-Z\-\_0-9.]+:/) { \
-				helpCommand = substr($$0, 0, index($$0, ":")); \
-				if (helpMessage) { \
-					printf "\033[36m%-23s\033[0m %s\n", \
-						helpCommand, helpMessage"\n"; \
-					helpMessage = ""; \
-				} \
-			} else if ($$0 ~ /^##/) { \
-				if (helpMessage) { \
-					helpMessage = helpMessage"\n                        "substr($$0, 3); \
-				} else { \
-					helpMessage = substr($$0, 3); \
-				} \
-			} else { \
-				if (helpMessage) { \
-					print "\n                        "helpMessage"\n" \
-				} \
+		if ($$0 ~ /^.PHONY: [a-zA-Z\-\_0-9]+$$/) { \
+			helpCommand = substr($$0, index($$0, ":") + 2); \
+			if (helpMessage) { \
+				printf "\033[36m%-23s\033[0m %s\n", \
+					helpCommand, helpMessage; \
 				helpMessage = ""; \
 			} \
-		}' \
-		$(MAKEFILE_LIST)
+		} else if ($$0 ~ /^[a-zA-Z\-\_0-9.]+:/) { \
+			helpCommand = substr($$0, 0, index($$0, ":")); \
+			if (helpMessage) { \
+				printf "\033[36m%-23s\033[0m %s\n", \
+					helpCommand, helpMessage"\n"; \
+				helpMessage = ""; \
+			} \
+		} else if ($$0 ~ /^##/) { \
+			if (helpMessage) { \
+				helpMessage = helpMessage"\n                        "substr($$0, 3); \
+			} else { \
+				helpMessage = substr($$0, 3); \
+			} \
+		} else { \
+			if (helpMessage) { \
+				print "\n                        "helpMessage"\n" \
+			} \
+			helpMessage = ""; \
+		} \
+	}' \
+	$(MAKEFILE_LIST)
