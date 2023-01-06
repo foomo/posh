@@ -8,36 +8,28 @@ check: tidy lint test
 
 .PHONY: tidy
 ## Run go mod tidy
-tidy: files=$(shell find . -type f -name go.mod)
-tidy: dirs=$(foreach file,$(files),$(dir $(file)) )
 tidy:
-	@for dir in $(dirs); do cd $$dir && go mod tidy; done
+	@go mod tidy
 
 .PHONY: outdated
 ## Show outdated direct dependencies
-outdated: files=$(shell find . -type f -name go.mod)
-outdated: dirs=$(foreach file,$(files),$(dir $(file)) )
 outdated:
-	@for dir in $(dirs); do cd $$dir && go list -u -m -json all | go-mod-outdated -update -direct; done
+	@go list -u -m -json all | go-mod-outdated -update -direct
 
 .PHONY: test
 ## Run tests
 test:
-	go test -v ./...
+	@go test -v ./...
 
 .PHONY: lint
 ## Run linter
-lint: files=$(shell find . -type f -name go.mod)
-lint: dirs=$(foreach file,$(files),$(dir $(file)) )
 lint:
-	@for dir in $(dirs); do cd $$dir && golangci-lint run; done
+	@golangci-lint run
 
 .PHONY: lint.fix
 ## Fix lint violations
-lint.fix: files=$(shell find . -type f -name go.mod)
-lint.fix: dirs=$(foreach file,$(files),$(dir $(file)) )
 lint.fix:
-	@for dir in $(dirs); do cd $$dir && golangci-lint run --fix; done
+	@golangci-lint run --fix
 
 .PHONY: lint.super
 ## Run super linter
