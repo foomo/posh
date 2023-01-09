@@ -3,29 +3,36 @@ package config
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/foomo/posh/pkg/log"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
-func Load(l log.Logger, configFile string) error {
-	// setup viper
-	if configFile != "" {
-		viper.SetConfigFile(configFile)
-	} else {
-		viper.AddConfigPath(".")
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".posh")
-	}
+func Load(l log.Logger) error {
+	var errNotFound viper.ConfigFileNotFoundError
 
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.AutomaticEnv()
-
+	viper.AddConfigPath(".")
+	viper.SetConfigType("yaml")
+	viper.SetConfigName(".posh")
 	if err := viper.ReadInConfig(); err != nil {
 		return err
 	} else {
 		l.Debug("using config file:", viper.ConfigFileUsed())
+	}
+
+	override := viper.New()
+	override.AddConfigPath(".")
+	override.SetConfigType("yaml")
+	override.SetConfigName(".posh.override")
+	if err := override.ReadInConfig(); errors.As(err, &errNotFound) {
+		// continue
+	} else if err != nil {
+		return err
+	} else if err := viper.MergeConfigMap(override.AllSettings()); err != nil {
+		return err
+	} else {
+		l.Debug("using override config file:", override.ConfigFileUsed())
 	}
 
 	// validate version
