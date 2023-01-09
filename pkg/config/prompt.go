@@ -2,9 +2,10 @@ package config
 
 type (
 	Prompt struct {
-		Title   string        `json:"title" yaml:"title"`
-		Prefix  string        `json:"prefix" yaml:"prefix"`
-		History PromptHistory `json:"history" yaml:"history"`
+		Title   string            `json:"title" yaml:"title"`
+		Prefix  string            `json:"prefix" yaml:"prefix"`
+		History PromptHistory     `json:"history" yaml:"history"`
+		Aliases map[string]string `json:"aliases" yaml:"aliases"`
 	}
 	PromptHistory struct {
 		Limit        int    `json:"limit" yaml:"limit"`

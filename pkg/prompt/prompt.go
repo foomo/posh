@@ -30,6 +30,7 @@ type (
 		readline *readline.Readline
 		history  history.History
 		commands command.Commands
+		aliases  map[string]string
 		// inputRegex - split cmd into args
 		promptOptions []prompt.Option
 	}
@@ -71,6 +72,13 @@ func WithCheck(v check.Check) Option {
 func WithCheckers(v ...check.Checker) Option {
 	return func(o *Prompt) error {
 		o.checkers = append(o.checkers, v...)
+		return nil
+	}
+}
+
+func WithAliases(v map[string]string) Option {
+	return func(o *Prompt) error {
+		o.aliases = v
 		return nil
 	}
 }
@@ -214,6 +222,18 @@ func (s *Prompt) Run() error {
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
 
+func (s *Prompt) alias(input string, aliases map[string]string) string {
+	if len(aliases) == 0 {
+		return input
+	} else if parts := strings.Split(input, " "); len(parts) == 0 {
+		return input
+	} else if value, ok := aliases[parts[0]]; !ok {
+		return input
+	} else {
+		return value + " " + strings.Join(parts[1:], " ")
+	}
+}
+
 func (s *Prompt) execute(input string) {
 	input = strings.TrimSpace(input)
 	if input == "" {
@@ -221,6 +241,8 @@ func (s *Prompt) execute(input string) {
 	}
 
 	s.history.Persist(s.ctx, input)
+
+	input = s.alias(input, s.aliases)
 
 	if err := s.readline.Parse(input); err != nil {
 		s.l.Error("failed to parse line:", err.Error())
@@ -254,6 +276,8 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 		return nil
 	}
 
+	input = s.alias(input, s.aliases)
+
 	if err := s.readline.Parse(input); err != nil {
 		s.l.Debug("failed to parse line:", err.Error())
 		return nil
@@ -263,6 +287,9 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 	// return root completion
 	if s.readline.IsModeDefault() && s.readline.Args().LenIs(0) {
 		var suggests []prompt.Suggest
+		for key, value := range s.aliases {
+			suggests = append(suggests, prompt.Suggest{Text: key, Description: "alias: " + value})
+		}
 		for _, inst := range s.Commands().List() {
 			suggests = append(suggests, prompt.Suggest{Text: inst.Name(), Description: inst.Description()})
 		}

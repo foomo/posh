@@ -91,7 +91,7 @@ func (p *Root) find(cmds []*Node, r *readline.Readline, i int) (*Node, int) {
 	arg := r.Args().At(i)
 	for _, cmd := range cmds {
 		if cmd.Name == arg {
-			if subCmd, j := p.find(cmd.Commands, r, i+1); subCmd != nil {
+			if subCmd, j := p.find(cmd.Nodes, r, i+1); subCmd != nil {
 				return subCmd, j
 			}
 			return cmd, i
@@ -99,7 +99,7 @@ func (p *Root) find(cmds []*Node, r *readline.Readline, i int) (*Node, int) {
 		if cmd.Names != nil {
 			for _, name := range cmd.Names() {
 				if name == arg {
-					if subCmd, j := p.find(cmd.Commands, r, i+1); subCmd != nil {
+					if subCmd, j := p.find(cmd.Nodes, r, i+1); subCmd != nil {
 						return subCmd, j
 					}
 				}

@@ -15,7 +15,6 @@ import (
 var (
 	l           log.Logger
 	flagLevel   string
-	flagConfig  string
 	flagNoColor bool
 )
 
@@ -60,7 +59,6 @@ func init() {
 	cobra.OnInitialize(initialize)
 	rootCmd.PersistentFlags().BoolVar(&flagNoColor, "no-color", false, "disabled colors (default is false)")
 	rootCmd.PersistentFlags().StringVar(&flagLevel, "level", "info", "set log level (default is warn)")
-	rootCmd.PersistentFlags().StringVar(&flagConfig, "config", "", "config file (default is $HOME/.posh.yml)")
 }
 
 // initialize reads in config file and ENV variables if set.
