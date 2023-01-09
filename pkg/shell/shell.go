@@ -119,7 +119,7 @@ func (s *Shell) Wait() error {
 // ------------------------------------------------------------------------------------------------
 
 func (s *Shell) debug() {
-	s.l.Debug(`"Executing:
+	s.l.Debugf(`"Executing:
 $ %s
 
 Directory: %s

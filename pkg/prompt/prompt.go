@@ -260,6 +260,7 @@ func (s *Prompt) execute(input string) {
 		if value, ok := cmd.(command.Validator); ok {
 			if err := value.Validate(ctx, s.readline); err != nil {
 				s.l.Error(err.Error())
+				return
 			}
 		}
 		if err := cmd.Execute(ctx, s.readline); err != nil {
