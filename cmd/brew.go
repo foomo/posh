@@ -19,7 +19,7 @@ var brewCmd = &cobra.Command{
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		if err := intconfig.Load(l, flagConfig); err != nil {
+		if err := intconfig.Load(l); err != nil {
 			return err
 		}
 		return nil

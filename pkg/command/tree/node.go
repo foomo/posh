@@ -17,7 +17,7 @@ type Node struct {
 	PassThroughArgs  Args
 	PassThroughFlags func(fs *readline.FlagSet)
 	Description      string
-	Commands         []*Node
+	Nodes            []*Node
 	Execute          func(ctx context.Context, args *readline.Readline) error
 }
 
@@ -48,8 +48,8 @@ func (c *Node) setFlags(r *readline.Readline, parse bool) error {
 func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readline, i int) []prompt.Suggest {
 	var suggest []prompt.Suggest
 	localArgs := r.Args()[i:]
-	if len(c.Commands) > 0 && len(localArgs) <= 1 {
-		for _, command := range c.Commands {
+	if len(c.Nodes) > 0 && len(localArgs) <= 1 {
+		for _, command := range c.Nodes {
 			suggest = append(suggest, prompt.Suggest{Text: command.Name, Description: command.Description})
 		}
 	} else if len(c.Args) >= len(localArgs) {
@@ -84,7 +84,7 @@ func (c *Node) completePassThroughFlags(r *readline.Readline) []prompt.Suggest {
 
 func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 	localArgs := r.Args()[i:]
-	if len(c.Commands) > 0 && len(localArgs) == 0 {
+	if len(c.Nodes) > 0 && len(localArgs) == 0 {
 		return errors.New("missing [command] argument")
 	} else if len(c.Args) > 0 {
 		for j, arg := range c.Args {
