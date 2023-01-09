@@ -3,7 +3,6 @@ package files
 import (
 	"context"
 	"io/fs"
-	"path"
 
 	"github.com/charlievieth/fastwalk"
 )
@@ -19,7 +18,7 @@ func Find(ctx context.Context, filename string) ([]string, error) {
 			return err
 		}
 		if d.Name() == filename {
-			ret = append(ret, path.Dir(p))
+			ret = append(ret, p)
 		}
 		return nil
 	}); err != nil {
