@@ -81,7 +81,7 @@ func (s *Shell) Run() error {
 		s.cmd.Stdout = s.Stdout
 		s.cmd.Stderr = s.Stderr
 	}
-	s.debug()
+	s.trace()
 	return s.cmd.Run()
 }
 
@@ -92,7 +92,7 @@ func (s *Shell) Output() ([]byte, error) {
 		s.cmd.Stdin = s.Stdin
 		s.cmd.Stderr = s.Stderr
 	}
-	s.debug()
+	s.trace()
 	return s.cmd.Output()
 }
 
@@ -104,7 +104,7 @@ func (s *Shell) Wait() error {
 		s.cmd.Stdout = s.Stdout
 		s.cmd.Stderr = s.Stderr
 	}
-	s.debug()
+	s.trace()
 	// start the process and wait till it's finished
 	if err := s.cmd.Start(); err != nil {
 		return err
@@ -118,8 +118,8 @@ func (s *Shell) Wait() error {
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
 
-func (s *Shell) debug() {
-	s.l.Debugf(`"Executing:
+func (s *Shell) trace() {
+	s.l.Tracef(`"Executing:
 $ %s
 
 Directory: %s

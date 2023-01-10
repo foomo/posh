@@ -8,6 +8,8 @@ type Logger interface {
 	Printf(format string, a ...interface{})
 	Success(a ...interface{})
 	Successf(format string, a ...interface{})
+	Trace(a ...interface{})
+	Tracef(format string, a ...interface{})
 	Debug(a ...interface{})
 	Debugf(format string, a ...interface{})
 	Info(a ...interface{})

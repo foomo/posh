@@ -11,8 +11,10 @@ prompt:
 
 ## Environment variables
 env:
-  PATH: "${PROJECT_ROOT}/bin:${PATH}"
-  GOPROXY: "https://proxy.golang.org,direct"
+  - name: PATH
+    value: "${PROJECT_ROOT}/bin:${PATH}"
+  - name: GOPROXY
+    value: "https://proxy.golang.org,direct"
 
 ## Plugin settings
 plugin:

@@ -11,10 +11,9 @@ import (
 
 type (
 	Welcome struct {
-		l         log.Logger
-		cfg       config.Welcome
-		name      string
-		configKey string
+		l    log.Logger
+		cfg  config.Welcome
+		name string
 	}
 	WelcomeOption func(*Welcome) error
 )
@@ -23,10 +22,16 @@ type (
 // ~ Options
 // ------------------------------------------------------------------------------------------------
 
+func WelcomeWithConfig(v config.Welcome) WelcomeOption {
+	return func(o *Welcome) error {
+		o.cfg = v
+		return nil
+	}
+}
+
 func WelcomeWithConfigKey(v string) WelcomeOption {
 	return func(o *Welcome) error {
-		o.configKey = v
-		return nil
+		return viper.UnmarshalKey(v, &o.cfg)
 	}
 }
 
@@ -36,9 +41,8 @@ func WelcomeWithConfigKey(v string) WelcomeOption {
 
 func NewWelcome(l log.Logger, opts ...WelcomeOption) (*Welcome, error) {
 	inst := &Welcome{
-		l:         l,
-		name:      "welcome",
-		configKey: "welcome",
+		l:    l,
+		name: "welcome",
 	}
 	for _, opt := range opts {
 		if opt != nil {
@@ -46,9 +50,6 @@ func NewWelcome(l log.Logger, opts ...WelcomeOption) (*Welcome, error) {
 				return nil, err
 			}
 		}
-	}
-	if err := viper.UnmarshalKey(inst.configKey, &inst.cfg); err != nil {
-		return nil, err
 	}
 	return inst, nil
 }
@@ -74,6 +75,6 @@ func (c *Welcome) Help() string {
 	return `Print a welcome message
 
 Usage:
-  welcome
+welcome
 `
 }

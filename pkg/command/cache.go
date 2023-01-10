@@ -59,11 +59,11 @@ func (c *Cache) Description() string {
 }
 
 func (c *Cache) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
-	return c.tree.Complete(ctx, r)
+	return c.tree.RunCompletion(ctx, r)
 }
 
 func (c *Cache) Execute(ctx context.Context, args *readline.Readline) error {
-	return c.tree.Execute(ctx, args)
+	return c.tree.RunExecution(ctx, args)
 }
 
 func (c *Cache) Help() string {
