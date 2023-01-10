@@ -6,12 +6,11 @@ import (
 	"strings"
 
 	pkgcommand "{{.module}}/posh/pkg/command"
-	pkgconfig "{{.module}}/posh/pkg/config"
 	"github.com/foomo/fender/fend"
 	"github.com/foomo/posh/pkg/command"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
-	"github.com/foomo/posh/pkg/ownbrew"
+	"github.com/foomo/posh/integration/ownbrew"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/foomo/posh/pkg/prompt"
 	"github.com/foomo/posh/pkg/prompt/check"
@@ -43,11 +42,14 @@ func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
 	)
 
 	// Welcome
-	if cmd, err := pkgcommand.NewWelcome(l); err != nil {
+	if cmd, err := pkgcommand.NewWelcome(l,
+		pkgcommand.WelcomeWithConfigKey("welcome"),
+	); err != nil {
 		return nil, err
 	} else {
 		inst.commands.Add(cmd)
 	}
+
 
 	return inst, nil
 }
@@ -71,7 +73,7 @@ func (p *Plugin) Brew(ctx context.Context, cfg config.Ownbrew) error {
 	return brew.Install(ctx)
 }
 
-func (p *Plugin) Require(ctx context.Context, cfg config.Dependencies) error {
+func (p *Plugin) Require(ctx context.Context, cfg config.Require) error {
 	return require.First(p.l,
 		require.Envs(p.l, cfg.Envs),
 		require.Packages(ctx, p.l, cfg.Packages),

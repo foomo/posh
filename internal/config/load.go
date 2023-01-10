@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -41,9 +42,14 @@ func Load(l log.Logger) error {
 	}
 
 	// set configured env
-	for key, value := range viper.GetStringMapString("env") {
-		if err := os.Setenv(key, os.ExpandEnv(value)); err != nil {
-			return err
+	var env config.Env
+	if err := viper.UnmarshalKey("env", &env); err != nil {
+		l.Warn("failed to load env:", err.Error())
+	} else {
+		for _, value := range env {
+			if err := os.Setenv(value.Name, os.ExpandEnv(value.Value)); err != nil {
+				return err
+			}
 		}
 	}
 

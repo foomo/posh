@@ -96,6 +96,16 @@ func (l *PTerm) Successf(format string, a ...interface{}) {
 	l.Success(fmt.Sprintf(format, a...))
 }
 
+func (l *PTerm) Trace(a ...interface{}) {
+	if l.IsLevel(LevelTrace) {
+		pterm.Debug.Println(l.prefix(a)...)
+	}
+}
+
+func (l *PTerm) Tracef(format string, a ...interface{}) {
+	l.Trace(fmt.Sprintf(format, a...))
+}
+
 func (l *PTerm) Debug(a ...interface{}) {
 	if l.IsLevel(LevelDebug) {
 		pterm.Debug.Println(l.prefix(a)...)

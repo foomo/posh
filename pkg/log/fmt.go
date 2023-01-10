@@ -73,6 +73,16 @@ func (l *Fmt) Successf(format string, a ...interface{}) {
 	l.Success(fmt.Sprintf(format, a...))
 }
 
+func (l *Fmt) Trace(a ...interface{}) {
+	if l.IsLevel(LevelTrace) {
+		fmt.Println(l.prefix("trace", a)...)
+	}
+}
+
+func (l *Fmt) Tracef(format string, a ...interface{}) {
+	l.Trace(fmt.Sprintf(format, a...))
+}
+
 func (l *Fmt) Debug(a ...interface{}) {
 	if l.IsLevel(LevelDebug) {
 		fmt.Println(l.prefix("debug", a)...)

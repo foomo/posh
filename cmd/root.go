@@ -6,7 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/foomo/posh/internal/env"
-	log2 "github.com/foomo/posh/internal/log"
+	intlog "github.com/foomo/posh/internal/log"
 	"github.com/foomo/posh/pkg/log"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -66,7 +66,7 @@ func initialize() {
 	var err error
 
 	// init logger
-	l, err = log2.Init(flagLevel, flagNoColor)
+	l, err = intlog.Init(flagLevel, flagNoColor)
 	cobra.CheckErr(err)
 
 	// init env

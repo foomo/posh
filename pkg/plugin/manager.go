@@ -78,7 +78,7 @@ func (m *Manager) LoadPlugin(filename, provider string) (Plugin, error) {
 		return nil, errors.Wrapf(err, "failed to lookup provider (%s)", provider)
 	} else if fn, ok := sym.(func(l log.Logger) (Plugin, error)); !ok {
 		return nil, fmt.Errorf("invalid provider type (%T) ", sym)
-	} else if inst, err := fn(m.l); err != nil {
+	} else if inst, err := fn(m.l.Named("")); err != nil {
 		return nil, errors.Wrap(err, "failed to create plugin instance")
 	} else if inst == nil {
 		return nil, errors.New("plugin can not be nil")

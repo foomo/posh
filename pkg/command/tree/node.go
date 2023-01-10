@@ -18,7 +18,7 @@ type Node struct {
 	PassThroughFlags func(fs *readline.FlagSet)
 	Description      string
 	Nodes            []*Node
-	Execute          func(ctx context.Context, args *readline.Readline) error
+	Execute          func(ctx context.Context, r *readline.Readline) error
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 		return errors.New("missing [command] argument")
 	} else if len(c.Args) > 0 {
 		for j, arg := range c.Args {
-			if !arg.Optional && len(localArgs) <= j+1 {
+			if !arg.Optional && len(localArgs) < j+1 {
 				return errors.New("missing [" + arg.Name + "] argument")
 			}
 		}
