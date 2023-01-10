@@ -59,6 +59,7 @@ func (m *Manager) Build(ctx context.Context, filename string) error {
 	base := path.Base(filename)
 	cmd := exec.CommandContext(ctx, "go", "build",
 		"-buildmode=plugin",
+		"-a",
 		"-o", strings.ReplaceAll(base, ".go", ".so"),
 		base,
 	)
