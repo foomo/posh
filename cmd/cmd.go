@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"runtime/debug"
 
 	intenv "github.com/foomo/posh/internal/env"
 	intlog "github.com/foomo/posh/internal/log"
@@ -48,6 +49,11 @@ func Execute() {
 
 	// handle defer
 	defer func() {
+		if err := recover(); err != nil {
+			debug.PrintStack()
+			l.Error(err)
+			code = 1
+		}
 		signal.Stop(osInterrupt)
 		cancel()
 		os.Exit(code)
@@ -55,7 +61,7 @@ func Execute() {
 
 	go func() {
 		<-osInterrupt
-		l.Debug("received interrupt")
+		l.Trace("received interrupt")
 		cancel()
 	}()
 

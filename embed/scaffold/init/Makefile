@@ -23,7 +23,7 @@ bin/posh: ldflags=\
 	-X github.com/foomo/posh/internal/version.BuildTimestamp=${buildTimestamp}
 bin/posh:
 	@if [ "${current}" != "${version}" ]; then \
-  	cd .posh && go build -trimpath -ldflags="${ldflags}" -o ../bin/posh main.go; \
+  	cd .posh && go mod tidy && go build -trimpath -ldflags="${ldflags}" -o ../bin/posh main.go; \
   fi
 
 # --- Targets -----------------------------------------------------------------
@@ -31,7 +31,7 @@ bin/posh:
 .PHONY: clean
 ## Remove built targets
 clean:
-	@rm bin/*
+	@rm -f bin/*
 
 .PHONY: config
 ## Print posh config
