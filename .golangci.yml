@@ -18,8 +18,12 @@ linters-settings:
       - ifElseChain
       - singleCaseSwitch
       - commentFormatting
+  importas:
+    no-unaliased: true
+    alias:
+      - pkg: github.com/foomo/posh/internal/(\w+)
+        alias: int$1
 linters:
-
   enable:
     # Enabled by default linters:
     - errcheck # Errcheck is a program for checking for unchecked errors in go programs. These unchecked errors can be critical bugs in some cases [fast: false, auto-fix: false]
