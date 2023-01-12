@@ -2,7 +2,6 @@ package cmd
 
 import (
 	intconfig "github.com/foomo/posh/internal/config"
-	intplugin "github.com/foomo/posh/internal/plugin"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -25,25 +24,11 @@ var execCmd = &cobra.Command{
 			return errors.New("missing [cmd] argument")
 		}
 
-		plg, err := intplugin.Load(cmd.Context(), l)
+		plg, err := pluginProvider(l)
 		if err != nil {
 			return err
 		}
 
 		return plg.Execute(cmd.Context(), args)
 	},
-}
-
-func init() {
-	rootCmd.AddCommand(execCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// execCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// execCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

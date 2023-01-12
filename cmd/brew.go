@@ -2,7 +2,6 @@ package cmd
 
 import (
 	intconfig "github.com/foomo/posh/internal/config"
-	intplugin "github.com/foomo/posh/internal/plugin"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,16 +30,11 @@ var brewCmd = &cobra.Command{
 		}
 		cfg.Dry = brewCmdFlagDry
 
-		plg, err := intplugin.Load(cmd.Context(), l)
+		plg, err := pluginProvider(l)
 		if err != nil {
 			return err
 		}
 
 		return plg.Brew(cmd.Context(), cfg)
 	},
-}
-
-func init() {
-	rootCmd.AddCommand(brewCmd)
-	brewCmd.Flags().BoolVar(&brewCmdFlagDry, "dry", false, "don't execute scripts")
 }

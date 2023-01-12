@@ -11,7 +11,7 @@ type (
 		name  string
 		level Level
 	}
-	PTermOption func(*PTerm) error
+	PTermOption func(*PTerm)
 )
 
 // ------------------------------------------------------------------------------------------------
@@ -19,16 +19,15 @@ type (
 // ------------------------------------------------------------------------------------------------
 
 func PTermWithDisableColor(v bool) PTermOption {
-	return func(o *PTerm) error {
+	return func(o *PTerm) {
 		if v {
 			pterm.DisableColor()
 		}
-		return nil
 	}
 }
 
 func PTermWithLevel(v Level) PTermOption {
-	return func(o *PTerm) error {
+	return func(o *PTerm) {
 		o.level = v
 		switch {
 		case v <= LevelTrace:
@@ -40,7 +39,6 @@ func PTermWithLevel(v Level) PTermOption {
 		default:
 			pterm.Debug.LineNumberOffset = 1
 		}
-		return nil
 	}
 }
 
@@ -48,18 +46,16 @@ func PTermWithLevel(v Level) PTermOption {
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
 
-func NewPTerm(opts ...PTermOption) (*PTerm, error) {
+func NewPTerm(opts ...PTermOption) *PTerm {
 	inst := &PTerm{
 		level: LevelError,
 	}
 	for _, opt := range opts {
 		if opt != nil {
-			if err := opt(inst); err != nil {
-				return nil, err
-			}
+			opt(inst)
 		}
 	}
-	return inst, nil
+	return inst
 }
 
 // ------------------------------------------------------------------------------------------------
