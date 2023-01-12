@@ -5,9 +5,7 @@ builds:
   - binary: posh
     main: ./main.go
     env:
-      - CGO_ENABLED=1
-    flags:
-      - -trimpath
+      - CGO_ENABLED=0
     ldflags:
       - -s -w
       - -X github.com/foomo/posh/internal/version.Version={{.Version}}
