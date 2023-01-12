@@ -48,18 +48,21 @@ func (c *Node) setFlags(r *readline.Readline, parse bool) error {
 func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readline, i int) []prompt.Suggest {
 	var suggest []prompt.Suggest
 	localArgs := r.Args()[i:]
-	if len(c.Nodes) > 0 && len(localArgs) <= 1 {
+	switch {
+	case len(c.Nodes) > 0 && len(localArgs) <= 1:
 		for _, command := range c.Nodes {
 			suggest = append(suggest, prompt.Suggest{Text: command.Name, Description: command.Description})
 		}
-	} else if len(c.Args) >= len(localArgs) {
-		if fn := c.Args[len(localArgs)-1].Suggest; fn != nil {
+	case len(c.Args) > 0 && len(c.Args) >= len(localArgs):
+		j := len(localArgs)
+		if len(localArgs) > 0 && localArgs[j-1] != "" {
+			j -= 1
+		}
+		if fn := c.Args[j].Suggest; fn != nil {
 			suggest = fn(ctx, p, r)
 		}
-	} else if lastArg := c.Args.Last(); lastArg != nil && lastArg.Repeat {
-		if fn := lastArg.Suggest; fn != nil {
-			suggest = fn(ctx, p, r)
-		}
+	case len(c.Args) > 0 && c.Args.Last().Repeat && c.Args.Last().Suggest != nil:
+		suggest = c.Args.Last().Suggest(ctx, p, r)
 	}
 	return suggest
 }
@@ -84,11 +87,12 @@ func (c *Node) completePassThroughFlags(r *readline.Readline) []prompt.Suggest {
 
 func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 	localArgs := r.Args()[i:]
-	if len(c.Nodes) > 0 && len(localArgs) == 0 {
+	switch {
+	case len(c.Nodes) > 0 && len(localArgs) == 0:
 		return errors.New("missing [command] argument")
-	} else if len(c.Args) > 0 {
+	case len(c.Args) > 0:
 		for j, arg := range c.Args {
-			if !arg.Optional && len(localArgs) < j+1 {
+			if !arg.Optional && len(localArgs)-2 < j {
 				return errors.New("missing [" + arg.Name + "] argument")
 			}
 		}

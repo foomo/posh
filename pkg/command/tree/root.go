@@ -67,9 +67,6 @@ func (t *Root) RunCompletion(ctx context.Context, r *readline.Readline) []prompt
 		} else {
 			suggests = cmd.completeArguments(ctx, t, r, i+1)
 		}
-		sort.Slice(suggests, func(i, j int) bool {
-			return suggests[i].Text < suggests[j].Text
-		})
 	case readline.ModeFlags:
 		if cmd, _ := t.find(t.Nodes, r, 0); cmd == nil && t.Node != nil {
 			if err := t.Node.setFlags(r, false); err != nil {
@@ -84,9 +81,6 @@ func (t *Root) RunCompletion(ctx context.Context, r *readline.Readline) []prompt
 		} else {
 			suggests = cmd.completeFlags(r)
 		}
-		sort.Slice(suggests, func(i, j int) bool {
-			return suggests[i].Text < suggests[j].Text
-		})
 	case readline.ModePassThroughArgs:
 		// TODO
 	case readline.ModePassThroughFlags:
@@ -103,12 +97,12 @@ func (t *Root) RunCompletion(ctx context.Context, r *readline.Readline) []prompt
 		} else {
 			suggests = cmd.completePassThroughFlags(r)
 		}
-		sort.Slice(suggests, func(i, j int) bool {
-			return suggests[i].Text < suggests[j].Text
-		})
 	case readline.ModeAdditionalArgs:
 		// do nothing
 	}
+	sort.Slice(suggests, func(i, j int) bool {
+		return suggests[i].Text < suggests[j].Text
+	})
 	return suggests
 }
 
