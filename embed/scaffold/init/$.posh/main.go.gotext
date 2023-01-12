@@ -1,9 +1,8 @@
 package main
 
 import (
-	"github.com/foomo/posh-sandbox/posh/pkg"
+	"{{.module}}/posh/pkg"
 	"github.com/foomo/posh/cmd"
-	_ "github.com/foomo/posh/pkg/plugin"
 )
 
 func init() {
