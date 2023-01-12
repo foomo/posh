@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"context"
@@ -29,7 +29,7 @@ type Plugin struct {
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
 
-func New(l log.Logger) (plugin.Plugin, error) { //nolint:unparam
+func New(l log.Logger) (plugin.Plugin, error) {
 	inst := &Plugin{
 		l:        l,
 		commands: command.Commands{},

@@ -23,7 +23,3 @@ var configCmd = &cobra.Command{
 		return nil
 	},
 }
-
-func init() {
-	rootCmd.AddCommand(configCmd)
-}

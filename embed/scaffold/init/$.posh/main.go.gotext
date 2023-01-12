@@ -1,11 +1,13 @@
 package main
 
 import (
+	"github.com/foomo/posh-sandbox/posh/pkg"
 	"github.com/foomo/posh/cmd"
+	_ "github.com/foomo/posh/pkg/plugin"
 )
 
 func init() {
-	cmd.Init(nil)
+	cmd.Init(pkg.New)
 }
 
 func main() {
