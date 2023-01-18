@@ -18,7 +18,6 @@ type (
 		args               Args
 		flags              Args
 		flagSet            *FlagSet
-		passThroughArgs    Args
 		passThroughFlags   Args
 		passThroughFlagSet *FlagSet
 		additionalArgs     Args
@@ -92,12 +91,6 @@ func (a *Readline) FlagSet() *FlagSet {
 	return a.flagSet
 }
 
-func (a *Readline) PassThroughArgs() Args {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
-	return a.passThroughArgs
-}
-
 func (a *Readline) PassThroughFlags() Args {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
@@ -138,9 +131,6 @@ func (a *Readline) Parse(input string) error {
 			a.mode = ModeFlags
 		}
 		if i != last && (a.mode == ModeArgs || a.mode == ModeFlags) && Arg(part).IsPass() {
-			a.mode = ModePassThroughArgs
-		}
-		if a.mode == ModePassThroughArgs && Arg(part).IsFlag() {
 			a.mode = ModePassThroughFlags
 		}
 		if Arg(part).IsAdditional() && i < len(parts)-1 {
@@ -152,8 +142,6 @@ func (a *Readline) Parse(input string) error {
 			a.args = append(a.args, part)
 		case ModeFlags:
 			a.flags = append(a.flags, part)
-		case ModePassThroughArgs:
-			a.passThroughArgs = append(a.passThroughArgs, part)
 		case ModePassThroughFlags:
 			a.passThroughFlags = append(a.passThroughFlags, part)
 		case ModeAdditionalArgs:
@@ -200,10 +188,9 @@ Cmd:              %s
 Mode              %s
 Args:             %s
 Flags:            %s
-PassThroughArgs:  %s
 PassThroughFlags: %s
 AdditionalArgs    %s
-`, a.Cmd(), a.Mode(), a.Args(), a.Flags(), a.PassThroughArgs(), a.PassThroughFlags(), a.AdditionalArgs())
+`, a.Cmd(), a.Mode(), a.Args(), a.Flags(), a.PassThroughFlags(), a.AdditionalArgs())
 }
 
 func (a *Readline) IsModeDefault() bool {
@@ -211,7 +198,7 @@ func (a *Readline) IsModeDefault() bool {
 }
 
 func (a *Readline) IsModePassThrough() bool {
-	return a.Mode() == ModePassThroughArgs
+	return a.Mode() == ModePassThroughFlags
 }
 
 func (a *Readline) IsModeAdditional() bool {
@@ -258,7 +245,6 @@ func (a *Readline) reset() {
 	a.args = nil
 	a.flags = nil
 	a.flagSet = nil
-	a.passThroughArgs = nil
 	a.passThroughFlags = nil
 	a.passThroughFlagSet = nil
 	a.additionalArgs = nil

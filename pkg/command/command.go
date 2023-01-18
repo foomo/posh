@@ -28,9 +28,6 @@ type (
 	ArgumentCompleter interface {
 		CompleteArguments(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest
 	}
-	PassThroughArgsCompleter interface {
-		CompletePassTroughArgs(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest
-	}
 	PassThroughFlagsCompleter interface {
 		CompletePassTroughFlags(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest
 	}

@@ -16,11 +16,6 @@ env:
   - name: GOPROXY
     value: "https://proxy.golang.org,direct"
 
-## Plugin settings
-plugin:
-  source: .posh/plugin.go
-  provider: New
-
 ## Ownbrew settings
 ownbrew:
   binDir: "bin"
@@ -60,7 +55,15 @@ require:
 
   ## Required scripts that need to succeed
   scripts: []
-    ## Example: require
+    ## Example: require 1Password account
+    #- name: op
+    #  command: |
+    #    [[ $(op account --account <ACCOUNT> get 2>&1) =~ "found no account" ]] && exit 1 || exit 0
+    #  help: |
+    #    You're 1Password account is not registered yet! Please do so by running:
+    #
+    #    $ op account add --address <ACCOUNT>.1password.eu --email <EMAIL>
+    ## Example: npm
     #- name: npm
     #  command: npm whoami --registry=https://npm.pkg.github.com > /dev/null 2>&1
     #  help: |
@@ -138,13 +141,13 @@ require:
     #      $ brew install teleport
 
     ## Example: goimports
-    # - name: goimports
-    #   version: '>=2022'
-    #   command: date -r $(which goimports) +%Y.%-m.%-d
-    #   help: |
-    #     Please ensure you have 'goimports' installed in a recent version: %s!
+    #- name: goimports
+    #  version: '>=2022'
+    #  command: date -r $(which goimports) +%Y.%-m.%-d
+    #  help: |
+    #    Please ensure you have 'goimports' installed in a recent version: %s!
     #
-    #       $ go install golang.org/x/tools/cmd/goimports@latest
+    #      $ go install golang.org/x/tools/cmd/goimports@latest
 
 
 ## Integrations

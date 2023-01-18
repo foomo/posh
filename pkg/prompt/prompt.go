@@ -318,12 +318,6 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 		} else if value, ok := cmd.(command.Completer); ok {
 			return s.filter(value.Complete(ctx, s.readline, d), word, true)
 		}
-	case readline.ModePassThroughArgs:
-		if value, ok := cmd.(command.PassThroughArgsCompleter); ok {
-			return s.filter(value.CompletePassTroughArgs(ctx, s.readline, d), word, true)
-		} else if value, ok := cmd.(command.Completer); ok {
-			return s.filter(value.Complete(ctx, s.readline, d), word, true)
-		}
 	case readline.ModePassThroughFlags:
 		if value, ok := cmd.(command.PassThroughFlagsCompleter); ok {
 			return s.filter(value.CompletePassTroughFlags(ctx, s.readline, d), word, true)

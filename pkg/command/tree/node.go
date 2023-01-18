@@ -11,7 +11,7 @@ import (
 
 type Node struct {
 	Name             string
-	Names            func() []string
+	Values           func(ctx context.Context, r *readline.Readline) []string
 	Args             Args
 	Flags            func(fs *readline.FlagSet)
 	PassThroughArgs  Args
@@ -51,7 +51,13 @@ func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readl
 	switch {
 	case len(c.Nodes) > 0 && len(localArgs) <= 1:
 		for _, command := range c.Nodes {
-			suggest = append(suggest, prompt.Suggest{Text: command.Name, Description: command.Description})
+			if command.Values != nil {
+				for _, name := range command.Values(ctx, r) {
+					suggest = append(suggest, prompt.Suggest{Text: name, Description: command.Description})
+				}
+			} else {
+				suggest = append(suggest, prompt.Suggest{Text: command.Name, Description: command.Description})
+			}
 		}
 	case len(c.Args) > 0 && len(c.Args) >= len(localArgs):
 		j := len(localArgs)
@@ -89,11 +95,11 @@ func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 	localArgs := r.Args()[i:]
 	switch {
 	case len(c.Nodes) > 0 && len(localArgs) == 0:
-		return errors.New("missing [command] argument")
+		return ErrMissingCommand
 	case len(c.Args) > 0:
 		for j, arg := range c.Args {
-			if !arg.Optional && len(localArgs)-2 < j {
-				return errors.New("missing [" + arg.Name + "] argument")
+			if !arg.Optional && len(localArgs)-1 < j {
+				return errors.Wrap(ErrMissingArgument, arg.Name)
 			}
 		}
 	}

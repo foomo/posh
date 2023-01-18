@@ -6,7 +6,6 @@ import (
 
 	"github.com/c-bata/go-prompt"
 	"github.com/foomo/posh/pkg/readline"
-	"github.com/pkg/errors"
 )
 
 type Root struct {
@@ -25,17 +24,23 @@ func (t *Root) RunExecution(ctx context.Context, r *readline.Readline) error {
 		cmd   *Node
 		index int
 	)
-	if r.Args().LenIs(0) {
-		cmd = t.Node
-	} else if found, i := t.find(t.Nodes, r, 0); found != nil {
-		cmd = found
-		index = i
-	} else {
-		cmd = t.Node
+
+	switch {
+	case t.Node == nil && len(t.Nodes) == 0:
+		return ErrNoop
+	case r.Args().LenIs(0) && t.Node == nil:
+		return ErrMissingCommand
 	}
 
-	if cmd == nil {
-		return errors.New("invalid command")
+	if r.Args().LenIs(0) {
+		cmd = t.Node
+	} else if found, i := t.find(ctx, t.Nodes, r, 0); found != nil {
+		cmd = found
+		index = i
+	} else if t.Node == nil {
+		return ErrInvalidCommand
+	} else {
+		cmd = t.Node
 	}
 
 	if err := cmd.setFlags(r, true); err != nil {
@@ -52,9 +57,15 @@ func (t *Root) RunCompletion(ctx context.Context, r *readline.Readline) []prompt
 	case readline.ModeArgs:
 		if r.Args().LenLte(1) && len(t.Nodes) > 0 {
 			for _, command := range t.Nodes {
-				suggests = append(suggests, prompt.Suggest{Text: command.Name, Description: command.Description})
+				if command.Values != nil {
+					for _, name := range command.Values(ctx, r) {
+						suggests = append(suggests, prompt.Suggest{Text: name, Description: command.Description})
+					}
+				} else {
+					suggests = append(suggests, prompt.Suggest{Text: command.Name, Description: command.Description})
+				}
 			}
-		} else if cmd, i := t.find(t.Nodes, r, 0); cmd == nil && t.Node != nil {
+		} else if cmd, i := t.find(ctx, t.Nodes, r, 0); cmd == nil && t.Node != nil {
 			if err := t.Node.setFlags(r, false); err != nil {
 				return nil
 			} else {
@@ -68,7 +79,7 @@ func (t *Root) RunCompletion(ctx context.Context, r *readline.Readline) []prompt
 			suggests = cmd.completeArguments(ctx, t, r, i+1)
 		}
 	case readline.ModeFlags:
-		if cmd, _ := t.find(t.Nodes, r, 0); cmd == nil && t.Node != nil {
+		if cmd, _ := t.find(ctx, t.Nodes, r, 0); cmd == nil && t.Node != nil {
 			if err := t.Node.setFlags(r, false); err != nil {
 				return nil
 			} else {
@@ -81,10 +92,8 @@ func (t *Root) RunCompletion(ctx context.Context, r *readline.Readline) []prompt
 		} else {
 			suggests = cmd.completeFlags(r)
 		}
-	case readline.ModePassThroughArgs:
-		// TODO
 	case readline.ModePassThroughFlags:
-		if cmd, _ := t.find(t.Nodes, r, 0); cmd == nil && t.Node != nil {
+		if cmd, _ := t.find(ctx, t.Nodes, r, 0); cmd == nil && t.Node != nil {
 			if err := t.Node.setFlags(r, false); err != nil {
 				return nil
 			} else {
@@ -110,26 +119,26 @@ func (t *Root) RunCompletion(ctx context.Context, r *readline.Readline) []prompt
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
 
-func (t *Root) find(cmds []*Node, r *readline.Readline, i int) (*Node, int) {
+func (t *Root) find(ctx context.Context, cmds []*Node, r *readline.Readline, i int) (*Node, int) {
 	if r.Args().LenLt(i + 1) {
 		return nil, i
 	}
 	arg := r.Args().At(i)
 	for _, cmd := range cmds {
 		if cmd.Name == arg {
-			if subCmd, j := t.find(cmd.Nodes, r, i+1); subCmd != nil {
+			if subCmd, j := t.find(ctx, cmd.Nodes, r, i+1); subCmd != nil {
 				return subCmd, j
 			}
 			return cmd, i
 		}
-		if cmd.Names != nil {
-			for _, name := range cmd.Names() {
+		if cmd.Values != nil {
+			for _, name := range cmd.Values(ctx, r) {
 				if name == arg {
-					if subCmd, j := t.find(cmd.Nodes, r, i+1); subCmd != nil {
+					if subCmd, j := t.find(ctx, cmd.Nodes, r, i+1); subCmd != nil {
 						return subCmd, j
 					}
+					return cmd, i
 				}
-				return cmd, i
 			}
 		}
 	}

@@ -70,3 +70,20 @@ func (a Args) Last() string {
 		return ""
 	}
 }
+
+func (a Args) IndexOf(v string) int {
+	for i, s := range a {
+		if s == v {
+			return i
+		}
+	}
+	return -1
+}
+
+func (a Args) Slice(start, end int) Args {
+	return append(a[:start], a[end:]...)
+}
+
+func (a Args) Splice(start, num int) Args {
+	return append(a[:start], a[start+num:]...)
+}
