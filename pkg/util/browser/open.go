@@ -22,11 +22,11 @@ func OpenURL(u *url.URL) error {
 	}
 	switch runtime.GOOS {
 	case "linux":
-		return exec.CommandContext(context.TODO(), "xdg-open", u.String()).Start() //nolint:all
+		return exec.CommandContext(context.TODO(), "xdg-open", u.String()).Start()
 	case "windows":
-		return exec.CommandContext(context.TODO(), "rundll32", "url.dll,FileProtocolHandler", u.String()).Start() //nolint:all
+		return exec.CommandContext(context.TODO(), "rundll32", "url.dll,FileProtocolHandler", u.String()).Start()
 	case "darwin":
-		return exec.CommandContext(context.TODO(), "open", u.String()).Start() //nolint:all
+		return exec.CommandContext(context.TODO(), "open", u.String()).Start()
 	default:
 		return fmt.Errorf("unsupported platform")
 	}

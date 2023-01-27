@@ -164,7 +164,7 @@ func TestRoot(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
-			if !tt.wantErr(t1, r.Execute(context.WithValue(ctx, "t", t1), rl)) {
+			if !tt.wantErr(t1, r.Execute(SetT(ctx, t1), rl)) {
 				l.Warn(rl.String())
 			} else {
 				l.Debug(rl.String())
@@ -223,7 +223,7 @@ func TestRoot_Node(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
-			if !tt.wantErr(t1, tt.root.Execute(context.WithValue(ctx, "t", t1), rl)) {
+			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
 				l.Warn(rl.String())
 			} else {
 				l.Debug(rl.String())
@@ -350,7 +350,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
-			if !tt.wantErr(t1, tt.root.Execute(context.WithValue(ctx, "t", t1), rl)) {
+			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
 				l.Warn(rl.String())
 			} else {
 				l.Debug(rl.String())
@@ -419,7 +419,7 @@ func TestRoot_NodeFlags(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
-			if !tt.wantErr(t1, tt.root.Execute(context.WithValue(ctx, "t", t1), rl)) {
+			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
 				l.Warn(rl.String())
 			} else {
 				l.Debug(rl.String())
@@ -429,5 +429,10 @@ func TestRoot_NodeFlags(t *testing.T) {
 }
 
 func T(ctx context.Context) *testing.T {
-	return ctx.Value("t").(*testing.T)
+	return ctx.Value("t").(*testing.T) //nolint:forcetypeassert
+}
+
+func SetT(ctx context.Context, t *testing.T) context.Context {
+	t.Helper()
+	return context.WithValue(ctx, "t", t) //nolint:staticcheck
 }

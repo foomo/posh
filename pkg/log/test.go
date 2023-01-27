@@ -29,6 +29,8 @@ func TestWithLevel(v Level) TestOption {
 // ------------------------------------------------------------------------------------------------
 
 func NewTest(t *testing.T, opts ...TestOption) *Test {
+	t.Helper()
+
 	inst := &Test{
 		t:     t,
 		level: LevelError,
