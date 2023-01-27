@@ -42,7 +42,7 @@ func (c *Exit) Execute(ctx context.Context, args *readline.Readline) error {
 	return nil
 }
 
-func (c *Exit) Help() string {
+func (c *Exit) Help(ctx context.Context, r *readline.Readline) string {
 	return `Exit the Project Oriented Shell.
 
 Usage:

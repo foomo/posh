@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/c-bata/go-prompt"
 	"github.com/foomo/posh/pkg/cache"
 	"github.com/foomo/posh/pkg/command/tree"
 	"github.com/foomo/posh/pkg/log"
+	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/pterm/pterm"
 	"github.com/pterm/pterm/putils"
@@ -58,15 +58,15 @@ func (c *Cache) Description() string {
 	return "manage the internal cache"
 }
 
-func (c *Cache) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
-	return c.tree.RunCompletion(ctx, r)
+func (c *Cache) Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
+	return c.tree.Complete(ctx, r)
 }
 
 func (c *Cache) Execute(ctx context.Context, args *readline.Readline) error {
-	return c.tree.RunExecution(ctx, args)
+	return c.tree.Execute(ctx, args)
 }
 
-func (c *Cache) Help() string {
+func (c *Cache) Help(ctx context.Context, r *readline.Readline) string {
 	return `Manage the internal cache.
 
 Usage:

@@ -12,6 +12,7 @@ import (
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/prompt/check"
 	"github.com/foomo/posh/pkg/prompt/flair"
+	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/shell"
@@ -26,7 +27,7 @@ type (
 		prefix   string
 		check    check.Check
 		checkers []check.Checker
-		filter   Filter
+		filter   goprompt.Filter
 		readline *readline.Readline
 		history  history.History
 		commands command.Commands
@@ -115,7 +116,7 @@ func WithCommands(v command.Commands) Option {
 	}
 }
 
-func WithFilter(v Filter) Option {
+func WithFilter(v goprompt.Filter) Option {
 	return func(o *Prompt) error {
 		o.filter = v
 		return nil
@@ -140,7 +141,7 @@ func New(l log.Logger, opts ...Option) (*Prompt, error) {
 		title:    "posh",
 		prefix:   "> ",
 		flair:    flair.DefaultFlair,
-		filter:   FilterFuzzy,
+		filter:   goprompt.FilterFuzzy,
 		check:    check.DefaultCheck,
 		history:  history.NewNoop(l),
 		commands: command.Commands{},
@@ -308,27 +309,27 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 	switch s.readline.Mode() {
 	case readline.ModeArgs:
 		if value, ok := cmd.(command.ArgumentCompleter); ok {
-			return s.filter(value.CompleteArguments(ctx, s.readline, d), word, true)
+			return s.filter(value.CompleteArguments(ctx, s.readline), word, true)
 		} else if value, ok := cmd.(command.Completer); ok {
-			return s.filter(value.Complete(ctx, s.readline, d), word, true)
+			return s.filter(value.Complete(ctx, s.readline), word, true)
 		}
 	case readline.ModeFlags:
 		if value, ok := cmd.(command.FlagCompleter); ok {
-			return s.filter(value.CompleteFlags(ctx, s.readline, d), word, true)
+			return s.filter(value.CompleteFlags(ctx, s.readline), word, true)
 		} else if value, ok := cmd.(command.Completer); ok {
-			return s.filter(value.Complete(ctx, s.readline, d), word, true)
+			return s.filter(value.Complete(ctx, s.readline), word, true)
 		}
 	case readline.ModePassThroughFlags:
 		if value, ok := cmd.(command.PassThroughFlagsCompleter); ok {
-			return s.filter(value.CompletePassTroughFlags(ctx, s.readline, d), word, true)
+			return s.filter(value.CompletePassTroughFlags(ctx, s.readline), word, true)
 		} else if value, ok := cmd.(command.Completer); ok {
-			return s.filter(value.Complete(ctx, s.readline, d), word, true)
+			return s.filter(value.Complete(ctx, s.readline), word, true)
 		}
 	case readline.ModeAdditionalArgs:
 		if value, ok := cmd.(command.AdditionalArgsCompleter); ok {
-			return s.filter(value.CompleteAdditionalArgs(ctx, s.readline, d), word, true)
+			return s.filter(value.CompleteAdditionalArgs(ctx, s.readline), word, true)
 		} else if value, ok := cmd.(command.Completer); ok {
-			return s.filter(value.Complete(ctx, s.readline, d), word, true)
+			return s.filter(value.Complete(ctx, s.readline), word, true)
 		}
 	}
 	return nil
@@ -336,7 +337,7 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 
 // context returns and watches over a new context
 func (s *Prompt) context() context.Context {
-	ctx, cancel := context.WithCancel(s.ctx)
+	ctx, cancel := context.WithCancel(context.Background()) // FIXME context.WithCancel(s.ctx)
 	go func(ctx context.Context, cancel context.CancelFunc) {
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, os.Interrupt)

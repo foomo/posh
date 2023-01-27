@@ -6,6 +6,7 @@ import (
 
 	"github.com/foomo/posh/pkg/command/tree"
 	"github.com/foomo/posh/pkg/log"
+	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -65,8 +66,11 @@ func TestRoot(t *testing.T) {
 			},
 			{
 				Name: "third",
-				Values: func(ctx context.Context, r *readline.Readline) []string {
-					return []string{"third-a", "third-b"}
+				Values: func(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
+					return []goprompt.Suggest{
+						{Text: "third-a"},
+						{Text: "third-b"},
+					}
 				},
 				Nodes: tree.Nodes{
 					{
@@ -160,7 +164,7 @@ func TestRoot(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
-			if !tt.wantErr(t1, r.RunExecution(context.WithValue(ctx, "t", t1), rl)) {
+			if !tt.wantErr(t1, r.Execute(context.WithValue(ctx, "t", t1), rl)) {
 				l.Warn(rl.String())
 			} else {
 				l.Debug(rl.String())
@@ -219,7 +223,7 @@ func TestRoot_Node(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
-			if !tt.wantErr(t1, tt.root.RunExecution(context.WithValue(ctx, "t", t1), rl)) {
+			if !tt.wantErr(t1, tt.root.Execute(context.WithValue(ctx, "t", t1), rl)) {
 				l.Warn(rl.String())
 			} else {
 				l.Debug(rl.String())
@@ -346,7 +350,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
-			if !tt.wantErr(t1, tt.root.RunExecution(context.WithValue(ctx, "t", t1), rl)) {
+			if !tt.wantErr(t1, tt.root.Execute(context.WithValue(ctx, "t", t1), rl)) {
 				l.Warn(rl.String())
 			} else {
 				l.Debug(rl.String())
@@ -368,10 +372,11 @@ func TestRoot_NodeFlags(t *testing.T) {
 			name: "tree",
 			root: &tree.Root{
 				Node: &tree.Node{
-					Flags: func(fs *readline.FlagSet) {
+					Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSet) error {
 						fs.String("first", "first", "first")
 						fs.Bool("second", false, "second")
 						fs.Int64("third", 0, "third")
+						return nil
 					},
 					Execute: func(ctx context.Context, r *readline.Readline) error {
 						assert.Equal(T(ctx), "first", r.FlagSet().GetString("first"))
@@ -389,10 +394,11 @@ func TestRoot_NodeFlags(t *testing.T) {
 			name: "tree --first one --second --third 13",
 			root: &tree.Root{
 				Node: &tree.Node{
-					Flags: func(fs *readline.FlagSet) {
+					Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSet) error {
 						fs.String("first", "first", "first")
 						fs.Bool("second", false, "second")
 						fs.Int64("third", 0, "third")
+						return nil
 					},
 					Execute: func(ctx context.Context, r *readline.Readline) error {
 						assert.Equal(T(ctx), "one", r.FlagSet().GetString("first"))
@@ -413,7 +419,7 @@ func TestRoot_NodeFlags(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
-			if !tt.wantErr(t1, tt.root.RunExecution(context.WithValue(ctx, "t", t1), rl)) {
+			if !tt.wantErr(t1, tt.root.Execute(context.WithValue(ctx, "t", t1), rl)) {
 				l.Warn(rl.String())
 			} else {
 				l.Debug(rl.String())

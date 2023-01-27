@@ -38,6 +38,14 @@ func (c Commands) Add(commands ...Command) {
 	}
 }
 
+func (c Commands) TryAdd(command Command, err error) error {
+	if err != nil {
+		return err
+	}
+	c[command.Name()] = command
+	return nil
+}
+
 func (c Commands) Load(paths ...string) error {
 	for _, path := range paths {
 		if plg, err := plugin.Open(path); err != nil {

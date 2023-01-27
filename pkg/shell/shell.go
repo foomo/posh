@@ -96,6 +96,16 @@ func (s *Shell) Output() ([]byte, error) {
 	return s.cmd.Output()
 }
 
+func (s *Shell) CombinedOutput() ([]byte, error) {
+	args := s.args
+	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
+	if !s.quiet {
+		s.cmd.Stdin = s.Stdin
+	}
+	s.trace()
+	return s.cmd.CombinedOutput()
+}
+
 func (s *Shell) Wait() error {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))

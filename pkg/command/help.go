@@ -5,8 +5,8 @@ import (
 	"math"
 	"strings"
 
-	"github.com/c-bata/go-prompt"
 	"github.com/foomo/posh/pkg/log"
+	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/pkg/errors"
 )
@@ -41,12 +41,12 @@ func (c *Help) Description() string {
 	return "print help"
 }
 
-func (c *Help) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
-	var suggests []prompt.Suggest
+func (c *Help) Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
+	var suggests []goprompt.Suggest
 	switch {
 	case r.Args().LenLte(1):
 		for _, value := range c.list() {
-			suggests = append(suggests, prompt.Suggest{Text: value.Name(), Description: value.Description()})
+			suggests = append(suggests, goprompt.Suggest{Text: value.Name(), Description: value.Description()})
 		}
 	}
 	return suggests
@@ -86,7 +86,7 @@ Available Commands:
 		c.l.Print(ret)
 	case 1:
 		if helper, ok := c.commands.Get(r.Args().At(0)).(Helper); ok {
-			c.l.Print(helper.Help())
+			c.l.Print(helper.Help(ctx, r))
 		}
 	}
 	return nil

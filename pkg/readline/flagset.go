@@ -10,14 +10,23 @@ type FlagSet struct {
 	*pflag.FlagSet
 }
 
-func NewFlagSet(handler func(set *FlagSet)) *FlagSet {
-	inst := &FlagSet{
+func NewFlagSet() *FlagSet {
+	return &FlagSet{
 		FlagSet: pflag.NewFlagSet("readline", pflag.ContinueOnError),
 	}
-	if handler != nil {
-		handler(inst)
+}
+
+func (a *FlagSet) SetValues(name string, values ...string) error {
+	return a.SetAnnotation(name, "values", values)
+}
+
+func (a *FlagSet) GetValues(name string) []string {
+	if f := a.FlagSet.Lookup(name); f == nil {
+		return nil
+	} else if v, ok := f.Annotations["values"]; ok {
+		return v
 	}
-	return inst
+	return nil
 }
 
 func (a *FlagSet) GetString(name string) string {

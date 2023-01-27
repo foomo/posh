@@ -3,7 +3,7 @@ package command
 import (
 	"context"
 
-	"github.com/c-bata/go-prompt"
+	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
 )
 
@@ -14,24 +14,24 @@ type (
 		Execute(ctx context.Context, r *readline.Readline) error
 	}
 	Helper interface {
-		Help() string
+		Help(ctx context.Context, r *readline.Readline) string
 	}
 	Validator interface {
 		Validate(ctx context.Context, r *readline.Readline) error
 	}
 	Completer interface {
-		Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest
+		Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest
 	}
 	FlagCompleter interface {
-		CompleteFlags(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest
+		CompleteFlags(ctx context.Context, r *readline.Readline) []goprompt.Suggest
 	}
 	ArgumentCompleter interface {
-		CompleteArguments(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest
+		CompleteArguments(ctx context.Context, r *readline.Readline) []goprompt.Suggest
 	}
 	PassThroughFlagsCompleter interface {
-		CompletePassTroughFlags(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest
+		CompletePassTroughFlags(ctx context.Context, r *readline.Readline) []goprompt.Suggest
 	}
 	AdditionalArgsCompleter interface {
-		CompleteAdditionalArgs(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest
+		CompleteAdditionalArgs(ctx context.Context, r *readline.Readline) []goprompt.Suggest
 	}
 )

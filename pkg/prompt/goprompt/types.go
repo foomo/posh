@@ -1,4 +1,4 @@
-package prompt
+package goprompt
 
 import (
 	"github.com/c-bata/go-prompt"
@@ -7,6 +7,7 @@ import (
 type (
 	Filter   = prompt.Filter
 	Suggest  = prompt.Suggest
+	Suggests = []prompt.Suggest
 	Document = prompt.Document
 )
 

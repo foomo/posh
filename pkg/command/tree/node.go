@@ -2,20 +2,22 @@ package tree
 
 import (
 	"context"
+	"strings"
 
-	"github.com/c-bata/go-prompt"
+	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
+	"github.com/foomo/posh/pkg/util/suggests"
 
 	"github.com/pkg/errors"
 )
 
 type Node struct {
 	Name             string
-	Values           func(ctx context.Context, r *readline.Readline) []string
+	Values           func(ctx context.Context, r *readline.Readline) []goprompt.Suggest
 	Args             Args
-	Flags            func(fs *readline.FlagSet)
+	Flags            func(ctx context.Context, r *readline.Readline, fs *readline.FlagSet) error
 	PassThroughArgs  Args
-	PassThroughFlags func(fs *readline.FlagSet)
+	PassThroughFlags func(ctx context.Context, r *readline.Readline, fs *readline.FlagSet) error
 	Description      string
 	Nodes            []*Node
 	Execute          func(ctx context.Context, r *readline.Readline) error
@@ -25,9 +27,13 @@ type Node struct {
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
 
-func (c *Node) setFlags(r *readline.Readline, parse bool) error {
+func (c *Node) setFlags(ctx context.Context, r *readline.Readline, parse bool) error {
 	if c.Flags != nil {
-		r.SetFlags(readline.NewFlagSet(c.Flags))
+		f := readline.NewFlagSet()
+		if err := c.Flags(ctx, r, f); err != nil {
+			return err
+		}
+		r.SetFlags(f)
 		if parse {
 			if err := r.ParseFlags(); err != nil {
 				return errors.Wrap(err, "failed to parse flags")
@@ -35,7 +41,11 @@ func (c *Node) setFlags(r *readline.Readline, parse bool) error {
 		}
 	}
 	if c.PassThroughFlags != nil {
-		r.SetParsePassThroughFlags(readline.NewFlagSet(c.PassThroughFlags))
+		f := readline.NewFlagSet()
+		if err := c.PassThroughFlags(ctx, r, f); err != nil {
+			return err
+		}
+		r.SetParsePassThroughFlags(f)
 		if parse {
 			if err := r.ParsePassThroughFlags(); err != nil {
 				return errors.Wrap(err, "failed to parse pass through flags")
@@ -45,18 +55,16 @@ func (c *Node) setFlags(r *readline.Readline, parse bool) error {
 	return nil
 }
 
-func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readline, i int) []prompt.Suggest {
-	var suggest []prompt.Suggest
+func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readline, i int) []goprompt.Suggest {
+	var suggest []goprompt.Suggest
 	localArgs := r.Args()[i:]
 	switch {
 	case len(c.Nodes) > 0 && len(localArgs) <= 1:
 		for _, command := range c.Nodes {
 			if command.Values != nil {
-				for _, name := range command.Values(ctx, r) {
-					suggest = append(suggest, prompt.Suggest{Text: name, Description: command.Description})
-				}
+				suggest = command.Values(ctx, r)
 			} else {
-				suggest = append(suggest, prompt.Suggest{Text: command.Name, Description: command.Description})
+				suggest = append(suggest, goprompt.Suggest{Text: command.Name, Description: command.Description})
 			}
 		}
 	case len(c.Args) > 0 && len(c.Args) >= len(localArgs):
@@ -73,20 +81,25 @@ func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readl
 	return suggest
 }
 
-func (c *Node) completeFlags(r *readline.Readline) []prompt.Suggest {
+func (c *Node) completeFlags(r *readline.Readline) []goprompt.Suggest {
 	allFlags := r.AllFlags()
-	suggest := make([]prompt.Suggest, len(allFlags))
+	if r.Flags().LenGt(1) {
+		if values := r.FlagSet().GetValues(strings.TrimPrefix(r.Flags().At(r.Flags().Len()-2), "--")); values != nil {
+			return suggests.List(values)
+		}
+	}
+	suggest := make([]goprompt.Suggest, len(allFlags))
 	for i, f := range allFlags {
-		suggest[i] = prompt.Suggest{Text: "--" + f.Name, Description: f.Usage}
+		suggest[i] = goprompt.Suggest{Text: "--" + f.Name, Description: f.Usage}
 	}
 	return suggest
 }
 
-func (c *Node) completePassThroughFlags(r *readline.Readline) []prompt.Suggest {
+func (c *Node) completePassThroughFlags(r *readline.Readline) []goprompt.Suggest {
 	allPassThroughFlags := r.AllPassThroughFlags()
-	suggest := make([]prompt.Suggest, len(allPassThroughFlags))
+	suggest := make([]goprompt.Suggest, len(allPassThroughFlags))
 	for i, f := range allPassThroughFlags {
-		suggest[i] = prompt.Suggest{Text: "--" + f.Name, Description: f.Usage}
+		suggest[i] = goprompt.Suggest{Text: "--" + f.Name, Description: f.Usage}
 	}
 	return suggest
 }
