@@ -12,33 +12,16 @@ env:
   GOPROXY: https://proxy.golang.org
 
 jobs:
-  matrix:
-    name: matrix
-    runs-on: ubuntu-latest
-    outputs:
-      gomod: ${{ steps.gomod.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v3
-      - id: gomod
-        run: |
-          matrix=$(find . -type f -name "go.mod" -print0 | xargs -0 -n1 dirname | sort --unique | jq -R -s -c 'split("\n")[:-1]')
-          echo "${matrix}"
-          echo "::set-output name=matrix::${matrix}"
   lint:
     name: lint
-    needs: matrix
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        gomod: ${{ fromJson(needs.matrix.outputs.gomod) }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version-file: 'go.mod'
       - uses: golangci/golangci-lint-action@v3
-        with:
-          working-directory: ${{ matrix.gomod }}
+
   test:
     name: test
     runs-on: ubuntu-latest
