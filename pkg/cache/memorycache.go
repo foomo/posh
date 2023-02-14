@@ -4,11 +4,11 @@ type MemoryCache map[string]MemoryNamespace
 
 func (c MemoryCache) Clear(namespace string) {
 	if namespace == "" {
-		for key := range c {
-			delete(c, key)
+		for _, value := range c {
+			value.Delete("")
 		}
-	} else {
-		delete(c, namespace)
+	} else if value := c.Get(namespace); value != nil {
+		value.Delete("")
 	}
 }
 

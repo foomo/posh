@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/foomo/posh/pkg/cache"
 	"github.com/foomo/posh/pkg/command/tree"
@@ -11,6 +12,7 @@ import (
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/pterm/pterm"
 	"github.com/pterm/pterm/putils"
+	"github.com/samber/lo"
 )
 
 type Cache struct {
@@ -92,9 +94,15 @@ func (c *Cache) list(ctx context.Context, r *readline.Readline) error {
 	// Create a fork of the default table, fill it with data and print it.
 	// Data can also be generated and inserted later.
 	list := pterm.LeveledList{}
-	for ns, value := range c.cache.List() {
+	cacheList := c.cache.List()
+	cacheListKeys := lo.Keys(cacheList)
+	sort.Strings(cacheListKeys)
+	for _, ns := range cacheListKeys {
+		value := cacheList[ns]
 		list = append(list, pterm.LeveledListItem{Level: 0, Text: ns})
-		for _, k := range value.Keys() {
+		keys := value.Keys()
+		sort.Strings(keys)
+		for _, k := range keys {
 			list = append(list, pterm.LeveledListItem{Level: 1, Text: k})
 			if c.l.Level() == log.LevelTrace {
 				list = append(list, pterm.LeveledListItem{Level: 2, Text: fmt.Sprintf("%v", value.Get(k, nil))})
