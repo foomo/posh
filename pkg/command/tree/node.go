@@ -115,6 +115,10 @@ func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 				return errors.Wrap(ErrMissingArgument, arg.Name)
 			}
 		}
+	case c.Execute == nil && len(c.Nodes) > 0:
+		return ErrMissingCommand
+	case c.Execute == nil:
+		return ErrInvalidCommand
 	}
 	return c.Execute(ctx, r)
 }
