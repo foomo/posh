@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	intconfig "github.com/foomo/posh/internal/config"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -8,11 +10,12 @@ import (
 
 // execCmd represents the exec command
 var execCmd = &cobra.Command{
-	Use:           "execute",
-	Short:         "Execute a single Project Oriented Shell command",
-	Args:          cobra.ArbitraryArgs,
-	SilenceUsage:  true,
-	SilenceErrors: true,
+	Use:                "execute",
+	Short:              "Execute a single Project Oriented Shell command",
+	Args:               cobra.ArbitraryArgs,
+	DisableFlagParsing: true,
+	SilenceUsage:       true,
+	SilenceErrors:      true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := intconfig.Load(l); err != nil {
 			return err
@@ -29,6 +32,7 @@ var execCmd = &cobra.Command{
 			return err
 		}
 
+		fmt.Println(args)
 		return plg.Execute(cmd.Context(), args)
 	},
 }
