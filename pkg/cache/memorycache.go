@@ -7,8 +7,8 @@ func (c MemoryCache) Clear(namespace string) {
 		for _, value := range c {
 			value.Delete("")
 		}
-	} else if value := c.Get(namespace); value != nil {
-		value.Delete("")
+	} else {
+		c.Get(namespace).Delete("")
 	}
 }
 
