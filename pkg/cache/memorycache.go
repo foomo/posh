@@ -2,6 +2,10 @@ package cache
 
 type MemoryCache map[string]MemoryNamespace
 
+func NewMemoryCache() MemoryCache {
+	return MemoryCache{}
+}
+
 func (c MemoryCache) Clear(namespace string) {
 	if namespace == "" {
 		for _, value := range c {
