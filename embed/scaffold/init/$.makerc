@@ -1,0 +1,2 @@
+## Override log level (error|warn|info|debug|trace)
+# level=debug

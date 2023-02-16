@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	pkgcommand "{{.module}}/posh/pkg/command"
-	"github.com/foomo/fender/fend"
 	"github.com/foomo/posh/pkg/command"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
@@ -17,7 +15,7 @@ import (
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/require"
-	"github.com/spf13/viper"
+	pkgcommand "{{.module}}/posh/pkg/command"
 )
 
 type Plugin struct {
@@ -109,9 +107,10 @@ func (p *Plugin) Execute(ctx context.Context, args []string) error {
 
 func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {
 	sh, err := prompt.New(p.l,
+		prompt.WithContext(ctx),
 		prompt.WithTitle(cfg.Title),
 		prompt.WithPrefix(cfg.Prefix),
-		prompt.WithContext(ctx),
+		prompt.WithAliases(cfg.Aliases),
 		prompt.WithCommands(p.commands),
 		prompt.WithCheckers(
 			func(ctx context.Context, l log.Logger) check.Info {

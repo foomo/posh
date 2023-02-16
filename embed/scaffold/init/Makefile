@@ -1,17 +1,12 @@
 -include .makerc
 .DEFAULT_GOAL:=help
 
-# --- .makerc -----------------------------------------------------------------
-#
-# level=debug
-
 # --- Config -----------------------------------------------------------------
 
 level?=info
 
 # --- Helpers -----------------------------------------------------------------
 
-.PHONY: bin/posh
 # Builds posh and takes the git hash to detect changes
 bin/posh: current=$(shell bin/posh version)
 bin/posh: version=$(shell git ls-files -s .posh/pkg | git hash-object --stdin)
@@ -50,7 +45,7 @@ require: bin/posh
 
 .PHONY: shell
 ## Start the interactive
-shell: bin/posh require brew
+shell: require brew
 	@bin/posh prompt --level ${level}
 
 .PHONY: shell.rebuild
