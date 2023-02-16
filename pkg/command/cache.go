@@ -64,8 +64,8 @@ func (c *Cache) Complete(ctx context.Context, r *readline.Readline) []goprompt.S
 	return c.tree.Complete(ctx, r)
 }
 
-func (c *Cache) Execute(ctx context.Context, args *readline.Readline) error {
-	return c.tree.Execute(ctx, args)
+func (c *Cache) Execute(ctx context.Context, r *readline.Readline) error {
+	return c.tree.Execute(ctx, r)
 }
 
 func (c *Cache) Help(ctx context.Context, r *readline.Readline) string {
