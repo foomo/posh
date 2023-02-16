@@ -2,15 +2,17 @@ package files
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"path/filepath"
+	"regexp"
 
 	"github.com/charlievieth/fastwalk"
 )
 
 type (
 	FindOptions struct {
-		ignore []string
+		ignore []*regexp.Regexp
 		follow bool
 	}
 	FindOption func(*FindOptions)
@@ -24,7 +26,9 @@ func FindWithFollow(v bool) FindOption {
 
 func FindWithIgnore(v ...string) FindOption {
 	return func(o *FindOptions) {
-		o.ignore = append(o.ignore, v...)
+		for _, s := range v {
+			o.ignore = append(o.ignore, regexp.MustCompile(s))
+		}
 	}
 }
 
@@ -45,14 +49,15 @@ func Find(ctx context.Context, root, pattern string, opts ...FindOption) ([]stri
 			return err
 		}
 
-		for _, pattern := range o.ignore {
-			if ok, err := filepath.Match(pattern, d.Name()); err != nil {
-				return err
-			} else if ok {
-				if d.IsDir() {
-					return fastwalk.SkipDir
-				} else {
-					return nil
+		if d.Name() != "." {
+			for _, ignore := range o.ignore {
+				if ignore.MatchString(d.Name()) {
+					fmt.Println(d.Name())
+					if d.IsDir() {
+						return fastwalk.SkipDir
+					} else {
+						return nil
+					}
 				}
 			}
 		}
