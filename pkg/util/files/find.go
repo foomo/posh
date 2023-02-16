@@ -2,7 +2,6 @@ package files
 
 import (
 	"context"
-	"fmt"
 	"io/fs"
 	"path/filepath"
 	"regexp"
@@ -52,7 +51,6 @@ func Find(ctx context.Context, root, pattern string, opts ...FindOption) ([]stri
 		if d.Name() != "." {
 			for _, ignore := range o.ignore {
 				if ignore.MatchString(d.Name()) {
-					fmt.Println(d.Name())
 					if d.IsDir() {
 						return fastwalk.SkipDir
 					} else {
