@@ -224,15 +224,13 @@ func (s *Prompt) Run() error {
 // ------------------------------------------------------------------------------------------------
 
 func (s *Prompt) alias(input string, aliases map[string]string) string {
-	if len(aliases) == 0 {
-		return input
-	} else if parts := strings.Split(input, " "); len(parts) == 0 {
-		return input
-	} else if value, ok := aliases[parts[0]]; !ok {
-		return input
-	} else {
-		return value + " " + strings.Join(parts[1:], " ")
+	for key, value := range aliases {
+		if strings.HasPrefix(input, key) {
+			input = value + strings.TrimPrefix(input, key)
+			return input
+		}
 	}
+	return input
 }
 
 func (s *Prompt) execute(input string) {
