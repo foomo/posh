@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	intconfig "github.com/foomo/posh/internal/config"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -32,7 +30,6 @@ var execCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Println(args)
 		return plg.Execute(cmd.Context(), args)
 	},
 }
