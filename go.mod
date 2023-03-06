@@ -9,7 +9,7 @@ require (
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/charlievieth/fastwalk v1.0.1
 	github.com/foomo/fender v0.4.4
-	github.com/go-git/go-git/v5 v5.5.2
+	github.com/go-git/go-git/v5 v5.6.0
 	github.com/gofrs/flock v0.8.1
 	github.com/pkg/errors v0.9.1
 	github.com/pterm/pterm v0.12.54
@@ -58,7 +58,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
-	github.com/pjbgf/sha1cd v0.2.3 // indirect
+	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/term v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
