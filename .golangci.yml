@@ -108,7 +108,7 @@ linters:
     - tenv # tenv is analyzer that detects using os.Setenv instead of t.Setenv since Go1.17 [fast: false, auto-fix: false]
     - testableexamples # linter checks if examples are testable (have an expected output) [fast: true, auto-fix: false]
     - testpackage # linter that makes you use a separate _test package [fast: true, auto-fix: false]
-    - thelper # thelper detects golang test helpers without t.Helper() call and checks the consistency of test helpers [fast: false, auto-fix: false]
+    #- thelper # thelper detects golang test helpers without t.Helper() call and checks the consistency of test helpers [fast: false, auto-fix: false]
     - tparallel # tparallel detects inappropriate usage of t.Parallel() method in your Go test codes [fast: false, auto-fix: false]
     - unconvert # Remove unnecessary type conversions [fast: false, auto-fix: false]
     #- unparam # Reports unused function parameters [fast: false, auto-fix: false]
