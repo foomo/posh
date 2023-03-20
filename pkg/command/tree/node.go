@@ -6,21 +6,20 @@ import (
 
 	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
+	xstrings "github.com/foomo/posh/pkg/util/strings"
 	"github.com/foomo/posh/pkg/util/suggests"
 
 	"github.com/pkg/errors"
 )
 
 type Node struct {
-	Name             string
-	Values           func(ctx context.Context, r *readline.Readline) []goprompt.Suggest
-	Args             Args
-	Flags            func(ctx context.Context, r *readline.Readline, fs *readline.FlagSet) error
-	PassThroughArgs  Args
-	PassThroughFlags func(ctx context.Context, r *readline.Readline, fs *readline.FlagSet) error
-	Description      string
-	Nodes            []*Node
-	Execute          func(ctx context.Context, r *readline.Readline) error
+	Name        string
+	Values      func(ctx context.Context, r *readline.Readline) []goprompt.Suggest
+	Args        Args
+	Flags       func(ctx context.Context, r *readline.Readline, fs *readline.FlagSets) error
+	Description string
+	Nodes       []*Node
+	Execute     func(ctx context.Context, r *readline.Readline) error
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -29,33 +28,21 @@ type Node struct {
 
 func (c *Node) setFlags(ctx context.Context, r *readline.Readline, parse bool) error {
 	if c.Flags != nil {
-		f := readline.NewFlagSet()
-		if err := c.Flags(ctx, r, f); err != nil {
+		fs := readline.NewFlagSets()
+		if err := c.Flags(ctx, r, fs); err != nil {
 			return err
 		}
-		r.SetFlags(f)
-		if parse {
-			if err := r.ParseFlags(); err != nil {
-				return errors.Wrap(err, "failed to parse flags")
-			}
-		}
+		r.SetFlagSets(fs)
 	}
-	if c.PassThroughFlags != nil {
-		f := readline.NewFlagSet()
-		if err := c.PassThroughFlags(ctx, r, f); err != nil {
-			return err
-		}
-		r.SetParsePassThroughFlags(f)
-		if parse {
-			if err := r.ParsePassThroughFlags(); err != nil {
-				return errors.Wrap(err, "failed to parse pass through flags")
-			}
+	if parse {
+		if err := r.ParseFlagSets(); err != nil {
+			return errors.Wrap(err, "failed to parse flags")
 		}
 	}
 	return nil
 }
 
-func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readline, i int) []goprompt.Suggest {
+func (c *Node) completeArguments(ctx context.Context, p *root, r *readline.Readline, i int) []goprompt.Suggest {
 	var suggest []goprompt.Suggest
 	localArgs := r.Args()[i:]
 	switch {
@@ -84,7 +71,7 @@ func (c *Node) completeArguments(ctx context.Context, p *Root, r *readline.Readl
 func (c *Node) completeFlags(r *readline.Readline) []goprompt.Suggest {
 	allFlags := r.AllFlags()
 	if r.Flags().LenGt(1) {
-		if values := r.FlagSet().GetValues(strings.TrimPrefix(r.Flags().At(r.Flags().Len()-2), "--")); values != nil {
+		if values := r.FlagSets().All().GetValues(strings.TrimPrefix(r.Flags().At(r.Flags().Len()-2), "--")); values != nil {
 			return suggests.List(values)
 		}
 	}
@@ -95,18 +82,11 @@ func (c *Node) completeFlags(r *readline.Readline) []goprompt.Suggest {
 	return suggest
 }
 
-func (c *Node) completePassThroughFlags(r *readline.Readline) []goprompt.Suggest {
-	allPassThroughFlags := r.AllPassThroughFlags()
-	suggest := make([]goprompt.Suggest, len(allPassThroughFlags))
-	for i, f := range allPassThroughFlags {
-		suggest[i] = goprompt.Suggest{Text: "--" + f.Name, Description: f.Usage}
-	}
-	return suggest
-}
-
 func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 	localArgs := r.Args()[i:]
 	switch {
+	case len(localArgs) == 0 && c.Execute != nil:
+		break
 	case len(c.Nodes) > 0 && len(localArgs) == 0:
 		return ErrMissingCommand
 	case len(c.Args) > 0:
@@ -121,4 +101,79 @@ func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 		return ErrInvalidCommand
 	}
 	return c.Execute(ctx, r)
+}
+
+func (c *Node) find(ctx context.Context, r *readline.Readline, i int) (*Node, int) {
+	if r.Args().LenLt(i + 1) {
+		return nil, i
+	}
+	arg := r.Args().At(i)
+	for _, cmd := range c.Nodes {
+		if cmd.Name == arg {
+			if subCmd, j := cmd.find(ctx, r, i+1); subCmd != nil {
+				return subCmd, j
+			}
+			return cmd, i
+		}
+		if cmd.Values != nil {
+			for _, name := range cmd.Values(ctx, r) {
+				if name.Text == arg {
+					if subCmd, j := cmd.find(ctx, r, i+1); subCmd != nil {
+						return subCmd, j
+					}
+					return cmd, i
+				}
+			}
+		}
+	}
+	return nil, i
+}
+
+func (c *Node) help(ctx context.Context, r *readline.Readline) string {
+	ret := c.Description
+
+	if len(c.Nodes) > 0 {
+		ret += "\n\nUsage:\n"
+		ret += "      " + c.Name + " [command]"
+
+		ret += "\n\nAvailable Commands:\n"
+		for _, node := range c.Nodes {
+			ret += "      " + xstrings.PadEnd(node.Name, " ", 30) + node.Description + "\n"
+		}
+	} else {
+		ret += "\n\nUsage:\n"
+		ret += "      " + c.Name
+
+		for _, arg := range c.Args {
+			ret += " "
+			if arg.Optional {
+				ret += "<"
+			} else {
+				ret += "["
+			}
+			ret += arg.Name
+			if arg.Optional {
+				ret += ">"
+			} else {
+				ret += "]"
+			}
+			ret += "\n"
+		}
+
+		if len(c.Args) > 0 {
+			ret += "\n\nArguments:\n"
+			for _, arg := range c.Args {
+				ret += "      " + xstrings.PadEnd(arg.Name, " ", 30) + arg.Description + "\n"
+			}
+		}
+
+		if c.Flags != nil {
+			fs := readline.NewFlagSets()
+			if err := c.Flags(ctx, r, fs); err == nil {
+				ret += "\n\nFlags:\n"
+				ret += fs.All().FlagUsages()
+			}
+		}
+	}
+	return ret
 }

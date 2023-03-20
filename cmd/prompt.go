@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+
 	intconfig "github.com/foomo/posh/internal/config"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/spf13/cobra"
@@ -30,6 +32,6 @@ var promptCmd = &cobra.Command{
 			return err
 		}
 
-		return plg.Prompt(cmd.Context(), cfg)
+		return plg.Prompt(context.TODO(), cfg)
 	},
 }

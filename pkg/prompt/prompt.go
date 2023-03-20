@@ -2,8 +2,6 @@ package prompt
 
 import (
 	"context"
-	"os"
-	"os/signal"
 	"strings"
 
 	"github.com/c-bata/go-prompt"
@@ -239,7 +237,7 @@ func (s *Prompt) execute(input string) {
 		return
 	}
 
-	s.history.Persist(s.ctx, input)
+	defer s.history.Persist(s.ctx, input)
 
 	input = s.alias(input, s.aliases)
 
@@ -317,12 +315,6 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 		} else if value, ok := cmd.(command.Completer); ok {
 			return s.filter(value.Complete(ctx, s.readline), word, true)
 		}
-	case readline.ModePassThroughFlags:
-		if value, ok := cmd.(command.PassThroughFlagsCompleter); ok {
-			return s.filter(value.CompletePassTroughFlags(ctx, s.readline), word, true)
-		} else if value, ok := cmd.(command.Completer); ok {
-			return s.filter(value.Complete(ctx, s.readline), word, true)
-		}
 	case readline.ModeAdditionalArgs:
 		if value, ok := cmd.(command.AdditionalArgsCompleter); ok {
 			return s.filter(value.CompleteAdditionalArgs(ctx, s.readline), word, true)
@@ -335,17 +327,21 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 
 // context returns and watches over a new context
 func (s *Prompt) context() context.Context {
-	ctx, cancel := context.WithCancel(context.Background()) // FIXME context.WithCancel(s.ctx)
-	go func(ctx context.Context, cancel context.CancelFunc) {
-		sigChan := make(chan os.Signal, 1)
-		signal.Notify(sigChan, os.Interrupt)
-		select {
-		case <-sigChan:
-			cancel()
-			return
-		case <-ctx.Done():
-			return
-		}
-	}(ctx, cancel)
-	return ctx
+	//ctx, cancel := context.WithCancel(context.Background())
+	//go func(ctx context.Context, cancel context.CancelFunc) {
+	//	sigChan := make(chan os.Signal, 1)
+	//	signal.Notify(sigChan, os.Interrupt)
+	//	select {
+	//	case <-s.ctx.Done():
+	//		cancel()
+	//		return
+	//	case <-sigChan:
+	//		cancel()
+	//		return
+	//	case <-ctx.Done():
+	//		return
+	//	}
+	//}(ctx, cancel)
+	//return ctx
+	return s.ctx
 }
