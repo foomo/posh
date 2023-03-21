@@ -84,22 +84,24 @@ func (c *Node) completeFlags(r *readline.Readline) []goprompt.Suggest {
 
 func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 	localArgs := r.Args()[i:]
+
+	// validate
 	switch {
-	case len(localArgs) == 0 && c.Execute != nil:
+	case c.Execute == nil && len(c.Nodes) == 0:
+		return ErrNoop
+	case c.Execute == nil && len(c.Nodes) > 0 && len(localArgs) == 0:
+		return ErrMissingCommand
+	case c.Execute != nil && len(c.Nodes) == 0 && len(c.Args) == 0:
 		break
-	case len(c.Nodes) > 0 && len(localArgs) == 0:
-		return ErrMissingCommand
-	case len(c.Args) > 0:
-		for j, arg := range c.Args {
-			if !arg.Optional && len(localArgs)-1 < j {
-				return errors.Wrap(ErrMissingArgument, arg.Name)
-			}
-		}
-	case c.Execute == nil && len(c.Nodes) > 0:
-		return ErrMissingCommand
+	case c.Execute != nil && len(c.Nodes) == 0 && c.Args.Validate(localArgs) == nil:
+		break
+	case c.Execute != nil && len(c.Nodes) == 0 && c.Args.Validate(localArgs) != nil:
+		return c.Args.Validate(localArgs)
 	case c.Execute == nil:
 		return ErrInvalidCommand
 	}
+
+	// execute
 	return c.Execute(ctx, r)
 }
 

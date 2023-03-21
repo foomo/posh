@@ -91,11 +91,8 @@ func (t *root) Execute(ctx context.Context, r *readline.Readline) error {
 		index int
 	)
 
-	switch {
-	case t.node == nil && t.node.Execute == nil && len(t.node.Nodes) == 0:
+	if t.node == nil {
 		return ErrNoop
-	case r.Args().LenIs(1) && t.node == nil:
-		return ErrMissingCommand
 	}
 
 	if r.Args().LenIs(0) {
