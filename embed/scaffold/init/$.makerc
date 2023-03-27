@@ -1,2 +1,3 @@
 ## Override log level (error|warn|info|debug|trace)
-# level=debug
+# POSH_PATH=.posh
+# POSH_LEVEL=debug

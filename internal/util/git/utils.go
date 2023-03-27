@@ -21,6 +21,6 @@ func OriginURL() (string, error) {
 	} else if value, err := giturls.Parse(value.Config().URLs[0]); err != nil {
 		return "", err
 	} else {
-		return value.Hostname() + "/" + strings.TrimSuffix(value.Path, path.Ext(value.Path)), nil
+		return value.Hostname() + strings.TrimSuffix(value.Path, path.Ext(value.Path)), nil
 	}
 }
