@@ -151,6 +151,9 @@ func New(l log.Logger, opts ...Option) (*Prompt, error) {
 			}
 		}
 	}
+	if inst.history != nil {
+		inst.commands.Add(command.NewHistory(l, inst.history))
+	}
 	if value, err := readline.New(l); err != nil {
 		return nil, err
 	} else {
