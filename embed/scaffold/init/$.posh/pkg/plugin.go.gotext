@@ -34,20 +34,15 @@ func New(l log.Logger) (plugin.Plugin, error) {
 	}
 
 	// add commands
-	inst.commands.Add(
-		command.NewExit(l),
-		command.NewHelp(l, inst.commands),
-	)
+	inst.commands.Add(command.NewExit(l))
+	inst.commands.Add(command.NewHelp(l, inst.commands))
 
 	// Welcome
-	if cmd, err := pkgcommand.NewWelcome(l,
-		pkgcommand.WelcomeWithConfigKey("welcome"),
-	); err != nil {
-		return nil, err
-	} else {
-		inst.commands.Add(cmd)
-	}
-
+	inst.commands.MustAdd(
+		pkgcommand.NewWelcome(l,
+			pkgcommand.WelcomeWithConfigKey("welcome"),
+		),
+	)
 
 	return inst, nil
 }
