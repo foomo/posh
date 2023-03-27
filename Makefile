@@ -57,6 +57,7 @@ lint.super:
 
 .PHONY: install
 ## Run go install
+install: GOPATH=${shell go env GOPATH}
 install:
 	@go install -a main.go
 	@mv "${GOPATH}/bin/main" "${GOPATH}/bin/posh"
