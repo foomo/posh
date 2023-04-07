@@ -29,13 +29,11 @@ func TestRoot(t *testing.T) {
 		ErrThird1  = errors.New("third1")
 	)
 
-	r := &tree.Root{
+	r := tree.New(&tree.Node{
 		Name:        "root",
 		Description: "root tree",
-		Node: &tree.Node{
-			Execute: func(ctx context.Context, r *readline.Readline) error {
-				return ErrRoot
-			},
+		Execute: func(ctx context.Context, r *readline.Readline) error {
+			return ErrRoot
 		},
 		Nodes: tree.Nodes{
 			{
@@ -85,7 +83,7 @@ func TestRoot(t *testing.T) {
 				},
 			},
 		},
-	}
+	})
 
 	tests := []struct {
 		name    string
@@ -179,39 +177,35 @@ func TestRoot_Node(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		root    *tree.Root
+		root    tree.Root
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
 			name: "tree",
-			root: &tree.Root{},
+			root: tree.New(&tree.Node{}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, tree.ErrNoop)
 			},
 		},
 		{
 			name: "tree",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						return ErrOK
-					},
+			root: tree.New(&tree.Node{
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					return ErrOK
 				},
-			},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrOK)
 			},
 		},
 		{
 			name: "tree one",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						assert.Equal(T(ctx), "one", r.Args().At(0))
-						return ErrOK
-					},
+			root: tree.New(&tree.Node{
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					assert.Equal(T(ctx), "one", r.Args().At(0))
+					return ErrOK
 				},
-			},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrOK)
 			},
@@ -238,107 +232,97 @@ func TestRoot_NodeArgs(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		root    *tree.Root
+		root    tree.Root
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
 			name: "tree",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Args: tree.Args{
-						{
-							Name: "first",
-						},
-					},
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						return ErrOK
+			root: tree.New(&tree.Node{
+				Args: tree.Args{
+					{
+						Name: "first",
 					},
 				},
-			},
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					return ErrOK
+				},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
 		{
 			name: "tree one",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Args: tree.Args{
-						{
-							Name: "first",
-						},
-					},
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						assert.Equal(T(ctx), "one", r.Args().At(0))
-						return ErrOK
+			root: tree.New(&tree.Node{
+				Args: tree.Args{
+					{
+						Name: "first",
 					},
 				},
-			},
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					assert.Equal(T(ctx), "one", r.Args().At(0))
+					return ErrOK
+				},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrOK)
 			},
 		},
 		{
 			name: "tree",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Args: tree.Args{
-						{
-							Name: "first",
-						},
-						{
-							Name: "second",
-						},
+			root: tree.New(&tree.Node{
+				Args: tree.Args{
+					{
+						Name: "first",
 					},
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						return ErrOK
+					{
+						Name: "second",
 					},
 				},
-			},
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					return ErrOK
+				},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
 		{
 			name: "tree one",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Args: tree.Args{
-						{
-							Name: "first",
-						},
-						{
-							Name: "second",
-						},
+			root: tree.New(&tree.Node{
+				Args: tree.Args{
+					{
+						Name: "first",
 					},
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						return ErrOK
+					{
+						Name: "second",
 					},
 				},
-			},
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					return ErrOK
+				},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
 		{
 			name: "tree one two",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Args: tree.Args{
-						{
-							Name: "first",
-						},
-						{
-							Name: "second",
-						},
+			root: tree.New(&tree.Node{
+				Args: tree.Args{
+					{
+						Name: "first",
 					},
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						assert.Equal(T(ctx), "one", r.Args().At(0))
-						assert.Equal(T(ctx), "two", r.Args().At(1))
-						return ErrOK
+					{
+						Name: "second",
 					},
 				},
-			},
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					assert.Equal(T(ctx), "one", r.Args().At(0))
+					assert.Equal(T(ctx), "two", r.Args().At(1))
+					return ErrOK
+				},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrOK)
 			},
@@ -365,49 +349,57 @@ func TestRoot_NodeFlags(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		root    *tree.Root
+		root    tree.Root
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
 			name: "tree",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSet) error {
-						fs.String("first", "first", "first")
-						fs.Bool("second", false, "second")
-						fs.Int64("third", 0, "third")
-						return nil
-					},
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						assert.Equal(T(ctx), "first", r.FlagSet().GetString("first"))
-						assert.False(T(ctx), r.FlagSet().GetBool("second"))
-						assert.Equal(T(ctx), int64(0), r.FlagSet().GetInt64("third"))
-						return ErrOK
-					},
+			root: tree.New(&tree.Node{
+				Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSets) error {
+					fs.Default().String("first", "first", "first")
+					fs.Default().Bool("second", false, "second")
+					fs.Default().Int64("third", 0, "third")
+					return nil
 				},
-			},
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					if value, err := r.FlagSets().Default().GetString("first"); assert.NoError(T(ctx), err) {
+						assert.Equal(T(ctx), "first", value)
+					}
+					if value, err := r.FlagSets().Default().GetBool("second"); assert.NoError(T(ctx), err) {
+						assert.False(T(ctx), value)
+					}
+					if value, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
+						assert.Equal(T(ctx), int64(0), value)
+					}
+					return ErrOK
+				},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrOK)
 			},
 		},
 		{
 			name: "tree --first one --second --third 13",
-			root: &tree.Root{
-				Node: &tree.Node{
-					Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSet) error {
-						fs.String("first", "first", "first")
-						fs.Bool("second", false, "second")
-						fs.Int64("third", 0, "third")
-						return nil
-					},
-					Execute: func(ctx context.Context, r *readline.Readline) error {
-						assert.Equal(T(ctx), "one", r.FlagSet().GetString("first"))
-						assert.True(T(ctx), r.FlagSet().GetBool("second"))
-						assert.Equal(T(ctx), int64(13), r.FlagSet().GetInt64("third"))
-						return ErrOK
-					},
+			root: tree.New(&tree.Node{
+				Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSets) error {
+					fs.Default().String("first", "first", "first")
+					fs.Default().Bool("second", false, "second")
+					fs.Default().Int64("third", 0, "third")
+					return nil
 				},
-			},
+				Execute: func(ctx context.Context, r *readline.Readline) error {
+					if value, err := r.FlagSets().Default().GetString("first"); assert.NoError(T(ctx), err) {
+						assert.Equal(T(ctx), "one", value)
+					}
+					if value, err := r.FlagSets().Default().GetBool("second"); assert.NoError(T(ctx), err) {
+						assert.True(T(ctx), value)
+					}
+					if value, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
+						assert.Equal(T(ctx), int64(13), value)
+					}
+					return ErrOK
+				},
+			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrOK)
 			},

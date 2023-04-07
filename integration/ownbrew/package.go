@@ -8,12 +8,21 @@ import (
 type Package struct {
 	Tap     string   `json:"tap" yaml:"tap"`
 	Name    string   `json:"name" yaml:"name"`
+	Names   []string `json:"names" yaml:"names"`
 	Args    []string `json:"args" yaml:"args"`
 	Version string   `json:"version" yaml:"version"`
 }
 
+func (c Package) AllNames() []string {
+	names := c.Names
+	if len(names) == 0 {
+		names = append(names, c.Name)
+	}
+	return names
+}
+
 func (c Package) String() string {
-	return fmt.Sprintf("Name: %s, Version: %s Tap: %s", c.Name, c.Version, c.Tap)
+	return fmt.Sprintf("Names: %s, Version: %s Tap: %s", c.AllNames(), c.Version, c.Tap)
 }
 
 func (c Package) URL() (string, error) {

@@ -1,5 +1,10 @@
 package tree
 
+import (
+	"github.com/foomo/posh/pkg/readline"
+	"github.com/pkg/errors"
+)
+
 type Args []*Arg
 
 func (a Args) Last() *Arg {
@@ -8,4 +13,13 @@ func (a Args) Last() *Arg {
 	} else {
 		return nil
 	}
+}
+
+func (a Args) Validate(args readline.Args) error {
+	for j, arg := range a {
+		if !arg.Optional && len(args)-1 < j {
+			return errors.Wrap(ErrMissingArgument, arg.Name)
+		}
+	}
+	return nil
 }

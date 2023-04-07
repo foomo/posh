@@ -21,6 +21,18 @@ outdated:
 test:
 	@go test -v ./...
 
+.PHONY: test.demo
+## Run tests
+test.demo: install
+	@rm -rf tmp/test
+	@mkdir -p tmp/test
+	@cd tmp/test && \
+		git init . && \
+		git remote add origin https://github.com/foomo/posh-test-demo && \
+		posh init && \
+		make shell.build && \
+		bin/posh execute welcome demo
+
 .PHONY: lint
 ## Run linter
 lint:
@@ -45,6 +57,7 @@ lint.super:
 
 .PHONY: install
 ## Run go install
+install: GOPATH=${shell go env GOPATH}
 install:
 	@go install -a main.go
 	@mv "${GOPATH}/bin/main" "${GOPATH}/bin/posh"

@@ -8,34 +8,52 @@ import (
 	"github.com/foomo/posh/pkg/readline"
 )
 
-type Root struct {
-	Name        string
-	Description string
-	Node        *Node
-	Nodes       Nodes
+type Root interface {
+	Node() *Node
+	Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest
+	Execute(ctx context.Context, r *readline.Readline) error
+	Help(ctx context.Context, r *readline.Readline) string
+}
+
+type root struct {
+	node *Node
+}
+
+// ------------------------------------------------------------------------------------------------
+// ~ Constructor
+// ------------------------------------------------------------------------------------------------
+
+func New(node *Node) Root {
+	return &root{
+		node: node,
+	}
 }
 
 // ------------------------------------------------------------------------------------------------
 // ~ Public methods
 // ------------------------------------------------------------------------------------------------
 
-func (t *Root) Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
+func (t *root) Node() *Node {
+	return t.node
+}
+
+func (t *root) Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
 	var suggests []goprompt.Suggest
 	switch r.Mode() {
 	case readline.ModeArgs:
-		if r.Args().LenLte(1) && len(t.Nodes) > 0 {
-			for _, command := range t.Nodes {
+		if r.Args().LenLte(1) && len(t.node.Nodes) > 0 {
+			for _, command := range t.node.Nodes {
 				if command.Values != nil {
 					suggests = command.Values(ctx, r)
 				} else {
 					suggests = append(suggests, goprompt.Suggest{Text: command.Name, Description: command.Description})
 				}
 			}
-		} else if cmd, i := t.find(ctx, t.Nodes, r, 0); cmd == nil && t.Node != nil {
-			if err := t.Node.setFlags(ctx, r, false); err != nil {
+		} else if cmd, i := t.node.find(ctx, r, 0); cmd == nil && t.node != nil {
+			if err := t.node.setFlags(ctx, r, false); err != nil {
 				return nil
 			} else {
-				suggests = t.Node.completeArguments(ctx, t, r, 0)
+				suggests = t.node.completeArguments(ctx, t, r, 0)
 			}
 		} else if cmd == nil {
 			return nil
@@ -45,11 +63,11 @@ func (t *Root) Complete(ctx context.Context, r *readline.Readline) []goprompt.Su
 			suggests = cmd.completeArguments(ctx, t, r, i+1)
 		}
 	case readline.ModeFlags:
-		if cmd, _ := t.find(ctx, t.Nodes, r, 0); cmd == nil && t.Node != nil {
-			if err := t.Node.setFlags(ctx, r, false); err != nil {
+		if cmd, _ := t.node.find(ctx, r, 0); cmd == nil && t.node != nil {
+			if err := t.node.setFlags(ctx, r, false); err != nil {
 				return nil
 			} else {
-				suggests = t.Node.completeFlags(r)
+				suggests = t.node.completeFlags(r)
 			}
 		} else if cmd == nil {
 			return nil
@@ -57,20 +75,6 @@ func (t *Root) Complete(ctx context.Context, r *readline.Readline) []goprompt.Su
 			return nil
 		} else {
 			suggests = cmd.completeFlags(r)
-		}
-	case readline.ModePassThroughFlags:
-		if cmd, _ := t.find(ctx, t.Nodes, r, 0); cmd == nil && t.Node != nil {
-			if err := t.Node.setFlags(ctx, r, false); err != nil {
-				return nil
-			} else {
-				suggests = t.Node.completePassThroughFlags(r)
-			}
-		} else if cmd == nil {
-			return nil
-		} else if err := cmd.setFlags(ctx, r, false); err != nil {
-			return nil
-		} else {
-			suggests = cmd.completePassThroughFlags(r)
 		}
 	case readline.ModeAdditionalArgs:
 		// do nothing
@@ -81,28 +85,25 @@ func (t *Root) Complete(ctx context.Context, r *readline.Readline) []goprompt.Su
 	return suggests
 }
 
-func (t *Root) Execute(ctx context.Context, r *readline.Readline) error {
+func (t *root) Execute(ctx context.Context, r *readline.Readline) error {
 	var (
 		cmd   *Node
 		index int
 	)
 
-	switch {
-	case t.Node == nil && len(t.Nodes) == 0:
+	if t.node == nil {
 		return ErrNoop
-	case r.Args().LenIs(0) && t.Node == nil:
-		return ErrMissingCommand
 	}
 
 	if r.Args().LenIs(0) {
-		cmd = t.Node
-	} else if found, i := t.find(ctx, t.Nodes, r, 0); found != nil {
+		cmd = t.node
+	} else if found, i := t.node.find(ctx, r, 0); found != nil {
 		cmd = found
 		index = i
-	} else if t.Node == nil {
+	} else if t.node == nil {
 		return ErrInvalidCommand
 	} else {
-		cmd = t.Node
+		cmd = t.node
 	}
 
 	if err := cmd.setFlags(ctx, r, true); err != nil {
@@ -113,47 +114,22 @@ func (t *Root) Execute(ctx context.Context, r *readline.Readline) error {
 	return nil
 }
 
-func (t *Root) Help(ctx context.Context, r *readline.Readline) string {
-	// TODO recursive help
-	ret := t.Description
-	if t.Nodes != nil {
-		ret += "\n\nUsage:\n"
-		ret += "  " + t.Name + " [command]"
+func (t *root) Help(ctx context.Context, r *readline.Readline) string {
+	var (
+		cmd *Node
+	)
 
-		ret += "\n\nAvailable Commands:\n"
-		for _, node := range t.Nodes {
-			ret += "  " + node.Name
-		}
+	if t.node == nil {
+		return "command not found"
+	} else if r.Args().LenIs(1) {
+		cmd = t.node
+	} else if len(t.node.Nodes) == 0 {
+		return "command not found"
+	} else if found, _ := t.node.find(ctx, r, 1); found != nil {
+		cmd = found
+	} else {
+		cmd = t.node
 	}
-	return ret
-}
 
-// ------------------------------------------------------------------------------------------------
-// ~ Private methods
-// ------------------------------------------------------------------------------------------------
-
-func (t *Root) find(ctx context.Context, cmds []*Node, r *readline.Readline, i int) (*Node, int) {
-	if r.Args().LenLt(i + 1) {
-		return nil, i
-	}
-	arg := r.Args().At(i)
-	for _, cmd := range cmds {
-		if cmd.Name == arg {
-			if subCmd, j := t.find(ctx, cmd.Nodes, r, i+1); subCmd != nil {
-				return subCmd, j
-			}
-			return cmd, i
-		}
-		if cmd.Values != nil {
-			for _, name := range cmd.Values(ctx, r) {
-				if name.Text == arg {
-					if subCmd, j := t.find(ctx, cmd.Nodes, r, i+1); subCmd != nil {
-						return subCmd, j
-					}
-					return cmd, i
-				}
-			}
-		}
-	}
-	return nil, i
+	return cmd.help(ctx, r)
 }

@@ -30,5 +30,5 @@ func (a Arg) IsRedirect() bool {
 }
 
 func (a Arg) IsAdditional() bool {
-	return a.IsPipe() || a.IsRedirect()
+	return a.IsPass() || a.IsPipe() || a.IsRedirect()
 }

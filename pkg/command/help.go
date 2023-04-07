@@ -63,8 +63,6 @@ func (c *Help) Validate(ctx context.Context, r *readline.Readline) error {
 			}
 		}
 		return errors.Errorf("invalid [command] argument: %s", r.Args().At(0))
-	case r.Args().LenGte(2):
-		return errors.New("too many arguments")
 	}
 
 	return nil
@@ -84,9 +82,11 @@ Available Commands:
 			ret += c.format(value.Name(), value.Description())
 		}
 		c.l.Print(ret)
-	case 1:
+	default:
 		if helper, ok := c.commands.Get(r.Args().At(0)).(Helper); ok {
 			c.l.Print(helper.Help(ctx, r))
+		} else {
+			c.l.Print("command not found")
 		}
 	}
 	return nil

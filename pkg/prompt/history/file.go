@@ -20,6 +20,7 @@ type (
 		limit        int
 		filename     string
 		lockFilename string
+		lastRecord   string
 	}
 	FileOption func(*File) error
 )
@@ -80,6 +81,10 @@ func (h *File) Load(ctx context.Context) ([]string, error) {
 }
 
 func (h *File) Persist(ctx context.Context, record string) {
+	if len(record) == 0 || record == h.lastRecord {
+		return
+	}
+	h.lastRecord = record
 	go func(ctx context.Context, record string) {
 		if lines, err := h.read(ctx); err != nil {
 			h.l.Warnf("failed to read history file (%s): %s", h.filename, err.Error())

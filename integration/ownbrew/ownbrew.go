@@ -112,10 +112,18 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 	o.l.Debug("install:", runtime.GOOS, runtime.GOARCH)
 
 	for _, pkg := range o.packages {
-		cellarFilename := o.cellarFilename(pkg)
-		if cellarExists, err := o.cellarExists(cellarFilename); err != nil {
-			return err
-		} else if !cellarExists {
+		var install bool
+		cellarFilenames := o.cellarFilenames(pkg)
+		for _, cellarFilename := range cellarFilenames {
+			if cellarExists, err := o.cellarExists(cellarFilename); err != nil {
+				return err
+			} else if !cellarExists {
+				install = true
+				break
+			}
+		}
+
+		if install {
 			if pkg.Tap == "" {
 				if err := o.installLocal(ctx, pkg); err != nil {
 					return errors.Wrap(err, "failed to install local tap")
@@ -131,8 +139,12 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 
 		// create symlink
 		if !o.dry {
-			if err := o.symlink(cellarFilename, filepath.Join(o.binDir, pkg.Name)); err != nil {
-				return err
+			for _, name := range pkg.AllNames() {
+				cellarFilename := o.cellarFilename(name, pkg.Version)
+				o.l.Debug("creating symlink:", cellarFilename, filepath.Join(o.binDir, name))
+				if err := o.symlink(cellarFilename, filepath.Join(o.binDir, name)); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -172,10 +184,19 @@ func (o *Ownbrew) cellarExists(filename string) (bool, error) {
 	}
 }
 
-func (o *Ownbrew) cellarFilename(pkg Package) string {
+func (o *Ownbrew) cellarFilenames(pkg Package) []string {
+	names := pkg.AllNames()
+	ret := make([]string, len(names))
+	for i, name := range names {
+		ret[i] = o.cellarFilename(name, pkg.Version)
+	}
+	return ret
+}
+
+func (o *Ownbrew) cellarFilename(name, version string) string {
 	return filepath.Join(
 		o.cellarDir,
-		fmt.Sprintf("%s-%s-%s-%s", pkg.Name, pkg.Version, runtime.GOOS, runtime.GOARCH),
+		fmt.Sprintf("%s-%s-%s-%s", name, version, runtime.GOOS, runtime.GOARCH),
 	)
 }
 

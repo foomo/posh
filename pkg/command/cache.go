@@ -17,7 +17,7 @@ import (
 
 type Cache struct {
 	l     log.Logger
-	tree  *tree.Root
+	tree  tree.Root
 	cache cache.Cache
 }
 
@@ -30,8 +30,9 @@ func NewCache(l log.Logger, cache cache.Cache) *Cache {
 		l:     l,
 		cache: cache,
 	}
-	inst.tree = &tree.Root{
-		Name: "cache",
+	inst.tree = tree.New(&tree.Node{
+		Name:        "cache",
+		Description: "manage the internal cache",
 		Nodes: tree.Nodes{
 			{
 				Name:        "clear",
@@ -44,7 +45,7 @@ func NewCache(l log.Logger, cache cache.Cache) *Cache {
 				Execute:     inst.list,
 			},
 		},
-	}
+	})
 	return inst
 }
 
@@ -53,11 +54,11 @@ func NewCache(l log.Logger, cache cache.Cache) *Cache {
 // ------------------------------------------------------------------------------------------------
 
 func (c *Cache) Name() string {
-	return c.tree.Name
+	return c.tree.Node().Name
 }
 
 func (c *Cache) Description() string {
-	return "manage the internal cache"
+	return c.tree.Node().Description
 }
 
 func (c *Cache) Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest {

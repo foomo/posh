@@ -17,9 +17,9 @@ type Shell struct {
 	cmd    *exec.Cmd
 	quiet  bool
 	args   []string
-	Stdin  io.Reader
-	Stdout io.Writer
-	Stderr io.Writer
+	stdin  io.Reader
+	stdout io.Writer
+	stderr io.Writer
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -43,9 +43,9 @@ func New(ctx context.Context, l log.Logger, inputs ...interface{}) *Shell {
 		l:      l.Named("shell"),
 		cmd:    cmd,
 		args:   args,
-		Stdin:  os.Stdin,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
+		stdin:  os.Stdin,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
 	}
 }
 
@@ -73,13 +73,28 @@ func (s *Shell) Quiet() *Shell {
 	return s
 }
 
+func (s *Shell) Stdin(v io.Reader) *Shell {
+	s.stdin = v
+	return s
+}
+
+func (s *Shell) Stdout(v io.Writer) *Shell {
+	s.stdout = v
+	return s
+}
+
+func (s *Shell) Stderr(v io.Writer) *Shell {
+	s.stderr = v
+	return s
+}
+
 func (s *Shell) Run() error {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
-	s.cmd.Stdin = s.Stdin
+	s.cmd.Stdin = s.stdin
 	if !s.quiet {
-		s.cmd.Stdout = s.Stdout
-		s.cmd.Stderr = s.Stderr
+		s.cmd.Stdout = s.stdout
+		s.cmd.Stderr = s.stderr
 	}
 	s.trace()
 	return s.cmd.Run()
@@ -89,8 +104,8 @@ func (s *Shell) Output() ([]byte, error) {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
 	if !s.quiet {
-		s.cmd.Stdin = s.Stdin
-		s.cmd.Stderr = s.Stderr
+		s.cmd.Stdin = s.stdin
+		s.cmd.Stderr = s.stderr
 	}
 	s.trace()
 	return s.cmd.Output()
@@ -100,7 +115,7 @@ func (s *Shell) CombinedOutput() ([]byte, error) {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
 	if !s.quiet {
-		s.cmd.Stdin = s.Stdin
+		s.cmd.Stdin = s.stdin
 	}
 	s.trace()
 	return s.cmd.CombinedOutput()
@@ -109,10 +124,10 @@ func (s *Shell) CombinedOutput() ([]byte, error) {
 func (s *Shell) Wait() error {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
-	s.cmd.Stdin = s.Stdin
+	s.cmd.Stdin = s.stdin
 	if !s.quiet {
-		s.cmd.Stdout = s.Stdout
-		s.cmd.Stderr = s.Stderr
+		s.cmd.Stdout = s.stdout
+		s.cmd.Stderr = s.stderr
 	}
 	s.trace()
 	// start the process and wait till it's finished

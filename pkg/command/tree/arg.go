@@ -8,8 +8,9 @@ import (
 )
 
 type Arg struct {
-	Name     string
-	Repeat   bool
-	Optional bool
-	Suggest  func(ctx context.Context, t *Root, r *readline.Readline) []goprompt.Suggest
+	Name        string
+	Description string
+	Repeat      bool
+	Optional    bool
+	Suggest     func(ctx context.Context, t Root, r *readline.Readline) []goprompt.Suggest
 }

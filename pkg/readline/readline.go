@@ -11,16 +11,14 @@ import (
 
 type (
 	Readline struct {
-		l                  log.Logger
-		mu                 sync.RWMutex
-		cmd                string
-		mode               Mode
-		args               Args
-		flags              Args
-		flagSet            *FlagSet
-		passThroughFlags   Args
-		passThroughFlagSet *FlagSet
-		additionalArgs     Args
+		l              log.Logger
+		mu             sync.RWMutex
+		cmd            string
+		mode           Mode
+		args           Args
+		flags          Args
+		flagSets       *FlagSets
+		additionalArgs Args
 		// regex - split cmd into args (https://regex101.com/r/EgiOzv/1)
 		regex *regexp.Regexp
 	}
@@ -85,22 +83,10 @@ func (a *Readline) Flags() Args {
 	return a.flags
 }
 
-func (a *Readline) FlagSet() *FlagSet {
+func (a *Readline) FlagSets() *FlagSets {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
-	return a.flagSet
-}
-
-func (a *Readline) PassThroughFlags() Args {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
-	return a.passThroughFlags
-}
-
-func (a *Readline) PassThroughFlagSet() *FlagSet {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
-	return a.passThroughFlagSet
+	return a.flagSets
 }
 
 func (a *Readline) AdditionalArgs() Args {
@@ -125,13 +111,9 @@ func (a *Readline) Parse(input string) error {
 		a.cmd, parts = parts[0], parts[1:]
 	}
 
-	last := len(parts) - 1
 	for i, part := range parts {
 		if a.mode == ModeArgs && Arg(part).IsFlag() {
 			a.mode = ModeFlags
-		}
-		if i != last && (a.mode == ModeArgs || a.mode == ModeFlags) && Arg(part).IsPass() {
-			a.mode = ModePassThroughFlags
 		}
 		if Arg(part).IsAdditional() && i < len(parts)-1 {
 			a.mode = ModeAdditionalArgs
@@ -142,8 +124,6 @@ func (a *Readline) Parse(input string) error {
 			a.args = append(a.args, part)
 		case ModeFlags:
 			a.flags = append(a.flags, part)
-		case ModePassThroughFlags:
-			a.passThroughFlags = append(a.passThroughFlags, part)
 		case ModeAdditionalArgs:
 			a.additionalArgs = append(a.additionalArgs, part)
 		}
@@ -152,53 +132,32 @@ func (a *Readline) Parse(input string) error {
 	return nil
 }
 
-func (a *Readline) SetFlags(fs *FlagSet) {
+func (a *Readline) SetFlagSets(fs *FlagSets) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	a.flagSet = fs
+	a.flagSets = fs
 }
 
-func (a *Readline) ParseFlags() error {
-	if fs := a.FlagSet(); fs == nil {
-		return nil
-	} else if err := fs.Parse(a.flags); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (a *Readline) SetParsePassThroughFlags(fs *FlagSet) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	a.passThroughFlagSet = fs
-}
-
-func (a *Readline) ParsePassThroughFlags() error {
-	if fs := a.PassThroughFlagSet(); fs == nil {
-		return nil
-	} else if err := fs.Parse(a.passThroughFlags); err != nil {
-		return err
+func (a *Readline) ParseFlagSets() error {
+	if fs := a.FlagSets(); fs != nil {
+		if err := fs.Parse(a.flags); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func (a *Readline) String() string {
 	return fmt.Sprintf(`
-Cmd:              %s
-Mode              %s
-Args:             %s
-Flags:            %s
-PassThroughFlags: %s
-AdditionalArgs    %s
-`, a.Cmd(), a.Mode(), a.Args(), a.Flags(), a.PassThroughFlags(), a.AdditionalArgs())
+Cmd:                  %s
+Args:                 %s
+Flags:                %s
+AdditionalArgs:       %s
+`, a.Cmd(), a.Args(), a.Flags(), a.AdditionalArgs())
 }
 
 func (a *Readline) IsModeDefault() bool {
 	return a.Mode() == ModeArgs
-}
-
-func (a *Readline) IsModePassThrough() bool {
-	return a.Mode() == ModePassThroughFlags
 }
 
 func (a *Readline) IsModeAdditional() bool {
@@ -207,29 +166,34 @@ func (a *Readline) IsModeAdditional() bool {
 
 func (a *Readline) AllFlags() []*pflag.Flag {
 	var ret []*pflag.Flag
-	if fs := a.FlagSet(); fs != nil {
-		fs.VisitAll(func(f *pflag.Flag) {
+	if fs := a.FlagSets(); fs != nil {
+		fs.All().VisitAll(func(f *pflag.Flag) {
 			ret = append(ret, f)
 		})
 	}
 	return ret
 }
 
-func (a *Readline) VisitedFlags() []*pflag.Flag {
-	var ret []*pflag.Flag
-	if fs := a.FlagSet(); fs != nil {
-		fs.Visit(func(f *pflag.Flag) {
-			ret = append(ret, f)
-		})
+func (a *Readline) VisitedFlags() Flags {
+	var ret Flags
+	if fs := a.FlagSets(); fs != nil {
+		ret = fs.Visited()
 	}
 	return ret
 }
 
-func (a *Readline) AllPassThroughFlags() []*pflag.Flag {
-	var ret []*pflag.Flag
-	if fs := a.PassThroughFlagSet(); fs != nil {
+func (a *Readline) AdditionalFlags() Args {
+	ret := append(Args{}, a.flags...)
+	if fs := a.FlagSets(); fs != nil {
 		fs.VisitAll(func(f *pflag.Flag) {
-			ret = append(ret, f)
+			if i := ret.IndexOf("--" + f.Name); i >= 0 {
+				switch f.Value.Type() {
+				case "bool":
+					ret = ret.Splice(ret.IndexOf("--"+f.Name), 1)
+				default:
+					ret = ret.Splice(ret.IndexOf("--"+f.Name), 2)
+				}
+			}
 		})
 	}
 	return ret
@@ -244,8 +208,6 @@ func (a *Readline) reset() {
 	a.cmd = ""
 	a.args = nil
 	a.flags = nil
-	a.flagSet = nil
-	a.passThroughFlags = nil
-	a.passThroughFlagSet = nil
+	a.flagSets = nil
 	a.additionalArgs = nil
 }

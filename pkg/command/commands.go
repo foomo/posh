@@ -46,6 +46,13 @@ func (c Commands) TryAdd(command Command, err error) error {
 	return nil
 }
 
+func (c Commands) MustAdd(command Command, err error) {
+	if err != nil {
+		panic(err)
+	}
+	c[command.Name()] = command
+}
+
 func (c Commands) Load(paths ...string) error {
 	for _, path := range paths {
 		if plg, err := plugin.Open(path); err != nil {

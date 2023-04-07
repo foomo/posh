@@ -55,7 +55,8 @@ func PackageVersion(ctx context.Context, l log.Logger, v config.RequirePackage) 
 		if output, err := exec.CommandContext(ctx, "sh", "-c", v.Command).CombinedOutput(); err != nil {
 			return nil, err
 		} else if actual := strings.TrimPrefix(strings.TrimSpace(string(output)), "v"); actual == "" {
-			return nil, fmt.Errorf("failed to retrieve version: %s", string(output))
+			l.Debugf("failed to retrieve version: %s", string(output))
+			return nil, fmt.Errorf(v.Help, v.Version)
 		} else if c, err := semver.NewConstraint(v.Version); err != nil {
 			return nil, errors.Wrapf(err, "failed to create version constraint: %s", v.Version)
 		} else if version, err := semver.NewVersion(actual); err != nil {
