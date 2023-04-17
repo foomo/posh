@@ -3,7 +3,7 @@ module github.com/foomo/posh
 go 1.19
 
 require (
-	github.com/Masterminds/semver/v3 v3.2.0
+	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alecthomas/chroma v0.10.0
 	github.com/c-bata/go-prompt v0.2.6
