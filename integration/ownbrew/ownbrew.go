@@ -1,6 +1,7 @@
 package ownbrew
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -116,7 +117,7 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 		cellarFilenames := o.cellarFilenames(pkg)
 		for _, cellarFilename := range cellarFilenames {
 			if cellarExists, err := o.cellarExists(cellarFilename); err != nil {
-				return err
+				return errors.Wrapf(err, "failed to check cellar: %s", cellarFilename)
 			} else if !cellarExists {
 				install = true
 				break
@@ -126,11 +127,11 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 		if install {
 			if pkg.Tap == "" {
 				if err := o.installLocal(ctx, pkg); err != nil {
-					return errors.Wrap(err, "failed to install local tap")
+					return errors.Wrapf(err, "failed to install local tap: %s", pkg.String())
 				}
 			} else {
 				if err := o.installRemote(ctx, pkg); err != nil {
-					return errors.Wrap(err, "failed to install local tap")
+					return errors.Wrapf(err, "failed to install remote tap: %s", pkg.String())
 				}
 			}
 		} else {
@@ -140,10 +141,11 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 		// create symlink
 		if !o.dry {
 			for _, name := range pkg.AllNames() {
+				filename := filepath.Join(o.binDir, name)
 				cellarFilename := o.cellarFilename(name, pkg.Version)
-				o.l.Debug("creating symlink:", cellarFilename, filepath.Join(o.binDir, name))
-				if err := o.symlink(cellarFilename, filepath.Join(o.binDir, name)); err != nil {
-					return err
+				o.l.Debug("creating symlink:", cellarFilename, filename)
+				if err := o.symlink(cellarFilename, filename); err != nil {
+					return errors.Wrapf(err, "failed to symlink: %s => %s", cellarFilename, filename)
 				}
 			}
 		}
@@ -267,12 +269,13 @@ func (o *Ownbrew) installRemote(ctx context.Context, pkg Package) error {
 		_ = resp.Body.Close()
 	}()
 
+	script, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
 	if o.dry {
-		if value, err := io.ReadAll(resp.Body); err != nil {
-			return err
-		} else {
-			prints.Code(o.l, url, string(value), "sh")
-		}
+		prints.Code(o.l, url, string(script), "sh")
 		return nil
 	}
 
@@ -288,13 +291,17 @@ func (o *Ownbrew) installRemote(ctx context.Context, pkg Package) error {
 		"TEMP_DIR="+o.tempDir,
 	)
 	cmd.Args = append(cmd.Args, pkg.Args...)
-	cmd.Stdin = resp.Body
+	cmd.Stdin = bytes.NewReader(script)
+	cmd.Stdout = os.Stdout
 	if err != nil {
 		return err
 	}
-	cmd.Stdout = os.Stdout
+	if o.l.IsLevel(log.LevelDebug) {
+		cmd.Stderr = os.Stderr
+	}
 	if err := cmd.Run(); err != nil {
-		return errors.Wrap(err, "failed to start installation")
+		prints.Code(o.l, url, string(script), "sh")
+		return errors.Wrap(err, "failed to install")
 	}
 
 	return nil
