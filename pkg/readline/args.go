@@ -80,6 +80,14 @@ func (a Args) IndexOf(v string) int {
 	return -1
 }
 
+func (a Args) From(start int) Args {
+	return a[start:]
+}
+
+func (a Args) To(end int) Args {
+	return a[:end]
+}
+
 func (a Args) Slice(start, end int) Args {
 	return append(a[:start], a[end:]...)
 }
