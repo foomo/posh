@@ -137,7 +137,7 @@ func New(l log.Logger, opts ...Option) (*Prompt, error) {
 		l:        l.Named("prompt"),
 		ctx:      context.Background(),
 		title:    "posh",
-		prefix:   "> ",
+		prefix:   ">",
 		flair:    flair.DefaultFlair,
 		filter:   goprompt.FilterFuzzy,
 		check:    check.DefaultCheck,
