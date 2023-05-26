@@ -27,13 +27,13 @@ type Node struct {
 // ------------------------------------------------------------------------------------------------
 
 func (c *Node) setFlags(ctx context.Context, r *readline.Readline, parse bool) error {
+	fs := readline.NewFlagSets()
 	if c.Flags != nil {
-		fs := readline.NewFlagSets()
 		if err := c.Flags(ctx, r, fs); err != nil {
 			return err
 		}
-		r.SetFlagSets(fs)
 	}
+	r.SetFlagSets(fs)
 	if parse {
 		if err := r.ParseFlagSets(); err != nil {
 			return errors.Wrap(err, "failed to parse flags")
@@ -71,8 +71,10 @@ func (c *Node) completeArguments(ctx context.Context, p *root, r *readline.Readl
 func (c *Node) completeFlags(r *readline.Readline) []goprompt.Suggest {
 	allFlags := r.AllFlags()
 	if r.Flags().LenGt(1) {
-		if values := r.FlagSets().All().GetValues(strings.TrimPrefix(r.Flags().At(r.Flags().Len()-2), "--")); values != nil {
-			return suggests.List(values)
+		if fs := r.FlagSets(); fs != nil {
+			if values := fs.All().GetValues(strings.TrimPrefix(r.Flags().At(r.Flags().Len()-2), "--")); values != nil {
+				return suggests.List(values)
+			}
 		}
 	}
 	suggest := make([]goprompt.Suggest, len(allFlags))
