@@ -14,58 +14,44 @@ import (
 	"github.com/pkg/errors"
 )
 
-type PackageRule func(ctx context.Context, l log.Logger, v config.RequirePackage) rule.Rule
-
-func Packages(ctx context.Context, l log.Logger, v []config.RequirePackage) []fend.Fend {
-	ret := make([]fend.Fend, len(v))
+func Packages(l log.Logger, v []config.RequirePackage) fend.Fends {
+	ret := make(fend.Fends, len(v))
 	for i, vv := range v {
-		ret[i] = Package(ctx, l, vv, PackageExists, PackageVersion)
+		ret[i] = fend.Var(vv, PackageExists(l), PackageVersion(l))
 	}
 	return ret
 }
 
-func Package(ctx context.Context, l log.Logger, v config.RequirePackage, rules ...PackageRule) fend.Fend {
-	return func() []rule.Rule {
-		ret := make([]rule.Rule, len(rules))
-		for i, r := range rules {
-			ret[i] = r(ctx, l, v)
-		}
-		return ret
-	}
-}
-
-func PackageExists(ctx context.Context, l log.Logger, v config.RequirePackage) rule.Rule {
-	return func() (*rule.Error, error) {
+func PackageExists(l log.Logger) rule.Rule[config.RequirePackage] {
+	return func(ctx context.Context, v config.RequirePackage) error {
 		l.Debug("validate package exists:", v.String())
 		if output, err := exec.LookPath(v.Name); err != nil {
 			l.Debug(err.Error(), output)
-			return nil, fmt.Errorf(v.Help, v.Version)
+			return fmt.Errorf(v.Help, v.Version)
 		} else if output == "" {
 			l.Debugf("missing executable %s", v.Name)
-			return nil, fmt.Errorf(v.Help, v.Version)
-		} else {
-			return nil, nil
+			return fmt.Errorf(v.Help, v.Version)
 		}
+		return nil
 	}
 }
 
-func PackageVersion(ctx context.Context, l log.Logger, v config.RequirePackage) rule.Rule {
-	return func() (*rule.Error, error) {
+func PackageVersion(l log.Logger) rule.Rule[config.RequirePackage] {
+	return func(ctx context.Context, v config.RequirePackage) error {
 		l.Debug("validate package version:", v.String())
 		if output, err := exec.CommandContext(ctx, "sh", "-c", v.Command).CombinedOutput(); err != nil {
-			return nil, err
+			return err
 		} else if actual := strings.TrimPrefix(strings.TrimSpace(string(output)), "v"); actual == "" {
 			l.Debugf("failed to retrieve version: %s", string(output))
-			return nil, fmt.Errorf(v.Help, v.Version)
+			return fmt.Errorf(v.Help, v.Version)
 		} else if c, err := semver.NewConstraint(v.Version); err != nil {
-			return nil, errors.Wrapf(err, "failed to create version constraint: %s", v.Version)
+			return errors.Wrapf(err, "failed to create version constraint: %s", v.Version)
 		} else if version, err := semver.NewVersion(actual); err != nil {
-			return nil, errors.Wrapf(err, "failed to create version")
+			return errors.Wrapf(err, "failed to create version")
 		} else if !c.Check(version) {
 			l.Debug("wrong package version:", actual)
-			return nil, fmt.Errorf(v.Help, v.Version)
-		} else {
-			return nil, nil
+			return fmt.Errorf(v.Help, v.Version)
 		}
+		return nil
 	}
 }
