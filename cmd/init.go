@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"os"
 	"path"
 
 	"github.com/foomo/posh/embed"
@@ -31,7 +30,7 @@ Posh init must be run inside of a go module (please run "go mod init <MODNAME> f
 		// define module
 		if value, err := git.OriginURL(); err != nil {
 			l.Debug("failed to retrieve git origin url:", err.Error())
-			data["module"] = path.Base(os.Getenv(env.ProjectRoot))
+			data["module"] = path.Base(env.ProjectRoot())
 		} else {
 			data["module"] = value
 		}
@@ -47,7 +46,7 @@ Posh init must be run inside of a go module (please run "go mod init <MODNAME> f
 			scaffold2.WithOverride(initCmdFlagOverride),
 			scaffold2.WithDirectories(scaffold2.Directory{
 				Source: fs,
-				Target: os.Getenv(env.ProjectRoot),
+				Target: env.ProjectRoot(),
 				Data:   data,
 			}),
 		)

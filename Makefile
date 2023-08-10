@@ -30,6 +30,7 @@ test.demo: install
 		git init . && \
 		git remote add origin https://github.com/foomo/posh-test-demo && \
 		posh init && \
+		echo "replace github.com/foomo/posh => ../../../" >> .posh/go.mod && \
 		make shell.build && \
 		bin/posh execute welcome demo
 

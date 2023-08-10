@@ -10,6 +10,7 @@ import (
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
+	"github.com/foomo/posh/pkg/util/suggests"
 	"github.com/pterm/pterm"
 	"github.com/pterm/pterm/putils"
 	"github.com/samber/lo"
@@ -36,8 +37,19 @@ func NewCache(l log.Logger, cache cache.Cache) *Cache {
 		Nodes: tree.Nodes{
 			{
 				Name:        "clear",
-				Description: "clear all caches",
-				Execute:     inst.clear,
+				Description: "clear caches",
+				Args: tree.Args{
+					{
+						Name:        "Namespace",
+						Description: "Name of namespace to clear.",
+						Repeat:      true,
+						Optional:    true,
+						Suggest: func(ctx context.Context, t tree.Root, r *readline.Readline) []goprompt.Suggest {
+							return suggests.List(lo.Keys(inst.cache.List()))
+						},
+					},
+				},
+				Execute: inst.clear,
 			},
 			{
 				Name:        "list",
@@ -86,8 +98,16 @@ Available commands:
 // ------------------------------------------------------------------------------------------------
 
 func (c *Cache) clear(ctx context.Context, r *readline.Readline) error {
-	c.l.Info("clearing cache")
-	c.cache.Clear("")
+	if r.Args().Len() > 1 {
+		c.l.Info("clearing cache:")
+		for _, value := range r.Args()[1:] {
+			c.l.Info("└ " + value)
+			c.cache.Get(value).Delete("")
+		}
+	} else {
+		c.l.Info("clearing all caches")
+		c.cache.Clear("")
+	}
 	return nil
 }
 
