@@ -1,26 +1,29 @@
 package require
 
 import (
+	"context"
+
+	"github.com/foomo/fender"
 	"github.com/foomo/fender/fend"
 	"github.com/foomo/posh/pkg/log"
 )
 
-func First(l log.Logger, fends ...any) error {
-	var allFends []fend.Fend
+func First(ctx context.Context, l log.Logger, fends ...interface{}) error {
+	var allFends fend.Fends
 	for _, value := range fends {
 		switch v := value.(type) {
 		case fend.Fend:
-			allFends = append(allFends, v)
+			allFends = allFends.Append(v)
+		case fend.Fends:
+			allFends = allFends.Append(v...)
 		case []fend.Fend:
-			allFends = append(allFends, v...)
+			allFends = allFends.Append(v...)
 		default:
-			l.Warn("unknown type:", v)
+			l.Warn("unknown type", v)
 		}
 	}
-	if fendErr, err := fend.First(allFends...); err != nil {
+	if err := fender.First(ctx, allFends...); err != nil {
 		return err
-	} else if fendErr != nil {
-		return fendErr
 	}
 	return nil
 }
