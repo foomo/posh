@@ -11,33 +11,21 @@ import (
 	"github.com/pkg/errors"
 )
 
-type ScriptRule func(ctx context.Context, l log.Logger, v config.RequireScript) rule.Rule
-
-func Scripts(ctx context.Context, l log.Logger, v []config.RequireScript) []fend.Fend {
-	ret := make([]fend.Fend, len(v))
+func Scripts(l log.Logger, v []config.RequireScript) fend.Fends {
+	ret := make(fend.Fends, len(v))
 	for i, vv := range v {
-		ret[i] = Script(ctx, l, vv, ScriptStatus)
+		ret[i] = fend.Var(vv, ScriptStatus(l))
 	}
 	return ret
 }
 
-func Script(ctx context.Context, l log.Logger, v config.RequireScript, rules ...ScriptRule) fend.Fend {
-	return func() []rule.Rule {
-		ret := make([]rule.Rule, len(rules))
-		for i, r := range rules {
-			ret[i] = r(ctx, l, v)
-		}
-		return ret
-	}
-}
-
-func ScriptStatus(ctx context.Context, l log.Logger, v config.RequireScript) rule.Rule {
-	return func() (*rule.Error, error) {
+func ScriptStatus(l log.Logger) rule.Rule[config.RequireScript] {
+	return func(ctx context.Context, v config.RequireScript) error {
 		l.Debug("validate script status:", v.String())
 		if output, err := exec.CommandContext(ctx, "sh", "-c", v.Command).CombinedOutput(); err != nil {
 			l.Debug(string(output))
-			return nil, errors.Wrap(err, v.Help)
+			return errors.Wrap(err, v.Help)
 		}
-		return nil, nil
+		return nil
 	}
 }
