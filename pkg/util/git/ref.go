@@ -10,17 +10,13 @@ import (
 )
 
 func Ref(ctx context.Context, l log.Logger) (string, error) {
-	value, err := shell.New(ctx, l, "git rev-parse --abbrev-ref HEAD").Output()
+	value, err := shell.New(ctx, l,
+		"git", "describe", "--tags", "--exact-match", "2>", "/dev/null",
+		"||", "git", "symbolic-ref -q", "--short HEAD",
+		"||", "git rev-parse", "--short", "HEAD",
+	).Output()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to retrieve git ref")
 	}
-
-	if strings.TrimSpace(string(value)) == "HEAD" {
-		value, err = shell.New(ctx, l, "git describe --tags").Output()
-		if err != nil {
-			return "", errors.Wrap(err, "failed to retrieve git tag")
-		}
-	}
-
 	return strings.TrimSpace(string(value)), nil
 }
