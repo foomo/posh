@@ -27,6 +27,7 @@ type (
 		tempDir   string
 		cellarDir string
 		packages  []Package
+		timeout   time.Duration
 	}
 	Option func(*Ownbrew) error
 )
@@ -77,6 +78,13 @@ func WithCellarDir(v string) Option {
 	}
 }
 
+func WithTimeout(v time.Duration) Option {
+	return func(o *Ownbrew) error {
+		o.timeout = v
+		return nil
+	}
+}
+
 // ------------------------------------------------------------------------------------------------
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
@@ -88,6 +96,7 @@ func New(l log.Logger, opts ...Option) (*Ownbrew, error) {
 		tempDir:   ".posh/tmp",
 		tapDir:    ".posh/ownbrew",
 		cellarDir: ".posh/bin",
+		timeout:   3 * time.Minute,
 	}
 	for _, opt := range opts {
 		if opt != nil {
@@ -251,7 +260,7 @@ func (o *Ownbrew) installRemote(ctx context.Context, pkg Package) error {
 	o.l.Info("installing remote:", pkg.String())
 	o.l.Debug("url:", url)
 
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, o.timeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
