@@ -5,7 +5,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/foomo/posh/badge.svg?branch=main&)](https://coveralls.io/github/foomo/posh?branch=main)
 [![GoDoc](https://godoc.org/github.com/foomo/posh?status.svg)](https://godoc.org/github.com/foomo/posh)
 
-
 > think of `posh` as an interactive and hackable Makefile
 
 ## Installing
