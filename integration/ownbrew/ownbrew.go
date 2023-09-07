@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -123,7 +124,10 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 
 	for _, pkg := range o.packages {
 		var install bool
-		cellarFilenames := o.cellarFilenames(pkg)
+		cellarFilenames, err := o.cellarFilenames(pkg)
+		if err != nil {
+			return errors.Wrap(err, "failed to retrieve cellar filename for package")
+		}
 		for _, cellarFilename := range cellarFilenames {
 			if cellarExists, err := o.cellarExists(cellarFilename); err != nil {
 				return errors.Wrapf(err, "failed to check cellar: %s", cellarFilename)
@@ -151,7 +155,10 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 		if !o.dry {
 			for _, name := range pkg.AllNames() {
 				filename := filepath.Join(o.binDir, name)
-				cellarFilename := o.cellarFilename(name, pkg.Version)
+				cellarFilename, err := o.cellarFilename(name, pkg.Version)
+				if err != nil {
+					return errors.Wrap(err, "failed to retrieve cellar filename")
+				}
 				o.l.Debug("creating symlink:", cellarFilename, filename)
 				if err := o.symlink(cellarFilename, filename); err != nil {
 					return errors.Wrapf(err, "failed to symlink: %s => %s", cellarFilename, filename)
@@ -167,6 +174,7 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 // ------------------------------------------------------------------------------------------------
 
 func (o *Ownbrew) symlink(source, target string) error {
+	// remove existing
 	if err := os.Remove(target); os.IsNotExist(err) {
 		// continue
 	} else if err != nil {
@@ -195,20 +203,34 @@ func (o *Ownbrew) cellarExists(filename string) (bool, error) {
 	}
 }
 
-func (o *Ownbrew) cellarFilenames(pkg Package) []string {
+func (o *Ownbrew) cellarFilenames(pkg Package) ([]string, error) {
 	names := pkg.AllNames()
 	ret := make([]string, len(names))
 	for i, name := range names {
-		ret[i] = o.cellarFilename(name, pkg.Version)
+		filename, err := o.cellarFilename(name, pkg.Version)
+		if err != nil {
+			return nil, err
+		}
+		ret[i] = filename
 	}
-	return ret
+	return ret, nil
 }
 
-func (o *Ownbrew) cellarFilename(name, version string) string {
-	return filepath.Join(
+func (o *Ownbrew) cellarFilename(name, version string) (string, error) {
+	ret := filepath.Join(
 		o.cellarDir,
 		fmt.Sprintf("%s-%s-%s-%s", name, version, runtime.GOOS, runtime.GOARCH),
 	)
+
+	if info, err := os.Stat(ret); errors.Is(err, os.ErrNotExist) {
+		// continue
+	} else if err != nil {
+		return "", errors.Wrap(err, "failed to retrieve fileinfo")
+	} else if info.IsDir() {
+		ret = path.Join(ret, name)
+	}
+
+	return ret, nil
 }
 
 func (o *Ownbrew) installLocal(ctx context.Context, pkg Package) error {

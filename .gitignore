@@ -1,6 +1,7 @@
 # General
 .*
 ._*
+*.out
 bin/
 tmp/
 *.log

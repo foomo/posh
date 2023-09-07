@@ -26,13 +26,7 @@ archives:
         format: zip
 
 changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^wip:'
-      - '^docs:'
-      - '^test:'
-      - '^Merge'
+  use: github-native
 
 brews:
   - tap:
