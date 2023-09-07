@@ -29,7 +29,7 @@ changelog:
   use: github-native
 
 brews:
-  - tap:
+  - repository:
       owner: foomo
       name: homebrew-tap
     caveats: "posh help"
