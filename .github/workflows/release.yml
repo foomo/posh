@@ -18,9 +18,11 @@ jobs:
           fetch-depth: 0
 
       - uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
 
       - uses: goreleaser/goreleaser-action@v4
         with:
           args: release --rm-dist
         env:
-          GITHUB_TOKEN: ${{ steps.app_token.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
