@@ -1,4 +1,4 @@
-name: Pull requests
+name: Test Branch
 
 on:
   push:
@@ -6,32 +6,31 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  GOFLAGS: -mod=readonly
-  GOPROXY: https://proxy.golang.org
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
-        with:
-          go-version-file: 'go.mod'
-      - uses: golangci/golangci-lint-action@v3
-
   test:
     name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v4
         with:
           go-version-file: 'go.mod'
+
+      - uses: golangci/golangci-lint-action@v3
+
       - uses: gotesttools/gotestfmt-action@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - run: make test
+
       - run: make test.demo
 
+      - uses: coverallsapp/github-action@v2
+        with:
+          file: coverage.out
