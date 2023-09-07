@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-go@v4
         with:
-          check-latest: trues
+          go-version: 'stable'
 
       - uses: golangci/golangci-lint-action@v3
 
