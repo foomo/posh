@@ -28,7 +28,7 @@ jobs:
           private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
           installation_id: ${{ secrets.TOKEN_APP_INSTALLATION_ID }}
 
-      - uses: goreleaser/goreleaser-action@v4
+      - uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --clean

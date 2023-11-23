@@ -3,7 +3,7 @@ package command
 import (
 	"context"
 
-	"{{.module}}/posh/pkg/config"
+	"{{.module}}/posh/internal/config"
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/spf13/viper"

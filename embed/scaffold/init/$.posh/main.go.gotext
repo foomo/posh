@@ -1,12 +1,12 @@
 package main
 
 import (
-	"{{.module}}/posh/pkg"
+	"{{.module}}/posh/internal"
 	"github.com/foomo/posh/cmd"
 )
 
 func init() {
-	cmd.Init(pkg.New)
+	cmd.Init(internal.New)
 }
 
 func main() {

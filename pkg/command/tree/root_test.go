@@ -31,7 +31,7 @@ func TestRoot(t *testing.T) {
 
 	r := tree.New(&tree.Node{
 		Name:        "root",
-		Description: "root tree",
+		Description: "Root tree",
 		Execute: func(ctx context.Context, r *readline.Readline) error {
 			return ErrRoot
 		},
