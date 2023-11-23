@@ -22,7 +22,7 @@ jobs:
           go-version: 'stable'
 
       - id: app_token
-        uses: tibdex/github-app-token@v1
+        uses: tibdex/github-app-token@v2
         with:
           app_id: ${{ secrets.TOKEN_APP_ID }}
           private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
