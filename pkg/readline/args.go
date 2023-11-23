@@ -14,6 +14,14 @@ func (a Args) At(v int) string {
 	}
 }
 
+func (a Args) AtDefault(v int, fallback string) string {
+	if a.HasIndex(v) {
+		return a[v]
+	} else {
+		return fallback
+	}
+}
+
 func (a Args) Shift() (string, Args) {
 	if a.HasIndex(0) {
 		return a[0], a[1:]
