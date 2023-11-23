@@ -1,4 +1,4 @@
-package pkg
+package internal
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/require"
-	pkgcommand "{{.module}}/posh/pkg/command"
+	icommand "{{.module}}/posh/internal/command"
 )
 
 type Plugin struct {
@@ -39,8 +39,8 @@ func New(l log.Logger) (plugin.Plugin, error) {
 
 	// Welcome
 	inst.commands.MustAdd(
-		pkgcommand.NewWelcome(l,
-			pkgcommand.WelcomeWithConfigKey("welcome"),
+		icommand.NewWelcome(l,
+			icommand.WelcomeWithConfigKey("welcome"),
 		),
 	)
 

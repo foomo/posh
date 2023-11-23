@@ -134,19 +134,20 @@ func (c *Node) find(ctx context.Context, r *readline.Readline, i int) (*Node, in
 }
 
 func (c *Node) help(ctx context.Context, r *readline.Readline) string {
+	pad := "      "
 	ret := c.Description
 
 	if len(c.Nodes) > 0 {
 		ret += "\n\nUsage:\n"
-		ret += "      " + c.Name + " [command]"
+		ret += pad + c.Name + " [command]"
 
 		ret += "\n\nAvailable Commands:\n"
 		for _, node := range c.Nodes {
-			ret += "      " + xstrings.PadEnd(node.Name, " ", 30) + node.Description + "\n"
+			ret += pad + xstrings.PadEnd(node.Name, " ", 30) + node.Description + "\n"
 		}
 	} else {
 		ret += "\n\nUsage:\n"
-		ret += "      " + c.Name
+		ret += pad + c.Name
 
 		for _, arg := range c.Args {
 			ret += " "
@@ -167,7 +168,7 @@ func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 		if len(c.Args) > 0 {
 			ret += "\n\nArguments:\n"
 			for _, arg := range c.Args {
-				ret += "      " + xstrings.PadEnd(arg.Name, " ", 30) + arg.Description + "\n"
+				ret += pad + xstrings.PadEnd(arg.Name, " ", 30) + arg.Description + "\n"
 			}
 		}
 
