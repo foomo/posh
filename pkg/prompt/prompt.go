@@ -289,7 +289,7 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 	if s.readline.IsModeDefault() && s.readline.Args().LenIs(0) {
 		var suggests []prompt.Suggest
 		for key, value := range s.aliases {
-			suggests = append(suggests, prompt.Suggest{Text: key, Description: "alias: " + value})
+			suggests = append(suggests, prompt.Suggest{Text: key, Description: "Alias: " + value})
 		}
 		for _, inst := range s.Commands().List() {
 			suggests = append(suggests, prompt.Suggest{Text: inst.Name(), Description: inst.Description()})

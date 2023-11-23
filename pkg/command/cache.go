@@ -33,11 +33,11 @@ func NewCache(l log.Logger, cache cache.Cache) *Cache {
 	}
 	inst.tree = tree.New(&tree.Node{
 		Name:        "cache",
-		Description: "manage the internal cache",
+		Description: "Manage the internal cache",
 		Nodes: tree.Nodes{
 			{
 				Name:        "clear",
-				Description: "clear caches",
+				Description: "Clear caches",
 				Args: tree.Args{
 					{
 						Name:        "Namespace",
@@ -53,7 +53,7 @@ func NewCache(l log.Logger, cache cache.Cache) *Cache {
 			},
 			{
 				Name:        "list",
-				Description: "list all caches",
+				Description: "List all caches",
 				Execute:     inst.list,
 			},
 		},
