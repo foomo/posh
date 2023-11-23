@@ -11,7 +11,7 @@ func DefaultFlair(title string) error {
 	pterm.FgGray.Println()
 	if err := pterm.DefaultBigText.WithLetters(
 		putils.LettersFromStringWithStyle(strings.ToUpper(title), pterm.NewStyle(pterm.FgCyan)),
-		putils.LettersFromStringWithStyle("$H", pterm.NewStyle(pterm.FgGreen))).
+	).
 		Render(); err != nil {
 		return err
 	}
