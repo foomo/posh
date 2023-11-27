@@ -27,7 +27,7 @@ type Plugin struct {
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
 
-func New(l log.Logger) (plugin.Plugin, error) {
+func New(l log.Logger) (plugin.Plugin, error) { //nolint: ireturn
 	inst := &Plugin{
 		l:        l,
 		commands: command.Commands{},
