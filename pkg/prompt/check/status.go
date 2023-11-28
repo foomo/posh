@@ -3,6 +3,7 @@ package check
 type Status string
 
 const (
+	StatusNote    = "⬜️️"
 	StatusSuccess = "✅"
 	StatusFailure = "❌"
 )

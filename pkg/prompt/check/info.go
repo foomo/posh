@@ -6,6 +6,14 @@ type Info struct {
 	Status Status
 }
 
+func NewNoteInfo(name, note string) Info {
+	return Info{
+		Name:   name,
+		Note:   note,
+		Status: StatusNote,
+	}
+}
+
 func NewSuccessInfo(name, note string) Info {
 	return Info{
 		Name:   name,
