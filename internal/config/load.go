@@ -24,7 +24,7 @@ func Load(l log.Logger) error {
 			// continue
 		} else if err != nil {
 			return err
-		} else if err := mergo.Merge(&settings, c.AllSettings(), mergo.WithAppendSlice); err != nil {
+		} else if err := mergo.Merge(&settings, c.AllSettings(), mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 			return err
 		} else {
 			l.Debug("using root config file:", c.ConfigFileUsed())
@@ -40,7 +40,7 @@ func Load(l log.Logger) error {
 			// continue
 		} else if err != nil {
 			return err
-		} else if err := mergo.Merge(&settings, c.AllSettings(), mergo.WithAppendSlice); err != nil {
+		} else if err := mergo.Merge(&settings, c.AllSettings(), mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 			return err
 		} else {
 			l.Debug("using config file:", c.ConfigFileUsed())
@@ -56,7 +56,7 @@ func Load(l log.Logger) error {
 			// continue
 		} else if err != nil {
 			return err
-		} else if err := mergo.Merge(&settings, c.AllSettings(), mergo.WithAppendSlice); err != nil {
+		} else if err := mergo.Merge(&settings, c.AllSettings(), mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 			return err
 		} else {
 			l.Debug("using override config file:", c.ConfigFileUsed())
