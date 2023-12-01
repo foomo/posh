@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/foomo/posh/pkg/command/tree"
@@ -104,7 +105,9 @@ func (c *Env) unset(ctx context.Context, r *readline.Readline) error {
 
 func (c *Env) list(ctx context.Context, r *readline.Readline) error {
 	data := pterm.TableData{{"Name", "Value"}}
-	for _, s := range os.Environ() {
+	values := os.Environ()
+	sort.Strings(values)
+	for _, s := range values {
 		data = append(data, strings.SplitN(s, "=", 2))
 	}
 	return pterm.DefaultTable.WithHasHeader(true).WithData(data).Render()
