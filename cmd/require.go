@@ -13,7 +13,7 @@ var requireCmd = &cobra.Command{
 	Short:         "Validate configured requirements",
 	SilenceUsage:  true,
 	SilenceErrors: true,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := intconfig.Load(l); err != nil {
 			return err
 		}

@@ -15,7 +15,7 @@ var promptCmd = &cobra.Command{
 	Short:         "Start the interactive Project Oriented Shell",
 	SilenceUsage:  true,
 	SilenceErrors: true,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := intconfig.Load(l); err != nil {
 			return err
 		}
