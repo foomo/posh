@@ -96,11 +96,11 @@ func (c *Env) Help(ctx context.Context, r *readline.Readline) string {
 // ------------------------------------------------------------------------------------------------
 
 func (c *Env) set(ctx context.Context, r *readline.Readline) error {
-	return os.Setenv(r.Args().At(0), r.Args().AtDefault(1, ""))
+	return os.Setenv(r.Args().At(1), r.Args().AtDefault(2, ""))
 }
 
 func (c *Env) unset(ctx context.Context, r *readline.Readline) error {
-	return os.Unsetenv(r.Args().At(0))
+	return os.Unsetenv(r.Args().At(1))
 }
 
 func (c *Env) list(ctx context.Context, r *readline.Readline) error {

@@ -17,9 +17,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: 'stable'
+          go-version-file: go.mod
 
       - id: app_token
         uses: tibdex/github-app-token@v2
