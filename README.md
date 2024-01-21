@@ -13,7 +13,7 @@ Install the latest release of the cli:
 
 ````bash
 $ brew update
-$ brew install brew install foomo/tap/posh
+$ brew install foomo/tap/posh
 ````
 
 ## Usage
@@ -30,5 +30,5 @@ This will generate the standard layout for posh which can be changed as required
 Once initialized you can start posh through:
 
 ```bash
-$ posh prompt
+$ make shell
 ```
