@@ -13,7 +13,7 @@ Install the latest release of the cli:
 
 ````bash
 $ brew update
-$ brew install brew install foomo/tap/posh
+$ brew install foomo/tap/posh
 ````
 
 ## Usage
@@ -32,3 +32,11 @@ Once initialized you can start posh through:
 ```bash
 $ posh prompt
 ```
+
+## How to Contribute
+
+Make a pull request...
+
+## License
+
+Distributed under MIT License, please see license file within the code for more details.
