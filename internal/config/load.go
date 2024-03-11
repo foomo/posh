@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"dario.cat/mergo"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
-	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
