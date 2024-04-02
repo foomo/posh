@@ -16,7 +16,7 @@ func Load(l log.Logger) error {
 	var settings map[string]interface{}
 
 	if value := os.Getenv("POSH_ROOT_CONFIG_PATH"); value != "" {
-		c := viper.New()
+		c := viper.NewWithOptions(viper.KeyDelimiter("\\"))
 		c.AddConfigPath(value)
 		c.SetConfigType("yaml")
 		c.SetConfigName(".posh")
@@ -32,7 +32,7 @@ func Load(l log.Logger) error {
 	}
 
 	{ // load config
-		c := viper.New()
+		c := viper.NewWithOptions(viper.KeyDelimiter("\\"))
 		c.AddConfigPath(".")
 		c.SetConfigType("yaml")
 		c.SetConfigName(".posh")
@@ -48,7 +48,7 @@ func Load(l log.Logger) error {
 	}
 
 	{ // load override
-		c := viper.New()
+		c := viper.NewWithOptions(viper.KeyDelimiter("\\"))
 		c.AddConfigPath(".")
 		c.SetConfigType("yaml")
 		c.SetConfigName(".posh.override")
@@ -66,6 +66,8 @@ func Load(l log.Logger) error {
 	if err := viper.MergeConfigMap(settings); err != nil {
 		return errors.Wrap(err, "failed to merge config map")
 	}
+
+	// viper.Debug()
 
 	// validate version
 	if v := viper.GetString("version"); v != Version {
