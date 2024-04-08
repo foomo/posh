@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alecthomas/chroma v0.10.0
 	github.com/c-bata/go-prompt v0.2.6
-	github.com/charlievieth/fastwalk v1.0.2
+	github.com/charlievieth/fastwalk v1.0.3
 	github.com/foomo/fender v1.0.1
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/gofrs/flock v0.8.1
