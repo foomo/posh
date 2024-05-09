@@ -16,6 +16,7 @@ func TestReadline(t *testing.T) {
 		{
 			name: "foo bar",
 			want: func(t *testing.T, r *readline.Readline) {
+				t.Helper()
 				assert.Equal(t, `
 Cmd:                  foo
 Args:                 [bar]
@@ -29,6 +30,7 @@ AdditionalArgs:       []
 		{
 			name: "foo bar baz",
 			want: func(t *testing.T, r *readline.Readline) {
+				t.Helper()
 				assert.Equal(t, `
 Cmd:                  foo
 Args:                 [bar baz]
@@ -42,6 +44,7 @@ AdditionalArgs:       []
 		{
 			name: "foo bar --baz",
 			want: func(t *testing.T, r *readline.Readline) {
+				t.Helper()
 				assert.Equal(t, `
 Cmd:                  foo
 Args:                 [bar]
@@ -55,6 +58,7 @@ AdditionalArgs:       []
 		{
 			name: "foo --baz bar",
 			want: func(t *testing.T, r *readline.Readline) {
+				t.Helper()
 				assert.Equal(t, `
 Cmd:                  foo
 Args:                 []
@@ -68,6 +72,7 @@ AdditionalArgs:       []
 		{
 			name: "foo --baz bar1",
 			want: func(t *testing.T, r *readline.Readline) {
+				t.Helper()
 				assert.Equal(t, `
 Cmd:                  foo
 Args:                 []
@@ -81,6 +86,7 @@ AdditionalArgs:       []
 		{
 			name: "foo | cat",
 			want: func(t *testing.T, r *readline.Readline) {
+				t.Helper()
 				assert.Equal(t, `
 Cmd:                  foo
 Args:                 []
@@ -94,6 +100,7 @@ AdditionalArgs:       [| cat]
 		{
 			name: "foo --bar1 --bar2 one --bar3 two,three,four",
 			want: func(t *testing.T, r *readline.Readline) {
+				t.Helper()
 				assert.Equal(t, `
 Cmd:                  foo
 Args:                 []

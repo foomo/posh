@@ -94,9 +94,7 @@ func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
 	case c.Execute == nil && len(c.Nodes) > 0 && len(localArgs) == 0:
 		return ErrMissingCommand
 	case c.Execute != nil && len(c.Nodes) == 0 && len(c.Args) == 0:
-		break
 	case c.Execute != nil && len(c.Nodes) == 0 && c.Args.Validate(localArgs) == nil:
-		break
 	case c.Execute != nil && len(c.Nodes) == 0 && c.Args.Validate(localArgs) != nil:
 		return c.Args.Validate(localArgs)
 	case c.Execute == nil:

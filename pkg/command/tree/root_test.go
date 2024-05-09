@@ -13,33 +13,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var ErrOK = errors.New("ok")
+var errOK = errors.New("ok")
 
 func TestRoot(t *testing.T) {
 	l := log.NewTest(t, log.TestWithLevel(log.LevelInfo))
 	ctx := context.TODO()
 
 	var (
-		ErrRoot    = errors.New("root")
-		ErrFirst   = errors.New("first")
-		ErrSecond  = errors.New("second")
-		ErrSecond1 = errors.New("second-1")
-		ErrSecond2 = errors.New("second-2")
-		ErrThird   = errors.New("third")
-		ErrThird1  = errors.New("third1")
+		errRoot    = errors.New("root")
+		errFirst   = errors.New("first")
+		errSecond  = errors.New("second")
+		errSecond1 = errors.New("second-1")
+		errSecond2 = errors.New("second-2")
+		errThird   = errors.New("third")
+		errThird1  = errors.New("third1")
 	)
 
 	r := tree.New(&tree.Node{
 		Name:        "root",
 		Description: "Root tree",
 		Execute: func(ctx context.Context, r *readline.Readline) error {
-			return ErrRoot
+			return errRoot
 		},
 		Nodes: tree.Nodes{
 			{
 				Name: "first",
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return ErrFirst
+					return errFirst
 				},
 			},
 			{
@@ -48,18 +48,18 @@ func TestRoot(t *testing.T) {
 					{
 						Name: "second-1",
 						Execute: func(ctx context.Context, r *readline.Readline) error {
-							return ErrSecond1
+							return errSecond1
 						},
 					},
 					{
 						Name: "second-2",
 						Execute: func(ctx context.Context, r *readline.Readline) error {
-							return ErrSecond2
+							return errSecond2
 						},
 					},
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return ErrSecond
+					return errSecond
 				},
 			},
 			{
@@ -74,12 +74,12 @@ func TestRoot(t *testing.T) {
 					{
 						Name: "third-1",
 						Execute: func(ctx context.Context, r *readline.Readline) error {
-							return ErrThird1
+							return errThird1
 						},
 					},
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return ErrThird
+					return errThird
 				},
 			},
 		},
@@ -92,67 +92,67 @@ func TestRoot(t *testing.T) {
 		{
 			name: "tree",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrRoot)
+				return assert.ErrorIs(t, err, errRoot)
 			},
 		},
 		{
 			name: "tree first",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrFirst)
+				return assert.ErrorIs(t, err, errFirst)
 			},
 		},
 		{
 			name: "tree first foo",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrFirst)
+				return assert.ErrorIs(t, err, errFirst)
 			},
 		},
 		{
 			name: "tree second",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrSecond)
+				return assert.ErrorIs(t, err, errSecond)
 			},
 		},
 		{
 			name: "tree second second-1",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrSecond1)
+				return assert.ErrorIs(t, err, errSecond1)
 			},
 		},
 		{
 			name: "tree second second-2",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrSecond2)
+				return assert.ErrorIs(t, err, errSecond2)
 			},
 		},
 		{
 			name: "tree second second-3",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrSecond)
+				return assert.ErrorIs(t, err, errSecond)
 			},
 		},
 		{
 			name: "tree third-a",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrThird)
+				return assert.ErrorIs(t, err, errThird)
 			},
 		},
 		{
 			name: "tree third-b",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrThird)
+				return assert.ErrorIs(t, err, errThird)
 			},
 		},
 		{
 			name: "tree third-c",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrRoot)
+				return assert.ErrorIs(t, err, errRoot)
 			},
 		},
 		{
 			name: "tree third-a third-1",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrThird1)
+				return assert.ErrorIs(t, err, errThird1)
 			},
 		},
 	}
@@ -191,11 +191,11 @@ func TestRoot_Node(t *testing.T) {
 			name: "tree",
 			root: tree.New(&tree.Node{
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrOK)
+				return assert.ErrorIs(t, err, errOK)
 			},
 		},
 		{
@@ -203,11 +203,11 @@ func TestRoot_Node(t *testing.T) {
 			root: tree.New(&tree.Node{
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					assert.Equal(T(ctx), "one", r.Args().At(0))
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrOK)
+				return assert.ErrorIs(t, err, errOK)
 			},
 		},
 	}
@@ -244,7 +244,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 					},
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
@@ -261,11 +261,11 @@ func TestRoot_NodeArgs(t *testing.T) {
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					assert.Equal(T(ctx), "one", r.Args().At(0))
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrOK)
+				return assert.ErrorIs(t, err, errOK)
 			},
 		},
 		{
@@ -280,7 +280,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 					},
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
@@ -299,7 +299,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 					},
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
@@ -320,11 +320,11 @@ func TestRoot_NodeArgs(t *testing.T) {
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					assert.Equal(T(ctx), "one", r.Args().At(0))
 					assert.Equal(T(ctx), "two", r.Args().At(1))
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrOK)
+				return assert.ErrorIs(t, err, errOK)
 			},
 		},
 	}
@@ -371,11 +371,11 @@ func TestRoot_NodeFlags(t *testing.T) {
 					if value, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
 						assert.Equal(T(ctx), int64(0), value)
 					}
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrOK)
+				return assert.ErrorIs(t, err, errOK)
 			},
 		},
 		{
@@ -397,11 +397,11 @@ func TestRoot_NodeFlags(t *testing.T) {
 					if value, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
 						assert.Equal(T(ctx), int64(13), value)
 					}
-					return ErrOK
+					return errOK
 				},
 			}),
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrOK)
+				return assert.ErrorIs(t, err, errOK)
 			},
 		},
 	}
@@ -421,10 +421,10 @@ func TestRoot_NodeFlags(t *testing.T) {
 }
 
 func T(ctx context.Context) *testing.T {
-	return ctx.Value("t").(*testing.T) //nolint:forcetypeassert
+	return ctx.Value("t").(*testing.T)
 }
 
 func SetT(ctx context.Context, t *testing.T) context.Context {
 	t.Helper()
-	return context.WithValue(ctx, "t", t) //nolint:staticcheck
+	return context.WithValue(ctx, "t", t)
 }
