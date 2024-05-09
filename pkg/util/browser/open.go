@@ -8,25 +8,25 @@ import (
 	"runtime"
 )
 
-func OpenRawURL(u string) error {
+func OpenRawURL(ctx context.Context, u string) error {
 	if u, err := url.Parse(u); err != nil {
 		return err
 	} else {
-		return OpenURL(u)
+		return OpenURL(ctx, u)
 	}
 }
 
-func OpenURL(u *url.URL) error {
+func OpenURL(ctx context.Context, u *url.URL) error {
 	if u == nil {
 		return fmt.Errorf("empty url")
 	}
 	switch runtime.GOOS {
 	case "linux":
-		return exec.CommandContext(context.TODO(), "xdg-open", u.String()).Start()
+		return exec.CommandContext(ctx, "xdg-open", u.String()).Start()
 	case "windows":
-		return exec.CommandContext(context.TODO(), "rundll32", "url.dll,FileProtocolHandler", u.String()).Start()
+		return exec.CommandContext(ctx, "rundll32", "url.dll,FileProtocolHandler", u.String()).Start()
 	case "darwin":
-		return exec.CommandContext(context.TODO(), "open", u.String()).Start()
+		return exec.CommandContext(ctx, "open", u.String()).Start()
 	default:
 		return fmt.Errorf("unsupported platform")
 	}
