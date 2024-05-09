@@ -42,6 +42,9 @@ linters-settings:
     replace-local: true
     replace-allow-list:
       - github.com/c-bata/go-prompt
+  # https://golangci-lint.run/usage/linters/#staticcheck
+  staticcheck:
+    checks: ["all", "-SA1029"]
   # https://golangci-lint.run/usage/linters/#revive
   revive:
     ignore-generated-header: true
@@ -104,10 +107,7 @@ linters-settings:
         disabled: true
       - name: unchecked-type-assertion
         disabled: true
-  staticcheck:
-    # SAxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
-    # Default: ["*"]
-    checks: ["all", "-SA1029"]
+
 linters:
   disable-all: true
   enable:
