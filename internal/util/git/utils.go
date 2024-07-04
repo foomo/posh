@@ -1,11 +1,8 @@
 package git
 
 import (
-	"path"
-	"strings"
-
 	"github.com/go-git/go-git/v5"
-	giturls "github.com/whilp/git-urls"
+	giturl "github.com/kubescape/go-git-url"
 )
 
 func OriginURL() (string, error) {
@@ -18,9 +15,9 @@ func OriginURL() (string, error) {
 		return "", err
 	} else if len(value.Config().URLs) == 0 {
 		return "", nil
-	} else if value, err := giturls.Parse(value.Config().URLs[0]); err != nil {
+	} else if value, err := giturl.NewGitURL(value.Config().URLs[0]); err != nil {
 		return "", err
 	} else {
-		return value.Hostname() + strings.TrimSuffix(value.Path, path.Ext(value.Path)), nil
+		return value.GetHostName() + "/" + value.GetRepoName(), nil
 	}
 }
