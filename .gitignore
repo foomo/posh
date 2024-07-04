@@ -11,4 +11,5 @@ tmp/
 !.editorconfig
 !.goreleaser.yml
 !.golangci.yml
+!.husky.yaml
 !.posh.yml
