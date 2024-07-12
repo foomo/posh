@@ -1,15 +1,31 @@
-# General
 .*
-._*
+*.zip
+*.tar
 *.out
-bin/
-tmp/
 *.log
-!.posh
-!.github
+/bin/
+/tmp/
+
+## Git
+!.gitkeep
 !.gitignore
+
+## GitHub
+!.github/
+
+## Editorconfig
 !.editorconfig
-!.goreleaser.yml
-!.golangci.yml
+
+## Husky
+!.husky/
 !.husky.yaml
+
+## Golang
+go.work
+go.work.sum
+!.golangci.yml
+!.goreleaser.yml
+
+## Posh
+!.posh/
 !.posh.yml
