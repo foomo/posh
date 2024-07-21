@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alecthomas/chroma v0.10.0
 	github.com/c-bata/go-prompt v0.2.6
-	github.com/charlievieth/fastwalk v1.0.6
+	github.com/charlievieth/fastwalk v1.0.8
 	github.com/foomo/fender v1.0.1
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/gofrs/flock v0.12.0
@@ -16,7 +16,7 @@ require (
 	github.com/kubescape/go-git-url v0.0.30
 	github.com/pkg/errors v0.9.1
 	github.com/pterm/pterm v0.12.79
-	github.com/samber/lo v1.44.0
+	github.com/samber/lo v1.46.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
