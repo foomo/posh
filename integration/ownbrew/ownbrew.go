@@ -140,11 +140,11 @@ func (o *Ownbrew) Install(ctx context.Context) error {
 		if install {
 			if pkg.Tap == "" {
 				if err := o.installLocal(ctx, pkg); err != nil {
-					return errors.Wrapf(err, "failed to install local tap: %s", pkg.String())
+					return errors.Wrap(err, "failed to install local tap")
 				}
 			} else {
 				if err := o.installRemote(ctx, pkg); err != nil {
-					return errors.Wrapf(err, "failed to install remote tap: %s", pkg.String())
+					return errors.Wrap(err, "failed to install remote tap")
 				}
 			}
 		} else {
@@ -236,7 +236,7 @@ func (o *Ownbrew) cellarFilename(name, version string) (string, error) {
 func (o *Ownbrew) installLocal(ctx context.Context, pkg Package) error {
 	filename := filepath.Join(o.tapDir, pkg.Name+".sh")
 	o.l.Info("installing local:", pkg.String())
-	o.l.Debug("filename:", filename)
+	o.l.Info("filename:", filename)
 
 	if exists, err := o.localTapExists(filename); err != nil {
 		return err
@@ -265,10 +265,9 @@ func (o *Ownbrew) installLocal(ctx context.Context, pkg Package) error {
 		"TEMP_DIR="+o.tempDir,
 	)
 	cmd.Args = append(cmd.Args, pkg.Args...)
-
 	o.l.Debug("running:", cmd.String())
-	if err := cmd.Run(); err != nil {
-		return errors.Wrapf(err, "failed to install: %s", pkg.String())
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return errors.Wrap(err, string(out))
 	}
 
 	return nil
@@ -324,9 +323,6 @@ func (o *Ownbrew) installRemote(ctx context.Context, pkg Package) error {
 	cmd.Args = append(cmd.Args, pkg.Args...)
 	cmd.Stdin = bytes.NewReader(script)
 	cmd.Stdout = os.Stdout
-	if err != nil {
-		return err
-	}
 	if o.l.IsLevel(log.LevelDebug) {
 		cmd.Stderr = os.Stderr
 	}
