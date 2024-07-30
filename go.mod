@@ -8,15 +8,15 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alecthomas/chroma v0.10.0
 	github.com/c-bata/go-prompt v0.2.6
-	github.com/charlievieth/fastwalk v1.0.6
+	github.com/charlievieth/fastwalk v1.0.8
 	github.com/foomo/fender v1.0.1
 	github.com/go-git/go-git/v5 v5.12.0
-	github.com/gofrs/flock v0.12.0
+	github.com/gofrs/flock v0.12.1
 	github.com/joho/godotenv v1.5.1
 	github.com/kubescape/go-git-url v0.0.30
 	github.com/pkg/errors v0.9.1
 	github.com/pterm/pterm v0.12.79
-	github.com/samber/lo v1.44.0
+	github.com/samber/lo v1.46.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
@@ -86,7 +86,7 @@ require (
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/term v0.20.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
