@@ -3,7 +3,7 @@ module github.com/foomo/posh
 go 1.21.0
 
 require (
-	dario.cat/mergo v1.0.0
+	dario.cat/mergo v1.0.1
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alecthomas/chroma v0.10.0
@@ -16,12 +16,12 @@ require (
 	github.com/kubescape/go-git-url v0.0.30
 	github.com/pkg/errors v0.9.1
 	github.com/pterm/pterm v0.12.79
-	github.com/samber/lo v1.46.0
+	github.com/samber/lo v1.47.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/sync v0.7.0
+	golang.org/x/sync v0.8.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
