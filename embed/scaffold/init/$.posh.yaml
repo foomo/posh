@@ -13,8 +13,6 @@ prompt:
 env:
   - name: PATH
     value: "${PROJECT_ROOT}/bin:${PATH}"
-  - name: GOPROXY
-    value: "https://proxy.golang.org,direct"
 
 ## Ownbrew settings
 ownbrew:
@@ -36,33 +34,24 @@ ownbrew:
 require:
   ## Required environment variables
   envs: []
-    ## Example: require GITHUB_TOKEN
-    #- name: GITHUB_TOKEN
+    ## Example: require VOLTA_HOME
+    #- name: VOLTA_HOME
     #  help: |
-    #    You need to export a GITHUB_TOKEN in your environment!
+    #    Missing required $VOLTA_HOME env var.
     #
-    #    To do so, create an access token on https://github.com/settings/tokens with the following permissions:
+    #    Please initialize volta and ensure $VOLTA_HOME is set:
     #
-    #      - repo
-    #      - write:packages
-    #      - delete:packages
-    #
-    #    and export it into your environment e.g. ZSH:
-    #
-    #      $ vi ~/.zshenv
-    #
-    #      export GITHUB_TOKEN=XXX
+    #      $ volta setup
 
   ## Required scripts that need to succeed
   scripts: []
-    ## Example: require 1Password account
-    #- name: op
+    ## Example: git
+    #- name: git
     #  command: |
-    #    [[ $(op account --account <ACCOUNT> get 2>&1) =~ "found no account" ]] && exit 1 || exit 0
+    #    git status && exit 0 || exit 1
     #  help: |
-    #    You're 1Password account is not registered yet! Please do so by running:
-    #
-    #    $ op account add --address <ACCOUNT>.1password.eu --email <EMAIL>
+    #    This is not a git repo. Please clone the repository
+
     ## Example: npm
     #- name: npm
     #  command: npm whoami --registry=https://npm.pkg.github.com > /dev/null 2>&1
@@ -88,7 +77,7 @@ require:
 
     ## Example: go
     #- name: go
-    #  version: '>=1.19.4'
+    #  version: '>=1.23'
     #  command: go env GOVERSION | cut -c3-
     #  help: |
     #    Please ensure you have 'go' installed in the required version: %s!
@@ -96,58 +85,15 @@ require:
     #      $ brew update
     #      $ brew install go
 
-    ## Example: onepassword
-    #- name: op
-    #  version: '~2'
-    #  command: op --version
+    #- name: volta
+    #  version: '>=2'
+    #  command: volta --version
     #  help: |
-    #    Please ensure you have the 1Password cli 'op' installed in the required version: %s!
+    #    Please ensure you have 'volta' installed in a recent version: %s!
     #
-    #      $ brew update
-    #      $ brew install 1password-cli
-
-    ## Example: node
-    #- name: node
-    #  version: '~16'
-    #  command: node --version
-    #  help: |
-    #    Please ensure you have 'node' installed in the required version: %s!
+    #      $ curl https://get.volta.sh | bash
     #
-    #    We strongly recommend installing 'nvm' trough:
-    #
-    #      $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
-    #
-    #    If you already have installed 'nvm' just run the following command to read in the .nvmrc:
-    #
-    #      $ nvm use
-
-    ## Example: yarn
-    #- name: yarn
-    #  version: '~1'
-    #  command: yarn --version
-    #  help: |
-    #    Please ensure you have 'yarn' installed in the required version: %s!
-    #
-    #      $ npm install -g yarn
-
-    ## Example: teleport
-    #- name: tsh
-    #  version: '>=10'
-    #  command: tsh version --skip-version-check | awk 'NR==1{print $2}'
-    #  help: |
-    #    Please ensure you have 'teleport' installed in the required version: %s!
-    #
-    #      $ brew update
-    #      $ brew install teleport
-
-    ## Example: goimports
-    #- name: goimports
-    #  version: '>=2022'
-    #  command: date -r $(which goimports) +%Y.%-m.%-d
-    #  help: |
-    #    Please ensure you have 'goimports' installed in a recent version: %s!
-    #
-    #      $ go install golang.org/x/tools/cmd/goimports@latest
+    #    Or see the documentation: https://docs.volta.sh/guide/getting-started
 
 
 ## Integrations
