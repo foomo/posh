@@ -1,6 +1,6 @@
 module github.com/foomo/posh
 
-go 1.21.0
+go 1.23.0
 
 require (
 	dario.cat/mergo v1.0.1
