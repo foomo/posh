@@ -2,7 +2,10 @@ package log
 
 import (
 	"fmt"
+	"log/slog"
 	"testing"
+
+	"github.com/neilotoole/slogt"
 )
 
 type (
@@ -139,6 +142,10 @@ func (l *Test) Must(err error) {
 	if err != nil {
 		l.Fatal(err.Error())
 	}
+}
+
+func (l *Test) SlogHandler() slog.Handler {
+	return slogt.New(l.t).Handler()
 }
 
 // ------------------------------------------------------------------------------------------------

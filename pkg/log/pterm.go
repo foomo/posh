@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/pterm/pterm"
 )
@@ -154,6 +155,10 @@ func (l *PTerm) Must(err error) {
 	if err != nil {
 		l.Fatal(err.Error())
 	}
+}
+
+func (l *PTerm) SlogHandler() slog.Handler {
+	return pterm.NewSlogHandler(&pterm.DefaultLogger)
 }
 
 // ------------------------------------------------------------------------------------------------

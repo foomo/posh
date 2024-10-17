@@ -1,5 +1,9 @@
 package log
 
+import (
+	"log/slog"
+)
+
 type Logger interface {
 	Level() Level
 	IsLevel(level Level) bool
@@ -21,4 +25,5 @@ type Logger interface {
 	Fatal(a ...interface{})
 	Fatalf(format string, a ...interface{})
 	Must(err error)
+	SlogHandler() slog.Handler
 }
