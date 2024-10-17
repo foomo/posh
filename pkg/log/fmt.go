@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 )
 
@@ -136,6 +137,10 @@ func (l *Fmt) Must(err error) {
 	if err != nil {
 		l.Fatal(err.Error())
 	}
+}
+
+func (l *Fmt) SlogHandler() slog.Handler {
+	return slog.NewTextHandler(os.Stdout, nil)
 }
 
 // ------------------------------------------------------------------------------------------------

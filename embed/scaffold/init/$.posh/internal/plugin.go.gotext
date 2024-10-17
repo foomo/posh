@@ -3,19 +3,21 @@ package internal
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 
+	ownbrewconfig "github.com/foomo/ownbrew/pkg/config"
+	"github.com/foomo/ownbrew/pkg/ownbrew"
 	"github.com/foomo/posh/pkg/command"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
-	"github.com/foomo/posh/integration/ownbrew"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/foomo/posh/pkg/prompt"
 	"github.com/foomo/posh/pkg/prompt/check"
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/require"
-	icommand "{{.module}}/posh/internal/command"
+	icommand "github.com/posh-test-demo/posh/internal/command"
 )
 
 type Plugin struct {
@@ -51,9 +53,9 @@ func New(l log.Logger) (plugin.Plugin, error) { //nolint: ireturn
 // ~ Public methods
 // ------------------------------------------------------------------------------------------------
 
-func (p *Plugin) Brew(ctx context.Context, cfg config.Ownbrew) error {
-	brew, err := ownbrew.New(p.l,
-		ownbrew.WithDry(cfg.Dry),
+func (p *Plugin) Brew(ctx context.Context, cfg ownbrewconfig.Config, dry bool) error {
+	brew, err := ownbrew.New(slog.New(p.l.SlogHandler()),
+		ownbrew.WithDry(dry),
 		ownbrew.WithBinDir(cfg.BinDir),
 		ownbrew.WithTapDir(cfg.TapDir),
 		ownbrew.WithTempDir(cfg.TempDir),
