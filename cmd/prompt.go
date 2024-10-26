@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+
 	intcmd "github.com/foomo/posh/internal/cmd"
 	intconfig "github.com/foomo/posh/internal/config"
 	"github.com/foomo/posh/pkg/config"
@@ -34,7 +36,7 @@ func NewPrompt(root *cobra.Command) {
 				return err
 			}
 
-			return plg.Prompt(cmd.Context(), cfg)
+			return plg.Prompt(context.WithoutCancel(cmd.Context()), cfg)
 		},
 	}
 
