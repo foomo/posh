@@ -1,9 +1,13 @@
-# Project Oriented SHELL (posh)
-
 [![Build Status](https://github.com/foomo/posh/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/foomo/posh/actions/workflows/test.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/foomo/posh)](https://goreportcard.com/report/github.com/foomo/posh)
 [![Coverage Status](https://coveralls.io/repos/github/foomo/posh/badge.svg?branch=main&)](https://coveralls.io/github/foomo/posh?branch=main)
 [![GoDoc](https://godoc.org/github.com/foomo/posh?status.svg)](https://godoc.org/github.com/foomo/posh)
+
+<p align="center">
+  <img alt="POSH" src=".github/assets/posh.png"/>
+</p>
+
+# Project Oriented SHELL (posh)
 
 > think of `posh` as an interactive and hackable Makefile
 
@@ -40,3 +44,5 @@ Make a pull request...
 ## License
 
 Distributed under MIT License, please see license file within the code for more details.
+
+[foomo](https://www.foomo.org) by [bestbytes](https://www.bestbytes.com)
