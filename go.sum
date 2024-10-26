@@ -60,8 +60,8 @@ github.com/emirpasic/gods v1.18.1 h1:FXtiHYKDGKCW2KzwZKx0iC0PQmdlorYgdFG9jPXJ1Bc
 github.com/emirpasic/gods v1.18.1/go.mod h1:8tpGGwCnJ5H4r6BWwaV6OrWmMoPhUl5jm/FMNAnJvWQ=
 github.com/foomo/fender v1.0.1 h1:sz+5IHWDgwAkYKau6NlgPHxa7v3kLyzScq8MrhKdybM=
 github.com/foomo/fender v1.0.1/go.mod h1:Out1+dS5S8qJ4VqtxzCj/FDYi4Wtal2NK+8vhCUCrao=
-github.com/foomo/ownbrew v0.1.2 h1:KYT1J1ztjARcPrsY8h2hhQ1A41atdEdp6YikYH5LQm0=
-github.com/foomo/ownbrew v0.1.2/go.mod h1:lyUFvPABflzcI/cAmQU4vif1DjH8tZ6kogc+Ee44Sag=
+github.com/foomo/ownbrew v0.2.0 h1:lmfEcMjQVx2c4Slb8a5pbwM8gTCk3EzmBIVjP1LVyB8=
+github.com/foomo/ownbrew v0.2.0/go.mod h1:lyUFvPABflzcI/cAmQU4vif1DjH8tZ6kogc+Ee44Sag=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/franklinkim/go-prompt v0.2.7-0.20210427061716-a8f4995d7aa5 h1:kXNtle4AoQnngdm+gwt4ku6Llbzw3EFHgZYpL618JaI=
@@ -146,6 +146,8 @@ github.com/mattn/go-runewidth v0.0.9/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m
 github.com/mattn/go-runewidth v0.0.13/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
 github.com/mattn/go-runewidth v0.0.15 h1:UNAjwbU9l54TA3KzvqLGxwWjHmMgBUVhBiTjelZgg3U=
 github.com/mattn/go-runewidth v0.0.15/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
+github.com/mattn/go-runewidth v0.0.16 h1:E5ScNMtiwvlvB5paMFdw9p4kSQzbXFikJ5SQO6TULQc=
+github.com/mattn/go-runewidth v0.0.16/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
 github.com/mattn/go-tty v0.0.3 h1:5OfyWorkyO7xP52Mq7tB36ajHDG5OHrmBGIS/DtakQI=
 github.com/mattn/go-tty v0.0.3/go.mod h1:ihxohKRERHTVzN+aSVRwACLCeqIoZAWpoICkkvrWyR0=
 github.com/mitchellh/copystructure v1.2.0 h1:vpKXTN4ewci03Vljg/q9QvCGUDttBOGBIa15WveJJGw=
@@ -178,6 +180,8 @@ github.com/pterm/pterm v0.12.36/go.mod h1:NjiL09hFhT/vWjQHSj1athJpx6H8cjpHXNAK5b
 github.com/pterm/pterm v0.12.40/go.mod h1:ffwPLwlbXxP+rxT0GsgDTzS3y3rmpAO1NMjUkGTYf8s=
 github.com/pterm/pterm v0.12.79 h1:lH3yrYMhdpeqX9y5Ep1u7DejyHy7NSQg9qrBjF9dFT4=
 github.com/pterm/pterm v0.12.79/go.mod h1:1v/gzOF1N0FsjbgTHZ1wVycRkKiatFvJSJC4IGaQAAo=
+github.com/pterm/pterm v0.12.80-0.20241004171054-a6948562ecff h1:50Ch3x1NIDpqRjlo4R00Xu7x9Xxdl0DS4iN61wyzpEI=
+github.com/pterm/pterm v0.12.80-0.20241004171054-a6948562ecff/go.mod h1:1aCALwSx8GfmY30yYBJwdcUjGngDrhMtNlYzxicHlbM=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.4 h1:8TfxU8dW6PdqD27gjM8MVNuicgxIjxpm4K7x4jp8sis=
 github.com/rivo/uniseg v0.4.4/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=

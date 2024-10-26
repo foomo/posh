@@ -10,6 +10,6 @@ import (
 type Plugin interface {
 	Prompt(ctx context.Context, cfg config.Prompt) error
 	Execute(ctx context.Context, args []string) error
-	Brew(ctx context.Context, cfg ownbrewconfig.Config, dry bool) error
+	Brew(ctx context.Context, cfg ownbrewconfig.Config, tags []string, dry bool) error
 	Require(ctx context.Context, cfg config.Require) error
 }

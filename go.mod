@@ -10,14 +10,14 @@ require (
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/charlievieth/fastwalk v1.0.8
 	github.com/foomo/fender v1.0.1
-	github.com/foomo/ownbrew v0.1.2
+	github.com/foomo/ownbrew v0.2.0
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/gofrs/flock v0.12.1
 	github.com/joho/godotenv v1.5.1
 	github.com/kubescape/go-git-url v0.0.30
 	github.com/neilotoole/slogt v1.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/pterm/pterm v0.12.79
+	github.com/pterm/pterm v0.12.80-0.20241004171054-a6948562ecff
 	github.com/samber/lo v1.47.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
@@ -60,7 +60,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
-	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mattn/go-tty v0.0.3 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
