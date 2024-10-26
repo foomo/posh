@@ -22,6 +22,28 @@ $ brew install foomo/tap/posh
 
 ## Usage
 
+```shell
+$ posh help
+Project Oriented Shell (posh)
+
+Usage:
+  posh [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  config      Print loaded configuration
+  help        Help about any command
+  init        Initialize a Project Oriented Shell
+  version     Print the version
+
+Flags:
+  -h, --help           help for posh
+      --level string   set log level (default: info) (default "info")
+      --no-color       disabled colors (default: false)
+
+Use "posh [command] --help" for more information about a command.
+```
+
 To start using posh, go into your project and run:
 
 ```bash
@@ -45,4 +67,4 @@ Make a pull request...
 
 Distributed under MIT License, please see license file within the code for more details.
 
-[foomo](https://www.foomo.org) by [bestbytes](https://www.bestbytes.com)
+_Made with ♥ [foomo](https://www.foomo.org) by [bestbytes](https://www.bestbytes.com)_
