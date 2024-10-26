@@ -56,6 +56,12 @@ func NewPTerm(opts ...PTermOption) *PTerm {
 			opt(inst)
 		}
 	}
+	pterm.Info = *pterm.Info.WithPrefix(pterm.Prefix{Text: "ℹ", Style: pterm.Info.Prefix.Style})
+	pterm.Debug = *pterm.Debug.WithPrefix(pterm.Prefix{Text: "⚒︎", Style: pterm.Debug.Prefix.Style})
+	pterm.Fatal = *pterm.Fatal.WithPrefix(pterm.Prefix{Text: "💀", Style: pterm.Fatal.Prefix.Style})
+	pterm.Error = *pterm.Error.WithPrefix(pterm.Prefix{Text: "⛌", Style: pterm.Error.Prefix.Style}) //nolint:reassign
+	pterm.Warning = *pterm.Info.WithPrefix(pterm.Prefix{Text: "⚠", Style: pterm.Warning.Prefix.Style})
+	pterm.Success = *pterm.Success.WithPrefix(pterm.Prefix{Text: "✓", Style: pterm.Success.Prefix.Style})
 	return inst
 }
 

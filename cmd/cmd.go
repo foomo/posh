@@ -7,7 +7,6 @@ import (
 	"runtime/debug"
 
 	intenv "github.com/foomo/posh/internal/env"
-	intlog "github.com/foomo/posh/internal/log"
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/pkg/errors"
@@ -16,33 +15,31 @@ import (
 
 func Init(provider plugin.Provider) {
 	pluginProvider = provider
-	cobra.OnInitialize(func() {
-		l = intlog.Init(flagLevel, flagNoColor)
-		l.Must(intenv.Init())
-	})
-	rootCmd.PersistentFlags().BoolVar(&flagNoColor, "no-color", false, "disabled colors (default is false)")
-	rootCmd.PersistentFlags().StringVar(&flagLevel, "level", "info", "set log level (default is warn)")
-	rootCmd.AddCommand(
-		configCmd,
-		versionCmd,
-	)
+	rootCmd = NewRoot()
+	NewConfig(rootCmd)
+	NewVersion(rootCmd)
 
 	if provider != nil {
-		rootCmd.AddCommand(
-			brewCmd,
-			execCmd,
-			promptCmd,
-			requireCmd,
-		)
-		brewCmd.Flags().BoolVar(&brewCmdFlagDry, "dry", false, "don't execute scripts")
+		NewBrew(rootCmd)
+		NewExecute(rootCmd)
+		NewPrompt(rootCmd)
+		NewRequire(rootCmd)
+	} else {
+		NewInit(rootCmd)
 	}
+
+	cobra.OnInitialize(func() {
+		if err := intenv.Init(); err != nil {
+			panic(err)
+		}
+	})
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	code := 0
-	l = log.NewFmt()
+	l := log.NewFmt()
 
 	// handle interrupt
 	osInterrupt := make(chan os.Signal, 1)
