@@ -4,11 +4,11 @@ go 1.23.2
 
 require (
 	dario.cat/mergo v1.0.1
-	github.com/Masterminds/semver/v3 v3.3.0
+	github.com/Masterminds/semver/v3 v3.3.1
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/alecthomas/chroma v0.10.0
 	github.com/c-bata/go-prompt v0.2.6
-	github.com/charlievieth/fastwalk v1.0.8
+	github.com/charlievieth/fastwalk v1.0.9
 	github.com/foomo/fender v1.0.1
 	github.com/foomo/ownbrew v0.2.0
 	github.com/go-git/go-git/v5 v5.12.0
@@ -17,13 +17,13 @@ require (
 	github.com/kubescape/go-git-url v0.0.30
 	github.com/neilotoole/slogt v1.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/pterm/pterm v0.12.80-0.20241004171054-a6948562ecff
+	github.com/pterm/pterm v0.12.80
 	github.com/samber/lo v1.47.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
-	github.com/stretchr/testify v1.9.0
-	golang.org/x/sync v0.8.0
+	github.com/stretchr/testify v1.10.0
+	golang.org/x/sync v0.9.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -86,9 +86,9 @@ require (
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/term v0.25.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/term v0.26.0 // indirect
+	golang.org/x/text v0.20.0 // indirect
 	golang.org/x/tools v0.25.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
