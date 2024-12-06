@@ -62,6 +62,7 @@ func NewPTerm(opts ...PTermOption) *PTerm {
 	pterm.Error = *pterm.Error.WithPrefix(pterm.Prefix{Text: "⛌", Style: pterm.Error.Prefix.Style}) //nolint:reassign
 	pterm.Warning = *pterm.Info.WithPrefix(pterm.Prefix{Text: "⚠", Style: pterm.Warning.Prefix.Style})
 	pterm.Success = *pterm.Success.WithPrefix(pterm.Prefix{Text: "✓", Style: pterm.Success.Prefix.Style})
+	pterm.DefaultLogger = *pterm.DefaultLogger.WithTime(false)
 	return inst
 }
 
