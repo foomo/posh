@@ -1,6 +1,6 @@
 module github.com/foomo/posh
 
-go 1.23.2
+go 1.23.4
 
 require (
 	dario.cat/mergo v1.0.1
@@ -10,7 +10,7 @@ require (
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/charlievieth/fastwalk v1.0.9
 	github.com/foomo/fender v1.0.1
-	github.com/foomo/ownbrew v0.2.0
+	github.com/foomo/ownbrew v0.2.1
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/gofrs/flock v0.12.1
 	github.com/joho/godotenv v1.5.1
