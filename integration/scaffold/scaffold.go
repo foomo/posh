@@ -95,7 +95,7 @@ func (s *Scaffold) scaffoldDir(target string) error {
 	} else if err != nil {
 		return errors.Wrapf(err, "failed to stat target folder (%s)", target)
 	} else if !stat.IsDir() {
-		return fmt.Errorf("target not a directory (%s)", target)
+		return errors.Errorf("target not a directory (%s)", target)
 	}
 	return nil
 }
@@ -177,7 +177,7 @@ func (s *Scaffold) fileExists(target string) (bool, error) {
 	} else if err != nil {
 		return false, errors.Wrapf(err, "failed to stat target (%s)", target)
 	} else if stat.IsDir() {
-		return true, fmt.Errorf("target file is an existing directory (%s)", target)
+		return true, errors.Errorf("target file is an existing directory (%s)", target)
 	} else {
 		return true, nil
 	}

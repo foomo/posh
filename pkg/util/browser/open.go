@@ -2,10 +2,11 @@ package browser
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"os/exec"
 	"runtime"
+
+	"github.com/pkg/errors"
 )
 
 func OpenRawURL(ctx context.Context, u string) error {
@@ -18,7 +19,7 @@ func OpenRawURL(ctx context.Context, u string) error {
 
 func OpenURL(ctx context.Context, u *url.URL) error {
 	if u == nil {
-		return fmt.Errorf("empty url")
+		return errors.New("empty url")
 	}
 	switch runtime.GOOS {
 	case "linux":
@@ -28,6 +29,6 @@ func OpenURL(ctx context.Context, u *url.URL) error {
 	case "darwin":
 		return exec.CommandContext(ctx, "open", u.String()).Start()
 	default:
-		return fmt.Errorf("unsupported platform")
+		return errors.New("unsupported platform")
 	}
 }
