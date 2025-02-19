@@ -17,7 +17,7 @@ var errOK = errors.New("ok")
 
 func TestRoot(t *testing.T) {
 	l := log.NewTest(t, log.TestWithLevel(log.LevelInfo))
-	ctx := context.TODO()
+	ctx := t.Context()
 
 	var (
 		errRoot    = errors.New("root")
@@ -173,7 +173,7 @@ func TestRoot(t *testing.T) {
 
 func TestRoot_Node(t *testing.T) {
 	l := log.NewTest(t, log.TestWithLevel(log.LevelInfo))
-	ctx := context.TODO()
+	ctx := t.Context()
 
 	tests := []struct {
 		name    string
@@ -228,7 +228,7 @@ func TestRoot_Node(t *testing.T) {
 
 func TestRoot_NodeArgs(t *testing.T) {
 	l := log.NewTest(t, log.TestWithLevel(log.LevelInfo))
-	ctx := context.TODO()
+	ctx := t.Context()
 
 	tests := []struct {
 		name    string
@@ -345,7 +345,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 
 func TestRoot_NodeFlags(t *testing.T) {
 	l := log.NewTest(t, log.TestWithLevel(log.LevelDebug))
-	ctx := context.TODO()
+	ctx := t.Context()
 
 	tests := []struct {
 		name    string

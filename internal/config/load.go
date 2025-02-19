@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
 	"dario.cat/mergo"
@@ -71,7 +70,7 @@ func Load(l log.Logger) error {
 
 	// validate version
 	if v := viper.GetString("version"); v != Version {
-		return fmt.Errorf("invalid config version: %s (%s)", v, Version)
+		return errors.Errorf("invalid config version: %s (%s)", v, Version)
 	}
 
 	// set configured env
