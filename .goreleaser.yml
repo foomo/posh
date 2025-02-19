@@ -7,6 +7,8 @@ builds:
     main: ./main.go
     env:
       - CGO_ENABLED=0
+    flags:
+      - -tags=safe
     ldflags:
       - -s -w
       - -X github.com/foomo/posh/internal/version.Version={{.Version}}
