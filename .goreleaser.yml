@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
     - go mod download
@@ -27,6 +29,9 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+
+release:
+  prerelease: auto
 
 changelog:
   use: github-native
