@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"runtime/debug"
 
+	"github.com/foomo/posh/internal/cmd"
 	intenv "github.com/foomo/posh/internal/env"
-	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -39,7 +39,7 @@ func Init(provider plugin.Provider) {
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	code := 0
-	l := log.NewFmt()
+	l := cmd.NewLogger()
 
 	// handle interrupt
 	osInterrupt := make(chan os.Signal, 1)
