@@ -14,7 +14,7 @@ func NewPTermWriter(printer pterm.PrefixPrinter) *PTermWriter {
 	}
 }
 
-func (p *PTermWriter) Write(b []byte) (n int, err error) {
+func (p *PTermWriter) Write(b []byte) (int, error) {
 	p.printer.Println(string(b))
 	return len(b), nil
 }
