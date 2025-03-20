@@ -2,10 +2,13 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"runtime/debug"
+	"strings"
 
+	cowsay "github.com/Code-Hex/Neo-cowsay/v2"
 	"github.com/foomo/posh/internal/cmd"
 	intenv "github.com/foomo/posh/internal/env"
 	"github.com/foomo/posh/pkg/plugin"
@@ -46,11 +49,19 @@ func Execute() {
 	signal.Notify(osInterrupt, os.Interrupt)
 	ctx, cancel := context.WithCancel(context.Background())
 
+	say := func(msg string) string {
+		if say, err := cowsay.Say(msg, cowsay.BallonWidth(80)); err == nil {
+			msg = say
+		}
+		return msg
+	}
+
 	// handle defer
 	defer func() {
-		if err := recover(); err != nil {
-			debug.PrintStack()
-			l.Error(err)
+		if r := recover(); r != nil {
+			l.Error(say("It's time to panic"))
+			l.Error(fmt.Sprintf("%v", r))
+			l.Error(string(debug.Stack()))
 			code = 1
 		}
 		signal.Stop(osInterrupt)
@@ -67,6 +78,7 @@ func Execute() {
 	if err := rootCmd.ExecuteContext(ctx); errors.Is(err, context.Canceled) {
 		l.Warn(err.Error())
 	} else if err != nil {
+		l.Error(say(strings.Split(errors.Cause(err).Error(), ":")[0]))
 		l.Error(err.Error())
 		code = 1
 	}

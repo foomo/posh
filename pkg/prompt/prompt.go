@@ -330,8 +330,8 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 
 // context returns and watches over a new context
 func (s *Prompt) context() context.Context {
-	//ctx, cancel := context.WithCancel(context.Background())
-	//go func(ctx context.Context, cancel context.CancelFunc) {
+	// ctx, cancel := context.WithCancel(context.Background())
+	// go func(ctx context.Context, cancel context.CancelFunc) {
 	//	sigChan := make(chan os.Signal, 1)
 	//	signal.Notify(sigChan, os.Interrupt)
 	//	select {
@@ -344,7 +344,7 @@ func (s *Prompt) context() context.Context {
 	//	case <-ctx.Done():
 	//		return
 	//	}
-	//}(ctx, cancel)
-	//return ctx
+	// }(ctx, cancel)
+	// return ctx
 	return s.ctx
 }
