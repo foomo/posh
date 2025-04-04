@@ -107,8 +107,23 @@ func (c *Env) list(ctx context.Context, r *readline.Readline) error {
 	data := pterm.TableData{{"Name", "Value"}}
 	values := os.Environ()
 	sort.Strings(values)
+	var pairs [][]string
 	for _, s := range values {
-		data = append(data, strings.SplitN(s, "=", 2))
+		pairs = append(pairs, strings.SplitN(s, "=", 2))
 	}
-	return pterm.DefaultTable.WithHasHeader(true).WithData(data).Render()
+	var maxKeyLen int
+	for _, pair := range pairs {
+		maxKeyLen = max(maxKeyLen, len(pair[0]))
+	}
+	maxValueLen := pterm.GetTerminalWidth() - maxKeyLen - 5
+	for i, pair := range pairs {
+		var value string
+		for len(pair[1]) > maxValueLen {
+			value += pair[1][:maxValueLen] + "\n"
+			pair[1] = pair[1][maxValueLen:]
+		}
+		pairs[i][1] = value + pair[1]
+	}
+	data = append(data, pairs...)
+	return pterm.DefaultTable.WithHasHeader(true).WithHeaderRowSeparator("-").WithData(data).Render()
 }
