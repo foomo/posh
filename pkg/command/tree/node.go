@@ -44,9 +44,10 @@ func (c *Node) setFlags(ctx context.Context, r *readline.Readline, parse bool) e
 
 func (c *Node) completeArguments(ctx context.Context, p *root, r *readline.Readline, i int) []goprompt.Suggest {
 	var suggest []goprompt.Suggest
-	localArgs := r.Args()[i:]
+	localArgs := r.Args().From(i)
+
 	switch {
-	case len(c.Nodes) > 0 && len(localArgs) <= 1:
+	case len(c.Nodes) > 0:
 		for _, command := range c.Nodes {
 			if command.Values != nil {
 				suggest = command.Values(ctx, r)
@@ -54,12 +55,12 @@ func (c *Node) completeArguments(ctx context.Context, p *root, r *readline.Readl
 				suggest = append(suggest, goprompt.Suggest{Text: command.Name, Description: command.Description})
 			}
 		}
-	case len(c.Args) > 0 && len(c.Args) >= len(localArgs):
-		j := len(localArgs)
-		if len(localArgs) > 0 && localArgs[j-1] != "" {
-			j -= 1
+	case len(c.Args) > 0 && len(localArgs) == 0:
+		if fn := c.Args[0].Suggest; fn != nil {
+			suggest = fn(ctx, p, r)
 		}
-		if fn := c.Args[j].Suggest; fn != nil {
+	case len(c.Args) > 0 && len(c.Args) >= len(localArgs):
+		if fn := c.Args[len(localArgs)-1].Suggest; fn != nil {
 			suggest = fn(ctx, p, r)
 		}
 	case len(c.Args) > 0 && c.Args.Last().Repeat && c.Args.Last().Suggest != nil:
@@ -85,7 +86,7 @@ func (c *Node) completeFlags(r *readline.Readline) []goprompt.Suggest {
 }
 
 func (c *Node) execute(ctx context.Context, r *readline.Readline, i int) error {
-	localArgs := r.Args()[i:]
+	localArgs := r.Args().From(i)
 
 	// validate
 	switch {
@@ -115,7 +116,7 @@ func (c *Node) find(ctx context.Context, r *readline.Readline, i int) (*Node, in
 			if subCmd, j := cmd.find(ctx, r, i+1); subCmd != nil {
 				return subCmd, j
 			}
-			return cmd, i
+			return cmd, i + 1
 		}
 		if cmd.Values != nil {
 			for _, name := range cmd.Values(ctx, r) {
@@ -123,7 +124,7 @@ func (c *Node) find(ctx context.Context, r *readline.Readline, i int) (*Node, in
 					if subCmd, j := cmd.find(ctx, r, i+1); subCmd != nil {
 						return subCmd, j
 					}
-					return cmd, i
+					return cmd, i + 1
 				}
 			}
 		}
