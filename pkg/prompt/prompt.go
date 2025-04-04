@@ -7,6 +7,7 @@ import (
 	"github.com/c-bata/go-prompt"
 	"github.com/c-bata/go-prompt/completer"
 	"github.com/foomo/posh/pkg/command"
+	"github.com/foomo/posh/pkg/env"
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/prompt/check"
 	"github.com/foomo/posh/pkg/prompt/flair"
@@ -14,22 +15,24 @@ import (
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/shell"
+	"github.com/go-git/go-git/v5"
 )
 
 type (
 	Prompt struct {
-		l        log.Logger
-		ctx      context.Context
-		title    string
-		flair    flair.Flair
-		prefix   string
-		check    check.Check
-		checkers []check.Checker
-		filter   goprompt.Filter
-		readline *readline.Readline
-		history  history.History
-		commands command.Commands
-		aliases  map[string]string
+		l         log.Logger
+		ctx       context.Context
+		title     string
+		flair     flair.Flair
+		prefix    string
+		prefixGit bool
+		check     check.Check
+		checkers  []check.Checker
+		filter    goprompt.Filter
+		readline  *readline.Readline
+		history   history.History
+		commands  command.Commands
+		aliases   map[string]string
 		// inputRegex - split cmd into args
 		promptOptions []prompt.Option
 	}
@@ -56,7 +59,14 @@ func WithFlair(v flair.Flair) Option {
 
 func WithPrefix(v string) Option {
 	return func(o *Prompt) error {
-		o.prefix = v + " "
+		o.prefix = v + " › "
+		return nil
+	}
+}
+
+func WithPrefixGit(v bool) Option {
+	return func(o *Prompt) error {
+		o.prefixGit = v
 		return nil
 	}
 }
@@ -134,15 +144,16 @@ func WithPromptOptions(v ...prompt.Option) Option {
 
 func New(l log.Logger, opts ...Option) (*Prompt, error) {
 	inst := &Prompt{
-		l:        l.Named("prompt"),
-		ctx:      context.Background(),
-		title:    "posh",
-		prefix:   ">",
-		flair:    flair.DefaultFlair,
-		filter:   goprompt.FilterFuzzy,
-		check:    check.DefaultCheck,
-		history:  history.NewNoop(l),
-		commands: command.Commands{},
+		l:         l.Named("prompt"),
+		ctx:       context.Background(),
+		title:     "posh",
+		prefix:    "› ",
+		prefixGit: false,
+		flair:     flair.DefaultFlair,
+		filter:    goprompt.FilterFuzzy,
+		check:     check.DefaultCheck,
+		history:   history.NewNoop(l),
+		commands:  command.Commands{},
 	}
 	for _, opt := range opts {
 		if opt != nil {
@@ -187,6 +198,20 @@ func (s *Prompt) Run() error {
 			[]prompt.Option{
 				prompt.OptionTitle(s.title),
 				prompt.OptionPrefix(s.prefix),
+				prompt.OptionLivePrefix(func() (string, bool) {
+					if s.prefixGit {
+						r, err := git.PlainOpen(env.ProjectRoot())
+						if err != nil {
+							s.l.Debug("failed to open git repository", "error", err)
+						}
+						ref, err := r.Head()
+						if err != nil {
+							s.l.Debug("failed to fetch HEAD", "error", err)
+						}
+						return s.prefix[:len(s.prefix)-4] + "(" + ref.Name().Short() + ") › ", true
+					}
+					return "", false
+				}),
 				prompt.OptionPrefixTextColor(prompt.Cyan),
 				prompt.OptionInputTextColor(prompt.DefaultColor),
 				prompt.OptionCompletionWordSeparator(completer.FilePathCompletionSeparator),
@@ -253,7 +278,7 @@ func (s *Prompt) execute(input string) {
 	if cmd := s.Commands().Get(s.readline.Cmd()); cmd != nil {
 		s.l.Debugf(`executing command:
 
-> %s
+› %s
 
 %s
 `, input, s.readline.String())
@@ -263,11 +288,17 @@ func (s *Prompt) execute(input string) {
 				return
 			}
 		}
-		if err := cmd.Execute(ctx, s.readline); err != nil {
+		if err := cmd.Execute(ctx, s.readline); err != nil && err.Error() == "signal: interrupt" {
+			s.l.Debug(err.Error())
+		} else if err != nil {
 			s.l.Error(err.Error())
 		}
-	} else if err := shell.New(ctx, s.l, input).Run(); err != nil {
-		s.l.Error(err.Error())
+	} else {
+		if err := shell.New(ctx, s.l, input).Run(); err != nil && err.Error() == "signal: interrupt" {
+			s.l.Debug(err.Error())
+		} else if err != nil {
+			s.l.Error(err.Error())
+		}
 	}
 }
 
