@@ -29,7 +29,7 @@ func (s *FlagSet) SetValues(name string, values ...string) error {
 }
 
 func (s *FlagSet) GetValues(name string) []string {
-	if f := s.FlagSet.Lookup(name); f == nil {
+	if f := s.Lookup(name); f == nil {
 		return nil
 	} else if v, ok := f.Annotations["values"]; ok {
 		return v
