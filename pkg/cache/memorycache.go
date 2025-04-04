@@ -1,32 +1,43 @@
 package cache
 
-type MemoryCache map[string]MemoryNamespace
+import (
+	"sync"
+)
 
-func NewMemoryCache() MemoryCache {
-	return MemoryCache{}
+type MemoryCache struct {
+	store sync.Map
 }
 
-func (c MemoryCache) Clear(namespace string) {
-	if namespace == "" {
-		for _, value := range c {
-			value.Delete("")
-		}
-	} else {
-		c.Get(namespace).Delete("")
+func NewMemoryCache() *MemoryCache {
+	return &MemoryCache{
+		store: sync.Map{},
 	}
 }
 
-func (c MemoryCache) Get(namespace string) Namespace {
-	if _, ok := c[namespace]; !ok {
-		c[namespace] = MemoryNamespace{}
+func (c *MemoryCache) Clear(namespaces ...string) {
+	if len(namespaces) == 0 {
+		c.store.Range(func(key, value interface{}) bool {
+			namespaces = append(namespaces, key.(string))
+			return true
+		})
 	}
-	return c[namespace]
+	for _, namespace := range namespaces {
+		c.Get(namespace).Delete()
+	}
 }
 
-func (c MemoryCache) List() map[string]Namespace {
+func (c *MemoryCache) Get(namespace string) Namespace {
+	value, _ := c.store.LoadOrStore(namespace, &MemoryNamespace{
+		store: sync.Map{},
+	})
+	return value.(*MemoryNamespace)
+}
+
+func (c *MemoryCache) List() map[string]Namespace {
 	ret := map[string]Namespace{}
-	for s, namespace := range c {
-		ret[s] = namespace
-	}
+	c.store.Range(func(k, v interface{}) bool {
+		ret[k.(string)] = v.(*MemoryNamespace)
+		return true
+	})
 	return ret
 }

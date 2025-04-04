@@ -1,38 +1,44 @@
 package cache
 
-import "github.com/c-bata/go-prompt"
+import (
+	"sync"
 
-type MemoryNamespace map[string]interface{}
+	"github.com/c-bata/go-prompt"
+)
 
-func (c MemoryNamespace) Delete(key string) {
-	if key == "" {
-		for key := range c {
-			delete(c, key)
-		}
+type MemoryNamespace struct {
+	store sync.Map
+}
+
+func (c *MemoryNamespace) Delete(keys ...string) {
+	if len(keys) == 0 {
+		c.store.Clear()
 	} else {
-		delete(c, key)
-	}
-}
-
-func (c MemoryNamespace) Get(key string, cb func() interface{}) interface{} {
-	if _, ok := c[key]; !ok {
-		if cb == nil {
-			return nil
+		for _, key := range keys {
+			c.store.Delete(key)
 		}
-		c[key] = cb()
 	}
-	return c[key]
 }
 
-func (c MemoryNamespace) Keys() []string {
-	keys := make([]string, 0, len(c))
-	for k := range c {
-		keys = append(keys, k)
+func (c *MemoryNamespace) Get(key string, cb func() any) any {
+	value, ok := c.store.Load(key)
+	if !ok && cb != nil {
+		value = cb()
+		c.store.Store(key, value)
 	}
+	return value
+}
+
+func (c *MemoryNamespace) Keys() []string {
+	var keys []string
+	c.store.Range(func(k, v interface{}) bool {
+		keys = append(keys, k.(string))
+		return true
+	})
 	return keys
 }
 
-func (c MemoryNamespace) GetSuggests(key string, cb func() interface{}) []prompt.Suggest {
+func (c *MemoryNamespace) GetSuggests(key string, cb func() any) []prompt.Suggest {
 	if v, ok := c.Get(key, cb).([]prompt.Suggest); ok {
 		return v
 	}
