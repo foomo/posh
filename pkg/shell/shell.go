@@ -16,6 +16,7 @@ type Shell struct {
 	l      log.Logger
 	cmd    *exec.Cmd
 	quiet  bool
+	debug  bool
 	args   []string
 	stdin  io.Reader
 	stdout io.Writer
@@ -88,6 +89,11 @@ func (s *Shell) Stderr(v io.Writer) *Shell {
 	return s
 }
 
+func (s *Shell) Debug() *Shell {
+	s.debug = true
+	return s
+}
+
 func (s *Shell) Run() error {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
@@ -144,15 +150,19 @@ func (s *Shell) Wait() error {
 // ------------------------------------------------------------------------------------------------
 
 func (s *Shell) trace() {
-	s.l.Tracef(`"Executing:
+	if s.debug {
+		s.l.Info(s.cmd.String())
+	} else {
+		s.l.Tracef(`"Executing:
 $ %s
 
 Directory: %s
 
 %s
 `,
-		s.cmd.String(),
-		s.cmd.Dir,
-		strings.Join(s.cmd.Environ(), "\n"),
-	)
+			s.cmd.String(),
+			s.cmd.Dir,
+			strings.Join(s.cmd.Environ(), "\n"),
+		)
+	}
 }
