@@ -106,7 +106,7 @@ func (c *Cache) clear(ctx context.Context, r *readline.Readline) error {
 		}
 	} else {
 		c.l.Info("clearing all caches")
-		c.cache.Clear("")
+		c.cache.Clear()
 	}
 	return nil
 }

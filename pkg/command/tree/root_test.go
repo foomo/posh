@@ -426,5 +426,5 @@ func T(ctx context.Context) *testing.T {
 
 func SetT(ctx context.Context, t *testing.T) context.Context {
 	t.Helper()
-	return context.WithValue(ctx, "t", t)
+	return context.WithValue(ctx, "t", t) //nolint:staticcheck
 }

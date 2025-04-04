@@ -2,6 +2,6 @@ package cache
 
 type Cache interface {
 	Get(namespace string) Namespace
-	Clear(namespace string)
+	Clear(namespaces ...string)
 	List() map[string]Namespace
 }

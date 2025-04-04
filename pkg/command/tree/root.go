@@ -60,7 +60,7 @@ func (t *root) Complete(ctx context.Context, r *readline.Readline) []goprompt.Su
 		} else if err := cmd.setFlags(ctx, r, false); err != nil {
 			return nil
 		} else {
-			suggests = cmd.completeArguments(ctx, t, r, i+1)
+			suggests = cmd.completeArguments(ctx, t, r, i)
 		}
 	case readline.ModeFlags:
 		if cmd, _ := t.node.find(ctx, r, 0); cmd == nil && t.node != nil {
