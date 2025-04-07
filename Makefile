@@ -19,7 +19,8 @@ outdated:
 .PHONY: test
 ## Run tests
 test:
-	@go test -coverprofile=coverage.out -race -json ./... | gotestfmt
+	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out -race ./...
+	#@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out -race -json ./... | gotestfmt
 
 .PHONY: test.demo
 ## Run tests
