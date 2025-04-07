@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	ptermx "github.com/foomo/posh/pkg/pterm"
 	"github.com/pterm/pterm"
 )
 
@@ -167,7 +168,7 @@ func (l *PTerm) Must(err error) {
 }
 
 func (l *PTerm) SlogHandler() slog.Handler {
-	return pterm.NewSlogHandler(&pterm.DefaultLogger)
+	return ptermx.NewSlogHandler()
 }
 
 // ------------------------------------------------------------------------------------------------

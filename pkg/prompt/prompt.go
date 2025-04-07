@@ -27,7 +27,7 @@ type (
 		prefix    string
 		prefixGit bool
 		check     check.Check
-		checkers  []check.Checker
+		checkers  check.Checkers
 		filter    goprompt.Filter
 		readline  *readline.Readline
 		history   history.History
