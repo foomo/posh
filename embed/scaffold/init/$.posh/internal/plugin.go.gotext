@@ -110,12 +110,12 @@ func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {
 		prompt.WithAliases(cfg.Aliases),
 		prompt.WithCommands(p.commands),
 		prompt.WithCheckers(
-			func(ctx context.Context, l log.Logger) check.Info {
-				return check.Info{
+			func(ctx context.Context, l log.Logger) []check.Info {
+				return []check.Info{check.Info{
 					Name:   "example",
 					Note:   "all good",
 					Status: check.StatusSuccess,
-				}
+				}}
 			},
 		),
 		prompt.WithFileHistory(
