@@ -16,4 +16,5 @@ var (
 	FilterContains  = prompt.FilterContains
 	FilterHasPrefix = prompt.FilterHasPrefix
 	FilterHasSuffix = prompt.FilterHasSuffix
+	FilterCombined  = filterCombined
 )
