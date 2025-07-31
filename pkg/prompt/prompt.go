@@ -152,7 +152,7 @@ func New(l log.Logger, opts ...Option) (*Prompt, error) {
 		prefix:    "› ",
 		prefixGit: false,
 		flair:     flair.DefaultFlair,
-		filter:    goprompt.FilterFuzzy,
+		filter:    goprompt.FilterCombined,
 		check:     check.DefaultCheck,
 		history:   history.NewNoop(l),
 		commands:  command.Commands{},
