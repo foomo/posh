@@ -1,4 +1,20 @@
 .DEFAULT_GOAL:=help
+-include .makerc
+
+# --- Targets -----------------------------------------------------------------
+
+# This allows us to accept extra arguments
+%: .husky
+	@:
+
+.PHONY: .husky
+# Configure git hooks for husky
+.husky:
+	@if ! command -v husky &> /dev/null; then \
+		echo "ERROR: missing executeable 'husky', please run:"; \
+		echo "\n$ go install github.com/go-courier/husky/cmd/husky@latest\n"; \
+	fi
+	@git config core.hooksPath .husky
 
 ## === Tasks ===
 
@@ -19,8 +35,8 @@ outdated:
 .PHONY: test
 ## Run tests
 test:
-	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out -race ./...
-	#@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out -race -json ./... | gotestfmt
+	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out --tags=safe -race ./...
+	#@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out --tags=safe -race -json ./... | gotestfmt
 
 .PHONY: test.demo
 ## Run tests
