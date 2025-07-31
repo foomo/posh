@@ -16,6 +16,8 @@ import (
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/shell"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/pkg/errors"
 )
 
 type (
@@ -208,7 +210,17 @@ func (s *Prompt) Run() error {
 						if err != nil {
 							s.l.Debug("failed to fetch HEAD", "error", err)
 						}
-						return s.prefix[:len(s.prefix)-4] + "(" + ref.Name().Short() + ") › ", true
+						name := ref.Name().Short()
+						if t, err := r.Tags(); err == nil {
+							_ = t.ForEach(func(reference *plumbing.Reference) error {
+								if ref.Hash() == reference.Hash() {
+									name = "\uF412" + reference.Name().Short()
+									return errors.New("break")
+								}
+								return nil
+							})
+						}
+						return s.prefix[:len(s.prefix)-4] + "(" + name + ") › ", true
 					}
 					return "", false
 				}),
