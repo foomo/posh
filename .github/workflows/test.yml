@@ -16,27 +16,26 @@ concurrency:
 
 jobs:
   test:
-    name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
+      - uses: jdx/mise-action@v3
+
       - uses: actions/setup-go@v6
         with:
+          check-latest: true
           go-version-file: go.mod
-
-      - uses: gotesttools/gotestfmt-action@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: golangci/golangci-lint-action@v8
         with:
-          version: latest
+          install-mode: none
 
-      - run: make test
+      - name: Run lint
+        run: make lint
 
-      - run: make test.demo
+      - name: Run tests
+        run: make test
 
-      - uses: coverallsapp/github-action@v2
-        with:
-          file: coverage.out
+      - name: Run demo test
+        run: make test.demo
