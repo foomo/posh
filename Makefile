@@ -10,6 +10,7 @@
 .PHONY: .mise
 # Install dependencies
 .mise:
+	@command -v mise >/dev/null 2>&1 || { echo >&2 "Error: 'mise' is not installed or not in PATH."; exit 1; }
 	@mise install -q
 
 ### Tasks
