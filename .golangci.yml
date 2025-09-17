@@ -1,7 +1,9 @@
 version: "2"
+
 run:
   build-tags: [safe]
   modules-download-mode: readonly
+
 linters:
   default: none
   enable:

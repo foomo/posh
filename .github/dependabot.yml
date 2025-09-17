@@ -1,34 +1,40 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/refs/heads/master/src/schemas/json/dependabot-2.0.json
 # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 version: 2
 
-multi-ecosystem-groups:
-  all:
-    schedule:
-      day: 'sunday'
-      interval: 'weekly'
-      timezone: "Europe/Berlin"
-    commit-message:
-      prefix: 'deps'
-
 updates:
-  - package-ecosystem: 'github-actions'
+  - package-ecosystem: github-actions
     open-pull-requests-limit: 1
-    multi-ecosystem-groups: all
-    patterns: ['*']
+    commit-message: { prefix: chore(deps) }
     directory: '/'
-    allow:
-      - dependency-type: 'all'
+    schedule:
+      day: sunday
+      interval: weekly
+      timezone: Europe/Berlin
     cooldown:
       default-days: 1
       include: [ '*' ]
 
-  - package-ecosystem: 'gomod'
+  - package-ecosystem: gomod
     open-pull-requests-limit: 1
-    multi-ecosystem-groups: all
-    directories: ['**/*']
-    patterns: ['*']
-    allow:
-      - dependency-type: all
+    commit-message: { prefix: chore(deps) }
+    directories: [ '**/*' ]
+    schedule:
+      day: sunday
+      interval: weekly
+      timezone: Europe/Berlin
+    groups:
+      security:
+        applies-to: security-updates
+        update-types: [ minor, patch ]
+        patterns: [ '*' ]
+      updates:
+        applies-to: version-updates
+        update-types: [ minor, patch ]
+        patterns: [ '*' ]
+    ignore:
+      - dependency-name: '*'
+        update-types: [ 'version-update:semver-major' ]
     cooldown:
       default-days: 1
       semver-major-days: 14
