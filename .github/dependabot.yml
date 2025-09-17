@@ -1,33 +1,37 @@
-# Please see the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 version: 2
+
+multi-ecosystem-groups:
+  all:
+    schedule:
+      day: 'sunday'
+      interval: 'weekly'
+      timezone: "Europe/Berlin"
+    commit-message:
+      prefix: 'deps'
 
 updates:
   - package-ecosystem: 'github-actions'
     open-pull-requests-limit: 1
+    multi-ecosystem-groups: all
+    patterns: ['*']
     directory: '/'
-    schedule:
-      day: 'sunday'
-      interval: 'weekly'
-    groups:
-      github-actions:
-        patterns: ['*']
+    allow:
+      - dependency-type: 'all'
+    cooldown:
+      default-days: 1
+      include: [ '*' ]
 
   - package-ecosystem: 'gomod'
     open-pull-requests-limit: 1
-    directory: '/'
-    schedule:
-      day: 'sunday'
-      interval: 'weekly'
-    groups:
-      gomod-security:
-        applies-to: security-updates
-        update-types: ['minor', 'patch']
-        patterns: ['*']
-      gomod-update:
-        applies-to: version-updates
-        update-types: ['minor', 'patch']
-        patterns: ['*']
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+    multi-ecosystem-groups: all
+    directories: ['**/*']
+    patterns: ['*']
+    allow:
+      - dependency-type: all
+    cooldown:
+      default-days: 1
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 1
+      include: [ '*' ]

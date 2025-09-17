@@ -16,6 +16,9 @@
 ## Editorconfig
 !.editorconfig
 
+## Docker
+!.dockerignore
+
 ## Husky
 !.husky/
 !.husky.yaml
@@ -29,3 +32,6 @@ go.work.sum
 ## Posh
 !.posh/
 !.posh.yml
+
+## Mise
+!.mise.toml

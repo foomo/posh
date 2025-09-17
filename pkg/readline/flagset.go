@@ -10,7 +10,7 @@ type FlagSet struct {
 
 func NewFlagSet(name string) *FlagSet {
 	fs := pflag.NewFlagSet(name, pflag.ContinueOnError)
-	fs.ParseErrorsWhitelist = pflag.ParseErrorsWhitelist{UnknownFlags: true}
+	fs.ParseErrorsAllowlist = pflag.ParseErrorsAllowlist{UnknownFlags: true}
 	return &FlagSet{
 		FlagSet: fs,
 	}
