@@ -39,7 +39,3 @@ jobs:
 
       - name: Run demo test
         run: make test.demo
-
-      - uses: coverallsapp/github-action@v2
-        with:
-          file: coverage.out
