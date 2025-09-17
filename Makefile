@@ -85,14 +85,15 @@ install.debug:
 .PHONY: help
 ## Show help text
 help:
-	@echo "\033[1;36mPOSH - Project oriented shell\033[0m"
+	@echo "Project Oriented SHELL (posh)\n"
+	@echo "Usage:\n  make [task]"
 	@awk '{ \
 		if($$0 ~ /^### /){ \
-			if(help) printf "\033[36m%-23s\033[0m %s\n\n", cmd, help; help=""; \
-			printf "\n\033[1;36m%s\033[0m\n", substr($$0,5); \
+			if(help) printf "%-23s %s\n\n", cmd, help; help=""; \
+			printf "\n%s:\n", substr($$0,5); \
 		} else if($$0 ~ /^[a-zA-Z0-9._-]+:/){ \
 			cmd = substr($$0, 1, index($$0, ":")-1); \
-			if(help) printf "  \033[36m%-23s\033[0m %s\n", cmd, help; help=""; \
+			if(help) printf "  %-23s %s\n", cmd, help; help=""; \
 		} else if($$0 ~ /^##/){ \
 			help = help ? help "\n                        " substr($$0,3) : substr($$0,3); \
 		} else if(help){ \
