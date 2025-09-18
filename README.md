@@ -8,16 +8,33 @@
 
 # Project Oriented SHELL (posh)
 
-> think of `posh` as an interactive and hackable Makefile
+> Think of `posh` as an interactive, isolated and hackable Makefile
 
-## Installing
+## Installation
 
-Install the latest release of the cli:
+### Download binary
 
-````bash
-$ brew update
-$ brew install foomo/tap/posh
-````
+Download a [binary release](https://github.com/foomo/posh/releases)
+
+### Build from source
+
+```
+go install github.com/foomo/posh@latest
+```
+
+### Homebrew (Linux/macOS)
+
+If you use [Homebrew](https://brew.sh), you can install like this:
+```
+brew install foomo/tap/posh
+```
+
+### Mise
+
+If you use [mise](https://https://mise.jdx.dev), you can install like this:
+```
+mise use github.com:foomo/posh
+```
 
 ## Usage
 
@@ -52,7 +69,7 @@ $ posh init
 
 This will generate the standard layout for posh which can be changed as required through `.posh.yml`.
 
-Once initialized you can start posh through:
+Once initialized, you can start posh through:
 
 ```bash
 $ make shell
