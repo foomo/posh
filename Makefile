@@ -1,17 +1,33 @@
 .DEFAULT_GOAL:=help
 -include .makerc
 
+# --- Config -----------------------------------------------------------------
+
+# Newline hack for error output
+define br
+
+
+endef
+
 # --- Targets -----------------------------------------------------------------
 
 # This allows us to accept extra arguments
-%: .mise
+%: .mise .husky
 	@:
 
 .PHONY: .mise
 # Install dependencies
+.mise: msg := $(br)$(br)Please ensure you have 'mise' installed and activated!$(br)$(br)$$ brew update$(br)$$ brew install mise$(br)$(br)See the documentation: https://mise.jdx.dev/getting-started.html$(br)$(br)
 .mise:
-	@command -v mise >/dev/null 2>&1 || { echo >&2 "Error: 'mise' is not installed or not in PATH."; exit 1; }
-	@mise install -q
+ifeq (, $(shell command -v mise))
+	$(error ${msg})
+endif
+	@mise install
+
+.PHONY: .husky
+# Configure git hooks for husky
+.husky:
+	@git config core.hooksPath .husky
 
 ### Tasks
 
@@ -24,10 +40,15 @@ check: tidy lint test
 tidy:
 	@go mod tidy
 
-.PHONY: outdated
-## Show outdated direct dependencies
-outdated:
-	@go list -u -m -json all | go-mod-outdated -update -direct
+.PHONY: lint
+## Run linter
+lint:
+	@golangci-lint run
+
+.PHONY: lint.fix
+## Fix lint violations
+lint.fix:
+	@golangci-lint run --fix
 
 .PHONY: test
 ## Run tests
@@ -46,28 +67,6 @@ test.demo: install
 		echo "replace github.com/foomo/posh => ../../../" >> .posh/go.mod && \
 		make shell.build && \
 		bin/posh execute welcome demo
-
-.PHONY: lint
-## Run linter
-lint:
-	@golangci-lint run
-
-.PHONY: lint.fix
-## Fix lint violations
-lint.fix:
-	@golangci-lint run --fix
-
-.PHONY: lint.super
-## Run super linter
-lint.super:
-	docker run --rm -it \
-		-e 'RUN_LOCAL=true' \
-		-e 'DEFAULT_BRANCH=main' \
-		-e 'IGNORE_GITIGNORED_FILES=true' \
-		-e 'VALIDATE_JSCPD=false' \
-		-e 'VALIDATE_GO=false' \
-		-v $(PWD):/tmp/lint \
-		github/super-linter
 
 .PHONY: install
 ## Run go install
