@@ -1,4 +1,5 @@
-Version: v1.0
+# yaml-language-server: $schema=https://raw.githubusercontent.com/foomo/posh/refs/heads/main/posh.schema.json
+version: v1.0
 
 ## Prompt settings
 prompt:
@@ -105,5 +106,5 @@ require:
 
 
 ## Example: Custom
-#welcome:
-#  message: Hi, thanks for using POSH!
+welcome:
+  message: Hi, thanks for using POSH!
