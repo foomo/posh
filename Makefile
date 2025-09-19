@@ -32,8 +32,8 @@ endif
 ### Tasks
 
 .PHONY: check
-## Run tests and linters
-check: tidy lint test
+## Run lint & test
+check: tidy lint test test.demo
 
 .PHONY: tidy
 ## Run go mod tidy
@@ -46,7 +46,7 @@ lint:
 	@golangci-lint run
 
 .PHONY: lint.fix
-## Fix lint violations
+## Run linter and fix
 lint.fix:
 	@golangci-lint run --fix
 
@@ -67,6 +67,18 @@ test.demo: install
 		echo "replace github.com/foomo/posh => ../../../" >> .posh/go.mod && \
 		make shell.build && \
 		bin/posh execute welcome demo
+
+.PHONY: build
+## Build binary
+build:
+	@rm -f bin/posh
+	@go build -o bin/posh main.go
+
+.PHONY: build.debug
+## Build binary in debug mode
+build.debug:
+	@rm -f bin/posh
+	@go build -gcflags "all=-N -l" -o bin/posh main.go
 
 .PHONY: install
 ## Run go install
@@ -100,4 +112,3 @@ help:
 			print "\n                        " help "\n"; help=""; \
 		} \
 	}' $(MAKEFILE_LIST)
-
