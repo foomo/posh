@@ -12,6 +12,7 @@ builds:
     env:
       - CGO_ENABLED=0
     flags:
+      - -trimpath
       - -tags=safe
     ldflags:
       - -s -w
@@ -60,7 +61,7 @@ dockers:
       - '--pull'
       # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
       - '--label=org.opencontainers.image.title={{.ProjectName}}'
-      - '--label=org.opencontainers.image.description=CLI utility manage infrastructure as code with helm'
+      - '--label=org.opencontainers.image.description=Project Oriented SHELL (posh)'
       - '--label=org.opencontainers.image.source={{.GitURL}}'
       - '--label=org.opencontainers.image.url={{.GitURL}}'
       - '--label=org.opencontainers.image.documentation={{.GitURL}}'
