@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=posh.schema.json
+version: '1.0'
+
+# Prompt settings
+prompt:
+  title: My title
+  prefix: my-prefix
+
+# Environment variables
+env:
+  - name: FOO
+    value: bar
+
+# Require settings
+require:
+  envs: []
+  packages: []
+  scripts: []

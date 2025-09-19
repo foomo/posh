@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/foomo/posh_test/config",
+  "$ref": "#/$defs/Config",
+  "$defs": {
+    "Config": {
+      "properties": {
+        "version": {
+          "type": "string",
+          "default": "v1.0"
+        },
+        "env": {
+          "$ref": "#/$defs/Env"
+        },
+        "prompt": {
+          "$ref": "#/$defs/Prompt"
+        },
+        "require": {
+          "$ref": "#/$defs/Require"
+        }
+      },
+      "type": "object",
+      "required": [
+        "version"
+      ]
+    },
+    "Env": {
+      "items": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "Prompt": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "prefixGit": {
+          "type": "boolean"
+        },
+        "history": {
+          "$ref": "#/$defs/PromptHistory"
+        },
+        "aliases": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "PromptHistory": {
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "lockFilename": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Require": {
+      "properties": {
+        "envs": {
+          "items": {
+            "$ref": "#/$defs/RequireEnv"
+          },
+          "type": "array"
+        },
+        "scripts": {
+          "items": {
+            "$ref": "#/$defs/RequireScript"
+          },
+          "type": "array"
+        },
+        "packages": {
+          "items": {
+            "$ref": "#/$defs/RequirePackage"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "RequireEnv": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "help": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RequirePackage": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "help": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RequireScript": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "help": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

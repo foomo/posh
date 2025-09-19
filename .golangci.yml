@@ -1,7 +1,8 @@
+# https://golangci-lint.run/usage/configuration/
 version: "2"
 
 run:
-  build-tags: [safe]
+  build-tags: [ safe ]
   modules-download-mode: readonly
 
 linters:
