@@ -26,7 +26,7 @@ type Config struct {
 	Require config.Require `json:"require"`
 }
 
-func TestConfig(t *testing.T) {
+func TestSchema(t *testing.T) {
 	t.Parallel()
 	testingx.Tags(t, tagx.Short)
 
@@ -34,12 +34,14 @@ func TestConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	reflector := new(jsonschema.Reflector)
+	reflector.AllowAdditionalProperties = true
+	reflector.RequiredFromJSONSchemaTags = true
 	require.NoError(t, reflector.AddGoComments("github.com/foomo/posh", "./"))
 	schema := reflector.Reflect(&Config{})
 	actual, err := json.MarshalIndent(schema, "", "  ")
 	require.NoError(t, err)
 
-	filename := path.Join(cwd, "config.schema.json")
+	filename := path.Join(cwd, "posh.schema.json")
 	expected, err := os.ReadFile(filename)
 	if !errors.Is(err, os.ErrNotExist) {
 		require.NoError(t, err)

@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=config.schema.json
+# yaml-language-server: $schema=posh.schema.json
 version: '1.0'
 
 # Prompt settings

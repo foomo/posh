@@ -19,13 +19,9 @@
           "$ref": "#/$defs/Require"
         }
       },
-      "additionalProperties": false,
       "type": "object",
       "required": [
-        "version",
-        "env",
-        "prompt",
-        "require"
+        "version"
       ]
     },
     "Env": {
@@ -38,12 +34,7 @@
             "type": "string"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "name",
-          "value"
-        ]
+        "type": "object"
       },
       "type": "array"
     },
@@ -68,15 +59,7 @@
           "type": "object"
         }
       },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "title",
-        "prefix",
-        "prefixGit",
-        "history",
-        "aliases"
-      ]
+      "type": "object"
     },
     "PromptHistory": {
       "properties": {
@@ -90,13 +73,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "limit",
-        "filename",
-        "lockFilename"
-      ]
+      "type": "object"
     },
     "Require": {
       "properties": {
@@ -119,13 +96,7 @@
           "type": "array"
         }
       },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "envs",
-        "scripts",
-        "packages"
-      ]
+      "type": "object"
     },
     "RequireEnv": {
       "properties": {
@@ -136,12 +107,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "name",
-        "help"
-      ]
+      "type": "object"
     },
     "RequirePackage": {
       "properties": {
@@ -158,14 +124,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "name",
-        "version",
-        "command",
-        "help"
-      ]
+      "type": "object"
     },
     "RequireScript": {
       "properties": {
@@ -179,13 +138,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "name",
-        "command",
-        "help"
-      ]
+      "type": "object"
     }
   }
 }
