@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  merge_group:
   workflow_dispatch:
 
 permissions:
@@ -30,6 +31,9 @@ jobs:
       - uses: golangci/golangci-lint-action@v8
         with:
           install-mode: none
+
+      - name: Run tidy
+        run: make tidy && git diff --exit-code
 
       - name: Run lint
         run: make lint
