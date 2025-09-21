@@ -15,7 +15,7 @@ require (
 	github.com/foomo/ownbrew v0.2.3
 	github.com/go-git/go-git/v5 v5.16.2
 	github.com/gofrs/flock v0.12.1
-	github.com/invopop/jsonschema v0.12.0
+	github.com/invopop/jsonschema v0.13.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kubescape/go-git-url v0.0.30
 	github.com/neilotoole/slogt v1.1.0
