@@ -13,15 +13,15 @@ require (
 	github.com/foomo/fender v1.0.1
 	github.com/foomo/go v0.0.3
 	github.com/foomo/ownbrew v0.2.3
-	github.com/go-git/go-git/v5 v5.16.2
-	github.com/gofrs/flock v0.12.1
-	github.com/invopop/jsonschema v0.12.0
+	github.com/go-git/go-git/v5 v5.16.3
+	github.com/gofrs/flock v0.13.0
+	github.com/invopop/jsonschema v0.13.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kubescape/go-git-url v0.0.30
 	github.com/neilotoole/slogt v1.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/pterm/pterm v0.12.81
-	github.com/samber/lo v1.51.0
+	github.com/pterm/pterm v0.12.82
+	github.com/samber/lo v1.52.0
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
@@ -92,7 +92,7 @@ require (
 	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/exp v0.0.0-20250911091902-df9299821621 // indirect
 	golang.org/x/net v0.44.0 // indirect
-	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/term v0.35.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
