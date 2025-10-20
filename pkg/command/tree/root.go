@@ -39,6 +39,7 @@ func (t *root) Node() *Node {
 
 func (t *root) Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
 	var suggests []goprompt.Suggest
+
 	switch r.Mode() {
 	case readline.ModeArgs:
 		if r.Args().LenLte(1) && len(t.node.Nodes) > 0 {
@@ -79,9 +80,11 @@ func (t *root) Complete(ctx context.Context, r *readline.Readline) []goprompt.Su
 	case readline.ModeAdditionalArgs:
 		// do nothing
 	}
+
 	sort.Slice(suggests, func(i, j int) bool {
 		return suggests[i].Text < suggests[j].Text
 	})
+
 	return suggests
 }
 
@@ -111,6 +114,7 @@ func (t *root) Execute(ctx context.Context, r *readline.Readline) error {
 	} else if err := cmd.execute(ctx, r, index); err != nil {
 		return err
 	}
+
 	return nil
 }
 

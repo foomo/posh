@@ -29,6 +29,7 @@ Posh init must be run inside of a go module (please run "go mod init <MODNAME> f
 			// define module
 			if value, err := git.OriginURL(); err != nil {
 				l.Debug("failed to retrieve git origin url:", err.Error())
+
 				data["module"] = path.Base(env.ProjectRoot())
 			} else {
 				data["module"] = value

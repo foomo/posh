@@ -22,9 +22,11 @@ func (c Commands) List() []Command {
 	for _, command := range c {
 		ret = append(ret, command)
 	}
+
 	sort.Slice(ret, func(i, j int) bool {
 		return ret[i].Name() < ret[j].Name()
 	})
+
 	return ret
 }
 
@@ -42,7 +44,9 @@ func (c Commands) TryAdd(command Command, err error) error {
 	if err != nil {
 		return err
 	}
+
 	c[command.Name()] = command
+
 	return nil
 }
 
@@ -50,6 +54,7 @@ func (c Commands) MustAdd(command Command, err error) {
 	if err != nil {
 		panic(err)
 	}
+
 	c[command.Name()] = command
 }
 
@@ -65,5 +70,6 @@ func (c Commands) Load(paths ...string) error {
 			c.Add(cmds...)
 		}
 	}
+
 	return nil
 }

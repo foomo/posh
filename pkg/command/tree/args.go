@@ -21,5 +21,6 @@ func (a Args) Validate(args readline.Args) error {
 			return errors.Wrap(ErrMissingArgument, arg.Name)
 		}
 	}
+
 	return nil
 }

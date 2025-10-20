@@ -18,5 +18,6 @@ func Ref(ctx context.Context, l log.Logger) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to retrieve git ref")
 	}
+
 	return strings.TrimSpace(string(value)), nil
 }

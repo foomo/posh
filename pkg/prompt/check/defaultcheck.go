@@ -13,19 +13,26 @@ import (
 )
 
 func DefaultCheck(ctx context.Context, l log.Logger, checkers []Checker) error {
-	var mu sync.Mutex
-	var wg errgroup.Group
-	var data pterm.TableData
+	var (
+		mu   sync.Mutex
+		wg   errgroup.Group
+		data pterm.TableData
+	)
 	// wg.SetLimit(3)
+
 	for _, checker := range checkers {
 		wg.Go(func() error {
 			cancelCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 			defer cancel()
+
 			infos := checker(cancelCtx, l)
+
 			mu.Lock()
 			defer mu.Unlock()
+
 			for _, info := range infos {
 				var color pterm.Color
+
 				switch info.Status {
 				case StatusFailure:
 					color = pterm.FgRed
@@ -34,15 +41,18 @@ func DefaultCheck(ctx context.Context, l log.Logger, checkers []Checker) error {
 				default:
 					color = pterm.FgGray
 				}
+
 				data = append(data, []string{
 					info.Status.String(),
 					info.Name,
 					color.Sprint(info.Note),
 				})
 			}
+
 			return nil
 		})
 	}
+
 	if err := wg.Wait(); err != nil {
 		return err
 	}

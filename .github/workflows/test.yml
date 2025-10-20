@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -28,9 +27,13 @@ jobs:
           check-latest: true
           go-version-file: go.mod
 
-      - uses: golangci/golangci-lint-action@v8
+      - name: Setup golangci-lint cache
+        uses: actions/cache@v4
         with:
-          install-mode: none
+          path: ~/.cache/golangci-lint
+          key: ${{ runner.os }}-golangci-lint-${{ hashFiles('**/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-golangci-lint-
 
       - name: Run tidy
         run: make tidy && git diff --exit-code

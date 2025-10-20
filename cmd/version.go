@@ -18,10 +18,12 @@ func NewVersion(root *cobra.Command) {
 		Long:  `If unsure which version of the CLI you are using, you can use this command to print the version of the CLI.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			l := intcmd.NewLogger()
+
 			buildTime := intversion.BuildTimestamp
 			if value, err := strconv.ParseInt(intversion.BuildTimestamp, 10, 64); err == nil {
 				buildTime = time.Unix(value, 0).String()
 			}
+
 			if l.IsLevel(log.LevelDebug) {
 				l.Printf("Version: %s\nCommit: %s\nBuildTime: %s", intversion.Version, intversion.CommitHash, buildTime)
 			} else {

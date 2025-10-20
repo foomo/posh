@@ -11,9 +11,11 @@ func Prompt(txt string) (string, error) {
 	if _, err := fmt.Fprint(os.Stderr, txt+": "); err != nil {
 		return "", err
 	}
+
 	out, err := r.ReadString('\n')
 	if err != nil {
 		return "", err
 	}
+
 	return out, nil
 }

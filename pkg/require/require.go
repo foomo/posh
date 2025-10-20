@@ -10,6 +10,7 @@ import (
 
 func First(ctx context.Context, l log.Logger, fends ...interface{}) error {
 	var allFends fend.Fends
+
 	for _, value := range fends {
 		switch v := value.(type) {
 		case fend.Fend:
@@ -22,8 +23,10 @@ func First(ctx context.Context, l log.Logger, fends ...interface{}) error {
 			l.Warn("unknown type", v)
 		}
 	}
+
 	if err := fender.First(ctx, allFends...); err != nil {
 		return err
 	}
+
 	return nil
 }

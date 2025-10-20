@@ -11,14 +11,17 @@ import (
 )
 
 func Load(l log.Logger) error {
-	var errNotFound viper.ConfigFileNotFoundError
-	var settings map[string]interface{}
+	var (
+		errNotFound viper.ConfigFileNotFoundError
+		settings    map[string]interface{}
+	)
 
 	if value := os.Getenv("POSH_ROOT_CONFIG_PATH"); value != "" {
 		c := viper.NewWithOptions(viper.KeyDelimiter("\\"))
 		c.AddConfigPath(value)
 		c.SetConfigType("yaml")
 		c.SetConfigName(".posh")
+
 		if err := c.ReadInConfig(); errors.As(err, &errNotFound) {
 			// continue
 		} else if err != nil {
@@ -35,6 +38,7 @@ func Load(l log.Logger) error {
 		c.AddConfigPath(".")
 		c.SetConfigType("yaml")
 		c.SetConfigName(".posh")
+
 		if err := c.ReadInConfig(); errors.As(err, &errNotFound) {
 			// continue
 		} else if err != nil {
@@ -51,6 +55,7 @@ func Load(l log.Logger) error {
 		c.AddConfigPath(".")
 		c.SetConfigType("yaml")
 		c.SetConfigName(".posh.override")
+
 		if err := c.ReadInConfig(); errors.As(err, &errNotFound) {
 			// continue
 		} else if err != nil {

@@ -32,11 +32,13 @@ func NewFmt(opts ...FmtOption) *Fmt {
 	inst := &Fmt{
 		level: LevelError,
 	}
+
 	for _, opt := range opts {
 		if opt != nil {
 			opt(inst)
 		}
 	}
+
 	return inst
 }
 
@@ -55,6 +57,7 @@ func (l *Fmt) IsLevel(v Level) bool {
 func (l *Fmt) Named(name string) Logger {
 	clone := *l
 	clone.name = name
+
 	return &clone
 }
 
@@ -152,8 +155,10 @@ func (l *Fmt) prefix(level string, a []any) []any {
 	if level != "" {
 		ret = append(ret, level+":")
 	}
+
 	if l.name != "" && l.IsLevel(LevelDebug) {
 		ret = append(ret, fmt.Sprintf("[%s]", l.name))
 	}
+
 	return append(ret, a...)
 }

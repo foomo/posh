@@ -20,11 +20,14 @@ func NewRequire(root *cobra.Command) {
 			if err := intconfig.Load(l); err != nil {
 				return err
 			}
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var cfg config.Require
+
 			l := intcmd.NewLogger()
+
 			if err := viper.UnmarshalKey("require", &cfg); err != nil {
 				return err
 			}

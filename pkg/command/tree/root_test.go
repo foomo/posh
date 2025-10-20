@@ -159,9 +159,11 @@ func TestRoot(t *testing.T) {
 
 	rl, err := readline.New(l)
 	require.NoError(t, err)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
+
 			if !tt.wantErr(t1, r.Execute(SetT(ctx, t1), rl)) {
 				l.Warn(rl.String())
 			} else {
@@ -214,9 +216,11 @@ func TestRoot_Node(t *testing.T) {
 
 	rl, err := readline.New(l)
 	require.NoError(t, err)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
+
 			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
 				l.Warn(rl.String())
 			} else {
@@ -320,6 +324,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					assert.Equal(T(ctx), "one", r.Args().At(0))
 					assert.Equal(T(ctx), "two", r.Args().At(1))
+
 					return errOK
 				},
 			}),
@@ -331,9 +336,11 @@ func TestRoot_NodeArgs(t *testing.T) {
 
 	rl, err := readline.New(l)
 	require.NoError(t, err)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
+
 			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
 				l.Warn(rl.String())
 			} else {
@@ -359,18 +366,22 @@ func TestRoot_NodeFlags(t *testing.T) {
 					fs.Default().String("first", "first", "first")
 					fs.Default().Bool("second", false, "second")
 					fs.Default().Int64("third", 0, "third")
+
 					return nil
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					if value, err := r.FlagSets().Default().GetString("first"); assert.NoError(T(ctx), err) {
 						assert.Equal(T(ctx), "first", value)
 					}
+
 					if value, err := r.FlagSets().Default().GetBool("second"); assert.NoError(T(ctx), err) {
 						assert.False(T(ctx), value)
 					}
+
 					if value, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
 						assert.Equal(T(ctx), int64(0), value)
 					}
+
 					return errOK
 				},
 			}),
@@ -385,18 +396,22 @@ func TestRoot_NodeFlags(t *testing.T) {
 					fs.Default().String("first", "first", "first")
 					fs.Default().Bool("second", false, "second")
 					fs.Default().Int64("third", 0, "third")
+
 					return nil
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					if value, err := r.FlagSets().Default().GetString("first"); assert.NoError(T(ctx), err) {
 						assert.Equal(T(ctx), "one", value)
 					}
+
 					if value, err := r.FlagSets().Default().GetBool("second"); assert.NoError(T(ctx), err) {
 						assert.True(T(ctx), value)
 					}
+
 					if value, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
 						assert.Equal(T(ctx), int64(13), value)
 					}
+
 					return errOK
 				},
 			}),
@@ -408,9 +423,11 @@ func TestRoot_NodeFlags(t *testing.T) {
 
 	rl, err := readline.New(l)
 	require.NoError(t, err)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t1 *testing.T) {
 			require.NoError(t1, rl.Parse(tt.name))
+
 			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
 				l.Warn(rl.String())
 			} else {

@@ -40,6 +40,7 @@ func (a Args) Has(v string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -85,6 +86,7 @@ func (a Args) IndexOf(v string) int {
 			return i
 		}
 	}
+
 	return -1
 }
 

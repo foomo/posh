@@ -45,6 +45,7 @@ func New(l log.Logger, opts ...Option) (*Readline, error) {
 		l:     l.Named("readline"),
 		regex: regexp.MustCompile(`[^\s"']+|"([^"]*)"|'([^']*)'|(\s$)`),
 	}
+
 	for _, opt := range opts {
 		if opt != nil {
 			if err := opt(inst); err != nil {
@@ -52,6 +53,7 @@ func New(l log.Logger, opts ...Option) (*Readline, error) {
 			}
 		}
 	}
+
 	return inst, nil
 }
 
@@ -62,36 +64,42 @@ func New(l log.Logger, opts ...Option) (*Readline, error) {
 func (a *Readline) Mode() Mode {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
+
 	return a.mode
 }
 
 func (a *Readline) Cmd() string {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
+
 	return a.cmd
 }
 
 func (a *Readline) Args() Args {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
+
 	return a.args
 }
 
 func (a *Readline) Flags() Args {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
+
 	return a.flags
 }
 
 func (a *Readline) FlagSets() *FlagSets {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
+
 	return a.flagSets
 }
 
 func (a *Readline) AdditionalArgs() Args {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
+
 	return a.additionalArgs
 }
 
@@ -102,6 +110,7 @@ func (a *Readline) AdditionalArgs() Args {
 func (a *Readline) Parse(input string) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+
 	a.reset()
 	parts := a.regex.FindAllString(input, -1)
 
@@ -115,6 +124,7 @@ func (a *Readline) Parse(input string) error {
 		if a.mode == ModeArgs && Arg(part).IsFlag() {
 			a.mode = ModeFlags
 		}
+
 		if Arg(part).IsAdditional() && i < len(parts)-1 {
 			a.mode = ModeAdditionalArgs
 		}
@@ -135,6 +145,7 @@ func (a *Readline) Parse(input string) error {
 func (a *Readline) SetFlagSets(fs *FlagSets) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+
 	a.flagSets = fs
 }
 
@@ -144,6 +155,7 @@ func (a *Readline) ParseFlagSets() error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -171,6 +183,7 @@ func (a *Readline) AllFlags() []*pflag.Flag {
 			ret = append(ret, f)
 		})
 	}
+
 	return ret
 }
 
@@ -179,6 +192,7 @@ func (a *Readline) VisitedFlags() Flags {
 	if fs := a.FlagSets(); fs != nil {
 		ret = fs.Visited()
 	}
+
 	return ret
 }
 
@@ -196,6 +210,7 @@ func (a *Readline) AdditionalFlags() Args {
 			}
 		})
 	}
+
 	return ret
 }
 

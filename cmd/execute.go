@@ -21,10 +21,12 @@ func NewExecute(root *cobra.Command) {
 			if err := intconfig.Load(l); err != nil {
 				return err
 			}
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			l := intcmd.NewLogger()
+
 			if len(args) == 0 {
 				return errors.New("missing [cmd] argument")
 			}

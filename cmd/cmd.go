@@ -47,12 +47,14 @@ func Execute() {
 	// handle interrupt
 	osInterrupt := make(chan os.Signal, 1)
 	signal.Notify(osInterrupt, os.Interrupt)
+
 	ctx, cancel := context.WithCancel(context.Background())
 
 	say := func(msg string) string {
 		if say, err := cowsay.Say(msg, cowsay.BallonWidth(80)); err == nil {
 			msg = say
 		}
+
 		return msg
 	}
 
@@ -62,8 +64,10 @@ func Execute() {
 			l.Error(say("It's time to panic"))
 			l.Error(fmt.Sprintf("%v", r))
 			l.Error(string(debug.Stack()))
+
 			code = 1
 		}
+
 		signal.Stop(osInterrupt)
 		cancel()
 		os.Exit(code)
@@ -80,6 +84,7 @@ func Execute() {
 	} else if err != nil {
 		l.Error(say(strings.Split(errors.Cause(err).Error(), ":")[0]))
 		l.Error(err.Error())
+
 		code = 1
 	}
 }

@@ -21,6 +21,7 @@ func (c *MemoryCache) Clear(namespaces ...string) {
 			return true
 		})
 	}
+
 	for _, namespace := range namespaces {
 		c.Get(namespace).Delete()
 	}
@@ -30,14 +31,17 @@ func (c *MemoryCache) Get(namespace string) Namespace {
 	value, _ := c.store.LoadOrStore(namespace, &MemoryNamespace{
 		store: sync.Map{},
 	})
+
 	return value.(*MemoryNamespace) //nolint:forcetypeassert
 }
 
 func (c *MemoryCache) List() map[string]Namespace {
 	ret := map[string]Namespace{}
+
 	c.store.Range(func(k, v interface{}) bool {
 		ret[k.(string)] = v.(*MemoryNamespace) //nolint:forcetypeassert
 		return true
 	})
+
 	return ret
 }
