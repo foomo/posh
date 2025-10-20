@@ -32,32 +32,37 @@ endif
 ### Tasks
 
 .PHONY: check
-## Run lint & test
+## Run lint & tests
 check: tidy lint test test.demo
 
 .PHONY: tidy
 ## Run go mod tidy
 tidy:
+	@echo "〉go mod tidy"
 	@go mod tidy
 
 .PHONY: lint
 ## Run linter
 lint:
+	@echo "〉golangci-lint run"
 	@golangci-lint run
 
 .PHONY: lint.fix
-## Run linter and fix
+## Fix lint violations
 lint.fix:
+	@echo "〉golangci-lint run fix"
 	@golangci-lint run --fix
 
 .PHONY: test
 ## Run tests
 test:
+	@echo "〉go test"
 	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out --tags=safe -race ./...
 
 .PHONY: test.demo
-## Run tests
+## Run demo tests
 test.demo: install
+	@echo "〉testing demo"
 	@rm -rf tmp/test
 	@mkdir -p tmp/test
 	@cd tmp/test && \
@@ -71,12 +76,14 @@ test.demo: install
 .PHONY: build
 ## Build binary
 build:
+	@echo "〉building bin/posh"
 	@rm -f bin/posh
 	@go build -o bin/posh main.go
 
 .PHONY: build.debug
 ## Build binary in debug mode
 build.debug:
+	@echo "〉building debug bin/posh"
 	@rm -f bin/posh
 	@go build -gcflags "all=-N -l" -o bin/posh main.go
 
@@ -84,13 +91,21 @@ build.debug:
 ## Run go install
 install: GOPATH=${shell go env GOPATH}
 install:
+	@echo "〉installing $$GOPATH/bin/posh"
 	@go install -a main.go
 	@mv "${GOPATH}/bin/main" "${GOPATH}/bin/posh"
 
 .PHONY: install.debug
 ## Run go install with debug
 install.debug:
+	@echo "〉installing debug $$GOPATH/bin/posh"
 	@go install -a -gcflags "all=-N -l" main.go
+
+.PHONY: outdated
+## Show outdated direct dependencies
+outdated:
+	@echo "〉go mod outdated"
+	@go list -u -m -json all | go-mod-outdated -update -direct
 
 ### Utils
 

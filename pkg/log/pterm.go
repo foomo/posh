@@ -52,6 +52,7 @@ func NewPTerm(opts ...PTermOption) *PTerm {
 	inst := &PTerm{
 		level: LevelError,
 	}
+
 	for _, opt := range opts {
 		if opt != nil {
 			opt(inst)
@@ -84,6 +85,7 @@ func (l *PTerm) IsLevel(v Level) bool {
 func (l *PTerm) Named(name string) Logger {
 	clone := *l
 	clone.name = name
+
 	return &clone
 }
 
@@ -180,5 +182,6 @@ func (l *PTerm) prefix(a []any) []any {
 	if l.name != "" && l.IsLevel(LevelDebug) {
 		ret = append(ret, fmt.Sprintf("[%s]", l.name))
 	}
+
 	return append(ret, a...)
 }

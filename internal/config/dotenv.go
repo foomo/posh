@@ -14,5 +14,6 @@ func Dotenv() error {
 	} else if err != nil {
 		return err
 	}
+
 	return nil
 }

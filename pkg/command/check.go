@@ -35,6 +35,7 @@ func NewCheck(l log.Logger, checkers ...check.Checker) *Check {
 		Description: "Print all system checks",
 		Execute:     inst.run,
 	})
+
 	return inst
 }
 

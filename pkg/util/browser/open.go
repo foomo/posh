@@ -21,6 +21,7 @@ func OpenURL(ctx context.Context, u *url.URL) error {
 	if u == nil {
 		return errors.New("empty url")
 	}
+
 	switch runtime.GOOS {
 	case "linux":
 		return exec.CommandContext(ctx, "xdg-open", u.String()).Start()

@@ -33,17 +33,21 @@ func (c *Node) setFlags(ctx context.Context, r *readline.Readline, parse bool) e
 			return err
 		}
 	}
+
 	r.SetFlagSets(fs)
+
 	if parse {
 		if err := r.ParseFlagSets(); err != nil {
 			return errors.Wrap(err, "failed to parse flags")
 		}
 	}
+
 	return nil
 }
 
 func (c *Node) completeArguments(ctx context.Context, p *root, r *readline.Readline, i int) []goprompt.Suggest {
 	var suggest []goprompt.Suggest
+
 	localArgs := r.Args().From(i)
 
 	switch {
@@ -66,6 +70,7 @@ func (c *Node) completeArguments(ctx context.Context, p *root, r *readline.Readl
 	case len(c.Args) > 0 && c.Args.Last().Repeat && c.Args.Last().Suggest != nil:
 		suggest = c.Args.Last().Suggest(ctx, p, r)
 	}
+
 	return suggest
 }
 
@@ -78,10 +83,12 @@ func (c *Node) completeFlags(r *readline.Readline) []goprompt.Suggest {
 			}
 		}
 	}
+
 	suggest := make([]goprompt.Suggest, len(allFlags))
 	for i, f := range allFlags {
 		suggest[i] = goprompt.Suggest{Text: "--" + f.Name, Description: f.Usage}
 	}
+
 	return suggest
 }
 
@@ -110,25 +117,30 @@ func (c *Node) find(ctx context.Context, r *readline.Readline, i int) (*Node, in
 	if r.Args().LenLt(i + 1) {
 		return nil, i
 	}
+
 	arg := r.Args().At(i)
 	for _, cmd := range c.Nodes {
 		if cmd.Name == arg {
 			if subCmd, j := cmd.find(ctx, r, i+1); subCmd != nil {
 				return subCmd, j
 			}
+
 			return cmd, i + 1
 		}
+
 		if cmd.Values != nil {
 			for _, name := range cmd.Values(ctx, r) {
 				if name.Text == arg {
 					if subCmd, j := cmd.find(ctx, r, i+1); subCmd != nil {
 						return subCmd, j
 					}
+
 					return cmd, i + 1
 				}
 			}
 		}
 	}
+
 	return nil, i
 }
 
@@ -155,12 +167,14 @@ func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 			} else {
 				ret += "["
 			}
+
 			ret += arg.Name
 			if arg.Optional {
 				ret += ">"
 			} else {
 				ret += "]"
 			}
+
 			ret += "\n"
 		}
 
@@ -179,5 +193,6 @@ func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 			}
 		}
 	}
+
 	return ret
 }

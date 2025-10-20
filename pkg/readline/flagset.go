@@ -11,6 +11,7 @@ type FlagSet struct {
 func NewFlagSet(name string) *FlagSet {
 	fs := pflag.NewFlagSet(name, pflag.ContinueOnError)
 	fs.ParseErrorsAllowlist = pflag.ParseErrorsAllowlist{UnknownFlags: true}
+
 	return &FlagSet{
 		FlagSet: fs,
 	}
@@ -18,9 +19,11 @@ func NewFlagSet(name string) *FlagSet {
 
 func (s *FlagSet) Visited() Flags {
 	var ret Flags
+
 	s.Visit(func(f *pflag.Flag) {
 		ret = append(ret, f)
 	})
+
 	return ret
 }
 
@@ -34,5 +37,6 @@ func (s *FlagSet) GetValues(name string) []string {
 	} else if v, ok := f.Annotations["values"]; ok {
 		return v
 	}
+
 	return nil
 }

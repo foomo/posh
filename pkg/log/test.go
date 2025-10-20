@@ -38,11 +38,13 @@ func NewTest(t *testing.T, opts ...TestOption) *Test {
 		t:     t,
 		level: LevelError,
 	}
+
 	for _, opt := range opts {
 		if opt != nil {
 			opt(inst)
 		}
 	}
+
 	return inst
 }
 
@@ -61,6 +63,7 @@ func (l *Test) IsLevel(v Level) bool {
 func (l *Test) Named(name string) Logger {
 	clone := *l
 	clone.name = name
+
 	return &clone
 }
 
@@ -157,8 +160,10 @@ func (l *Test) prefix(level string, a []any) []any {
 	if level != "" {
 		ret = append(ret, level+":")
 	}
+
 	if l.name != "" && l.IsLevel(LevelDebug) {
 		ret = append(ret, fmt.Sprintf("[%s]", l.name))
 	}
+
 	return append(ret, a...)
 }

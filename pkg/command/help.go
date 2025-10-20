@@ -43,12 +43,13 @@ func (c *Help) Description() string {
 
 func (c *Help) Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
 	var suggests []goprompt.Suggest
-	switch {
-	case r.Args().LenLte(1):
+
+	if r.Args().LenLte(1) {
 		for _, value := range c.list() {
 			suggests = append(suggests, goprompt.Suggest{Text: value.Name(), Description: value.Description()})
 		}
 	}
+
 	return suggests
 }
 
@@ -62,6 +63,7 @@ func (c *Help) Validate(ctx context.Context, r *readline.Readline) error {
 				return nil
 			}
 		}
+
 		return errors.Errorf("invalid [command] argument: %s", r.Args().At(0))
 	}
 
@@ -81,6 +83,7 @@ Available Commands:
 		for _, value := range c.list() {
 			ret += c.format(value.Name(), value.Description())
 		}
+
 		c.l.Print(ret)
 	default:
 		if helper, ok := c.commands.Get(r.Args().At(0)).(Helper); ok {
@@ -89,6 +92,7 @@ Available Commands:
 			c.l.Print("command not found")
 		}
 	}
+
 	return nil
 }
 
@@ -98,11 +102,13 @@ Available Commands:
 
 func (c *Help) list() []Command {
 	var ret []Command
+
 	for _, value := range c.commands.List() {
 		if _, ok := value.(Helper); ok {
 			ret = append(ret, value)
 		}
 	}
+
 	return ret
 }
 
@@ -111,9 +117,11 @@ func (c *Help) format(name, description string) string {
 	offset := int(math.Max(0, float64(20-len(name))))
 	suffix := strings.Repeat(" ", offset)
 	prefix := ""
+
 	if offset == 0 {
 		suffix = "\n"
 		prefix = strings.Repeat(" ", 20)
 	}
+
 	return "  " + name + suffix + prefix + description + "\n"
 }

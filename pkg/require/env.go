@@ -16,15 +16,18 @@ func Envs(l log.Logger, v []config.RequireEnv) fend.Fends {
 	for i, vv := range v {
 		ret[i] = fend.Var(vv, EnvExists(l))
 	}
+
 	return ret
 }
 
 func EnvExists(l log.Logger) rule.Rule[config.RequireEnv] {
 	return func(ctx context.Context, v config.RequireEnv) error {
 		l.Debug("validate env exists:", v.String())
+
 		if value := os.Getenv(v.Name); value == "" {
 			return errors.New(v.Help)
 		}
+
 		return nil
 	}
 }

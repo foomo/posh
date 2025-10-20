@@ -61,6 +61,7 @@ func New(l log.Logger, opts ...Option) (*Scaffold, error) {
 		dry:      false,
 		override: false,
 	}
+
 	for _, opt := range opts {
 		if opt != nil {
 			if err := opt(inst); err != nil {
@@ -68,6 +69,7 @@ func New(l log.Logger, opts ...Option) (*Scaffold, error) {
 			}
 		}
 	}
+
 	return inst, nil
 }
 
@@ -79,6 +81,7 @@ func (s *Scaffold) Render(ctx context.Context) error {
 	if err := s.renderDirectories(); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -88,6 +91,7 @@ func (s *Scaffold) Render(ctx context.Context) error {
 
 func (s *Scaffold) scaffoldDir(target string) error {
 	s.l.Info("mkdir:", s.filename(target))
+
 	if stat, err := os.Stat(target); errors.Is(err, os.ErrNotExist) {
 		if err := os.MkdirAll(target, os.ModePerm); err != nil {
 			return err
@@ -97,20 +101,24 @@ func (s *Scaffold) scaffoldDir(target string) error {
 	} else if !stat.IsDir() {
 		return errors.Errorf("target not a directory (%s)", target)
 	}
+
 	return nil
 }
 
 func (s *Scaffold) scaffoldTemplate(target string, tpl *template.Template, data any) error {
 	s.l.Info("file:", s.filename(target))
+
 	file, err := os.Create(target)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create target file (%s)", target)
 	}
+
 	defer func() {
 		if err := file.Close(); err != nil {
 			s.l.Warn("failed to close file: %s", err.Error())
 		}
 	}()
+
 	return tpl.Execute(file, data)
 }
 
@@ -119,7 +127,9 @@ func (s *Scaffold) printTemplate(msg, target string, tpl *template.Template, dat
 	if err := tpl.Execute(&out, data); err != nil {
 		return err
 	}
+
 	prints.Code(s.l, fmt.Sprintf("%s: %s", msg, target), out.String(), filepath.Ext(target))
+
 	return nil
 }
 
@@ -129,6 +139,7 @@ func (s *Scaffold) renderDirectories() error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -187,5 +198,6 @@ func (s *Scaffold) filename(v string) string {
 	v = strings.ReplaceAll(v, "$", "")
 	v = strings.TrimSuffix(v, ".gotext")
 	v = strings.TrimSuffix(v, ".gohtml")
+
 	return v
 }

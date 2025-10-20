@@ -58,6 +58,7 @@ func NewCache(l log.Logger, cache cache.Cache) *Cache {
 			},
 		},
 	})
+
 	return inst
 }
 
@@ -100,6 +101,7 @@ Available commands:
 func (c *Cache) clear(ctx context.Context, r *readline.Readline) error {
 	if r.Args().Len() > 1 {
 		c.l.Info("clearing cache:")
+
 		for _, value := range r.Args()[1:] {
 			c.l.Info("└ " + value)
 			c.cache.Get(value).Delete("")
@@ -108,6 +110,7 @@ func (c *Cache) clear(ctx context.Context, r *readline.Readline) error {
 		c.l.Info("clearing all caches")
 		c.cache.Clear()
 	}
+
 	return nil
 }
 
@@ -118,11 +121,13 @@ func (c *Cache) list(ctx context.Context, r *readline.Readline) error {
 	cacheList := c.cache.List()
 	cacheListKeys := lo.Keys(cacheList)
 	sort.Strings(cacheListKeys)
+
 	for _, ns := range cacheListKeys {
 		value := cacheList[ns]
 		list = append(list, pterm.LeveledListItem{Level: 0, Text: ns})
 		keys := value.Keys()
 		sort.Strings(keys)
+
 		for _, k := range keys {
 			list = append(list, pterm.LeveledListItem{Level: 1, Text: k})
 			if c.l.Level() == log.LevelTrace {

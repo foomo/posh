@@ -43,6 +43,7 @@ func TestSchema(t *testing.T) {
 	require.NoError(t, err)
 
 	filename := path.Join(cwd, "posh.schema.json")
+
 	expected, err := os.ReadFile(filename)
 	if !errors.Is(err, os.ErrNotExist) {
 		require.NoError(t, err)

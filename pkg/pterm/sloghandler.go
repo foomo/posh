@@ -75,6 +75,7 @@ func (s *SlogHandler) Handle(ctx context.Context, record slog.Record) error {
 func (s *SlogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	newS := *s
 	newS.attrs = attrs
+
 	return &newS
 }
 

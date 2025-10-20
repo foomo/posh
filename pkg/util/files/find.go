@@ -47,11 +47,13 @@ func FindWithIsFile(v bool) FindOption {
 
 func Find(ctx context.Context, root, pattern string, opts ...FindOption) ([]string, error) {
 	o := FindOptions{}
+
 	for _, opt := range opts {
 		if opt != nil {
 			opt(&o)
 		}
 	}
+
 	var ret []string
 	if err := fastwalk.Walk(&fastwalk.Config{
 		Follow: o.follow,
@@ -93,5 +95,6 @@ func Find(ctx context.Context, root, pattern string, opts ...FindOption) ([]stri
 	}); err != nil {
 		return nil, err
 	}
+
 	return ret, nil
 }

@@ -26,6 +26,7 @@ func (s *FlagSets) Get(name string) *FlagSet {
 	if _, ok := s.sets[name]; !ok {
 		s.sets[name] = NewFlagSet(name)
 	}
+
 	return s.sets[name]
 }
 
@@ -35,6 +36,7 @@ func (s *FlagSets) Parse(arguments []string) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -43,22 +45,27 @@ func (s *FlagSets) All() *FlagSet {
 	for _, set := range s.sets {
 		fs.AddFlagSet(set.FlagSet)
 	}
+
 	return fs
 }
 
 func (s *FlagSets) Visit(fn func(*pflag.Flag)) Flags {
 	var ret Flags
+
 	for _, set := range s.sets {
 		set.Visit(fn)
 	}
+
 	return ret
 }
 
 func (s *FlagSets) VisitAll(fn func(*pflag.Flag)) Flags {
 	var ret Flags
+
 	for _, set := range s.sets {
 		set.VisitAll(fn)
 	}
+
 	return ret
 }
 
@@ -67,6 +74,7 @@ func (s *FlagSets) Visited() Flags {
 	for _, set := range s.sets {
 		ret = append(ret, set.Visited()...)
 	}
+
 	return ret
 }
 
@@ -76,5 +84,6 @@ func (s *FlagSets) ParseAll(arguments []string, fn func(flag *pflag.Flag, value 
 			return err
 		}
 	}
+
 	return nil
 }

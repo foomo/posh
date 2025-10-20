@@ -44,6 +44,8 @@ func (c *History) Execute(ctx context.Context, r *readline.Readline) error {
 	if err != nil {
 		return err
 	}
+
 	c.l.Info("History:\n\n" + strings.Join(value, "\n"))
+
 	return nil
 }

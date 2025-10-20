@@ -20,10 +20,12 @@ func NewBrew(root *cobra.Command) {
 			if err := config.Load(l); err != nil {
 				return err
 			}
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			l := intcmd.NewLogger()
+
 			var cfg ownbrewconfig.Config
 			if err := viper.UnmarshalKey("ownbrew", &cfg); err != nil {
 				return err

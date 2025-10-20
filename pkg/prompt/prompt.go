@@ -157,6 +157,7 @@ func New(l log.Logger, opts ...Option) (*Prompt, error) {
 		history:   history.NewNoop(l),
 		commands:  command.Commands{},
 	}
+
 	for _, opt := range opts {
 		if opt != nil {
 			if err := opt(inst); err != nil {
@@ -164,14 +165,17 @@ func New(l log.Logger, opts ...Option) (*Prompt, error) {
 			}
 		}
 	}
+
 	if inst.history != nil {
 		inst.commands.Add(command.NewHistory(l, inst.history))
 	}
+
 	if value, err := readline.New(l); err != nil {
 		return nil, err
 	} else {
 		inst.readline = value
 	}
+
 	return inst, nil
 }
 
@@ -206,22 +210,28 @@ func (s *Prompt) Run() error {
 						if err != nil {
 							s.l.Debug("failed to open git repository", "error", err)
 						}
+
 						ref, err := r.Head()
 						if err != nil {
 							s.l.Debug("failed to fetch HEAD", "error", err)
 						}
+
 						name := ref.Name().Short()
+
 						if t, err := r.Tags(); err == nil {
 							_ = t.ForEach(func(reference *plumbing.Reference) error {
 								if ref.Hash() == reference.Hash() {
 									name = "\uF412" + reference.Name().Short()
 									return errors.New("break")
 								}
+
 								return nil
 							})
 						}
+
 						return s.prefix[:len(s.prefix)-4] + "(" + name + ") › ", true
 					}
+
 					return "", false
 				}),
 				prompt.OptionPrefixTextColor(prompt.Cyan),
@@ -268,6 +278,7 @@ func (s *Prompt) alias(input string, aliases map[string]string) string {
 			return input
 		}
 	}
+
 	return input
 }
 
@@ -294,12 +305,14 @@ func (s *Prompt) execute(input string) {
 
 %s
 `, input, s.readline.String())
+
 		if value, ok := cmd.(command.Validator); ok {
 			if err := value.Validate(ctx, s.readline); err != nil {
 				s.l.Error(err.Error())
 				return
 			}
 		}
+
 		if err := cmd.Execute(ctx, s.readline); err != nil && err.Error() == "signal: interrupt" {
 			s.l.Debug(err.Error())
 		} else if err != nil {
@@ -326,6 +339,7 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 		s.l.Debug("failed to parse line:", err.Error())
 		return nil
 	}
+
 	word := d.GetWordBeforeCursor()
 
 	// return root completion
@@ -334,9 +348,11 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 		for key, value := range s.aliases {
 			suggests = append(suggests, prompt.Suggest{Text: key, Description: "Alias: " + value})
 		}
+
 		for _, inst := range s.Commands().List() {
 			suggests = append(suggests, prompt.Suggest{Text: inst.Name(), Description: inst.Description()})
 		}
+
 		return s.filter(suggests, word, true)
 	}
 
@@ -368,6 +384,7 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 			return s.filter(value.Complete(ctx, s.readline), word, true)
 		}
 	}
+
 	return nil
 }
 

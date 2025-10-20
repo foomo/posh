@@ -12,5 +12,6 @@ func Exists(paths ...string) error {
 			return errors.Wrap(err, path)
 		}
 	}
+
 	return nil
 }

@@ -38,8 +38,10 @@ func New(ctx context.Context, l log.Logger, inputs ...interface{}) *Shell {
 			args = append(args, fmt.Sprintf("%v", args))
 		}
 	}
+
 	cmd := exec.CommandContext(ctx, "sh", "-c")
 	cmd.Env = os.Environ()
+
 	return &Shell{
 		l:      l.Named("shell"),
 		cmd:    cmd,
@@ -97,44 +99,55 @@ func (s *Shell) Debug() *Shell {
 func (s *Shell) Run() error {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
+
 	s.cmd.Stdin = s.stdin
 	if !s.quiet {
 		s.cmd.Stdout = s.stdout
 		s.cmd.Stderr = s.stderr
 	}
+
 	s.trace()
+
 	return s.cmd.Run()
 }
 
 func (s *Shell) Output() ([]byte, error) {
 	args := s.args
+
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
 	if !s.quiet {
 		s.cmd.Stdin = s.stdin
 		s.cmd.Stderr = s.stderr
 	}
+
 	s.trace()
+
 	return s.cmd.Output()
 }
 
 func (s *Shell) CombinedOutput() ([]byte, error) {
 	args := s.args
+
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
 	if !s.quiet {
 		s.cmd.Stdin = s.stdin
 	}
+
 	s.trace()
+
 	return s.cmd.CombinedOutput()
 }
 
 func (s *Shell) Wait() error {
 	args := s.args
 	s.cmd.Args = append(s.cmd.Args, strings.Join(args, " "))
+
 	s.cmd.Stdin = s.stdin
 	if !s.quiet {
 		s.cmd.Stdout = s.stdout
 		s.cmd.Stderr = s.stderr
 	}
+
 	s.trace()
 	// start the process and wait till it's finished
 	if err := s.cmd.Start(); err != nil {
@@ -142,6 +155,7 @@ func (s *Shell) Wait() error {
 	} else if err := s.cmd.Wait(); err != nil {
 		return err
 	}
+
 	return nil
 }
 

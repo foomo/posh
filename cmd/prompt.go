@@ -22,10 +22,12 @@ func NewPrompt(root *cobra.Command) {
 			if err := intconfig.Load(l); err != nil {
 				return err
 			}
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			l := intcmd.NewLogger()
+
 			var cfg config.Prompt
 			if err := viper.UnmarshalKey("prompt", &cfg); err != nil {
 				return err

@@ -12,6 +12,7 @@ func (f Flags) Remove(name string) (*pflag.Flag, Flags) {
 			return v, f.Splice(i, 1)
 		}
 	}
+
 	return nil, f
 }
 
@@ -25,6 +26,7 @@ func (f Flags) Splice(start, num int) Flags {
 
 func (f Flags) Args() Args {
 	var ret Args
+
 	for _, v := range f {
 		switch v.Value.Type() {
 		case "bool":
@@ -33,5 +35,6 @@ func (f Flags) Args() Args {
 			ret = append(ret, "--"+v.Name, v.Value.String())
 		}
 	}
+
 	return ret
 }

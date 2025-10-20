@@ -14,6 +14,7 @@ func ConfigUserName(ctx context.Context, l log.Logger) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to retrieve git user name")
 	}
+
 	return strings.TrimSpace(string(value)), nil
 }
 
@@ -22,5 +23,6 @@ func ConfigUserEmail(ctx context.Context, l log.Logger) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to retrieve git user name")
 	}
+
 	return strings.TrimSpace(string(value)), nil
 }

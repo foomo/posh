@@ -18,21 +18,26 @@ func Packages(l log.Logger, v []config.RequirePackage) fend.Fends {
 	for i, vv := range v {
 		ret[i] = fend.Var(vv, PackageExists(l), PackageVersion(l))
 	}
+
 	return ret
 }
 
 func PackageExists(l log.Logger) rule.Rule[config.RequirePackage] {
 	return func(ctx context.Context, v config.RequirePackage) error {
 		l.Debug("validate package exists:", v.String())
+
 		if output, err := exec.LookPath(v.Name); err != nil {
 			l.Error(v.String())
 			l.Error(err.Error(), output)
+
 			return errors.Errorf(v.Help, v.Version)
 		} else if output == "" {
 			l.Error(v.String())
 			l.Errorf("missing executable %s", v.Name)
+
 			return errors.Errorf(v.Help, v.Version)
 		}
+
 		return nil
 	}
 }
@@ -68,6 +73,7 @@ func PackageVersion(l log.Logger) rule.Rule[config.RequirePackage] {
 		if !expected.Check(version) {
 			l.Error(v.String())
 			l.Debug("wrong package version:", actual)
+
 			return errors.Errorf(v.Help, v.Version)
 		}
 
