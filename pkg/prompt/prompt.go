@@ -206,7 +206,9 @@ func (s *Prompt) Run() error {
 				prompt.OptionPrefix(s.prefix),
 				prompt.OptionLivePrefix(func() (string, bool) {
 					if s.prefixGit {
-						r, err := git.PlainOpen(env.ProjectRoot())
+						r, err := git.PlainOpenWithOptions(env.ProjectRoot(), &git.PlainOpenOptions{
+							EnableDotGitCommonDir: true,
+						})
 						if err != nil {
 							s.l.Debug("failed to open git repository", "error", err)
 						}
@@ -214,6 +216,10 @@ func (s *Prompt) Run() error {
 						ref, err := r.Head()
 						if err != nil {
 							s.l.Debug("failed to fetch HEAD", "error", err)
+						}
+
+						if ref == nil {
+							return s.prefix, false
 						}
 
 						name := ref.Name().Short()
