@@ -1,37 +1,50 @@
 .*
-*.zip
-*.tar
-*.out
 *.log
+*.pid
+*.retry
+*.out
+*.tgz
+*.zip
+*.pem
 /bin/
 /tmp/
 
 ## Git
 !.gitkeep
 !.gitignore
+!.gitattributes
 
 ## GitHub
 !.github/
 
+## Mise
+!.mise.toml
+
+## Lefthook
+!.lefthook.yaml
+
+## VSCode
+!.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.default.json
+
 ## Editorconfig
 !.editorconfig
-
-## Docker
-!.dockerignore
-
-## Husky
-!.husky/
-!.husky.yaml
 
 ## Golang
 go.work
 go.work.sum
-!.golangci.yml
-!.goreleaser.yml
+!.golangci.yaml
+!.goreleaser.yaml
+
+## Vitepress
+node_modules/
+!docs/.vitepress
+
+## Docker
+!.dockerignore
 
 ## Posh
 !.posh/
 !.posh.yml
-
-## Mise
-!.mise.toml
