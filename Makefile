@@ -12,7 +12,7 @@ endef
 # --- Targets -----------------------------------------------------------------
 
 # This allows us to accept extra arguments
-%: .mise lefthook
+%: .mise .lefthook
 	@:
 
 .PHONY: .mise
