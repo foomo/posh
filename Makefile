@@ -12,34 +12,27 @@ endef
 # --- Targets -----------------------------------------------------------------
 
 # This allows us to accept extra arguments
-%: .mise .husky
+%: .mise lefthook
 	@:
 
 .PHONY: .mise
 # Install dependencies
-.mise: msg := $(br)$(br)Please ensure you have 'mise' installed and activated!$(br)$(br)$$ brew update$(br)$$ brew install mise$(br)$(br)See the documentation: https://mise.jdx.dev/getting-started.html$(br)$(br)
 .mise:
 ifeq (, $(shell command -v mise))
-	$(error ${msg})
+	$(error $(br)$(br)Please ensure you have 'mise' installed and activated!$(br)$(br)  $$ brew update$(br)  $$ brew install mise$(br)$(br)See the documentation: https://mise.jdx.dev/getting-started.html)
 endif
 	@mise install
 
-.PHONY: .husky
-# Configure git hooks for husky
-.husky:
-	@git config core.hooksPath .husky
+.PHONY: .lefthook
+# Configure git hooks for lefthook
+.lefthook:
+	@lefthook install --reset-hooks-path
 
 ### Tasks
 
 .PHONY: check
 ## Run lint & tests
-check: tidy lint test test.demo
-
-.PHONY: tidy
-## Run go mod tidy
-tidy:
-	@echo "〉go mod tidy"
-	@go mod tidy
+check: tidy generate lint test test.demo audit
 
 .PHONY: lint
 ## Run linter
@@ -53,11 +46,23 @@ lint.fix:
 	@echo "〉golangci-lint run fix"
 	@golangci-lint run --fix
 
+.PHONY: generate
+## Run go generate
+generate:
+	@echo "〉go generate"
+	@go generate ./...
+
 .PHONY: test
 ## Run tests
 test:
 	@echo "〉go test"
-	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out --tags=safe -race ./...
+	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out --tags=safe ./...
+
+.PHONY: test.race
+## Run tests
+test.race:
+	@echo "〉go test with -race"
+	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out -tags=safe -race ./...
 
 .PHONY: test.demo
 ## Run demo tests
@@ -101,18 +106,64 @@ install.debug:
 	@echo "〉installing debug $$GOPATH/bin/posh"
 	@go install -a -gcflags "all=-N -l" main.go
 
+### Security
+
+.PHONY: tidy
+## Run go mod tidy
+tidy:
+	@echo "〉go mod tidy"
+	@go mod tidy
+
+.PHONY: audit
+## Run security audit
+audit:
+	@echo "〉security audit"
+	@go install golang.org/x/vuln/cmd/govulncheck@latest
+	@govulncheck ./...
+
+### Dependencies
+
 .PHONY: outdated
 ## Show outdated direct dependencies
 outdated:
 	@echo "〉go mod outdated"
 	@go list -u -m -json all | go-mod-outdated -update -direct
 
+.PHONY: upgrade
+## Show outdated direct dependencies
+upgrade:
+	@echo "〉go mod upgrade"
+	@go get -u ./...)
+	@$(Make) tidy
+
+### Documentation
+
+.PHONY: docs
+## Open docs
+docs:
+	@echo "〉starting docs"
+	@cd docs && bun install && bun run dev
+
+.PHONY: docs.build
+## Open docs
+docs.build:
+	@echo "〉building docs"
+	@cd docs && bun install && bun run build
+
+.PHONY: godocs
+## Open go docs
+godocs:
+	@echo "〉starting go docs"
+	@go doc -http
+
 ### Utils
 
 .PHONY: help
 ## Show help text
 help:
-	@echo "Project Oriented SHELL (posh)\n"
+	@echo ""
+	@echo "Project Oriented SHELL (posh)"
+	@echo ""
 	@echo "Usage:\n  make [task]"
 	@awk '{ \
 		if($$0 ~ /^### /){ \

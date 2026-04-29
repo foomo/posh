@@ -178,6 +178,7 @@ func (a *Readline) IsModeAdditional() bool {
 
 func (a *Readline) AllFlags() []*pflag.Flag {
 	var ret []*pflag.Flag
+
 	if fs := a.FlagSets(); fs != nil {
 		fs.All().VisitAll(func(f *pflag.Flag) {
 			ret = append(ret, f)

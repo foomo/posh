@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/foomo/posh?status.svg)](https://godoc.org/github.com/foomo/posh)
 
 <p align="center">
-  <img alt="POSH" src=".github/assets/posh.png"/>
+  <img alt="posh-providers" src="docs/public/logo.png" width="400" height="400"/>
 </p>
 
 # Project Oriented SHELL (posh)
@@ -12,29 +12,62 @@
 
 ## Installation
 
-### Download binary
+<details>
+<summary><b>Homebrew</b> (macOS / Linux)</summary>
 
-Download a [binary release](https://github.com/foomo/posh/releases)
-
-### Build from source
-
-```
-go install github.com/foomo/posh@latest
-```
-
-### Homebrew (Linux/macOS)
-
-If you use [Homebrew](https://brew.sh), you can install like this:
-```
+```shell
 brew install foomo/tap/posh
 ```
 
-### Mise
+See the [foomo/homebrew-tap](https://github.com/foomo/homebrew-tap) repository.
 
-If you use [mise](https://https://mise.jdx.dev), you can install like this:
+</details>
+
+<details>
+<summary><b>Docker</b></summary>
+
+```shell
+docker run --rm foomo/posh:latest --help
 ```
-mise use github.com:foomo/posh
+
+Multi-arch images (`amd64`, `arm64`) are published to [Docker Hub](https://hub.docker.com/r/foomo/posh).
+
+</details>
+
+<details>
+<summary><b>mise</b></summary>
+
+```shell
+mise use github:foomo/posh
 ```
+
+or run directly:
+
+```shell
+mise x github:foomo/posh -- --help
+```
+
+See [mise.jdx.dev](https://mise.jdx.dev).
+
+</details>
+
+<details>
+<summary><b>Binary release</b></summary>
+
+Download the archive for your OS/arch from the [releases page](https://github.com/foomo/posh/releases) and extract `posh` into your `$PATH`.
+
+</details>
+
+<details>
+<summary><b>go install</b></summary>
+
+```shell
+go install github.com/foomo/posh/cmd/posh@latest
+```
+
+Requires Go 1.26+.
+
+</details>
 
 ## Usage
 
@@ -184,10 +217,12 @@ $ make shell
 
 ## How to Contribute
 
-Please refer to the [CONTRIBUTING](.gihub/CONTRIBUTING.md) details and follow the [CODE_OF_CONDUCT](.gihub/CODE_OF_CONDUCT.md) and [SECURITY](.github/SECURITY.md) guidelines.
+Contributions are welcome! Please read the [contributing guide](docs/CONTRIBUTING.md).
+
+![Contributors](https://contributors-table.vercel.app/image?repo=foomo/posh&width=50&columns=15)
 
 ## License
 
-Distributed under MIT License, please see license file within the code for more details.
+Distributed under MIT License, please see the [license](LICENSE) file within the code for more details.
 
 _Made with ♥ [foomo](https://www.foomo.org) by [bestbytes](https://www.bestbytes.com)_

@@ -61,78 +61,78 @@ func (l *Fmt) Named(name string) Logger {
 	return &clone
 }
 
-func (l *Fmt) Print(a ...interface{}) {
+func (l *Fmt) Print(a ...any) {
 	fmt.Println(l.prefix("", a)...)
 }
 
-func (l *Fmt) Printf(format string, a ...interface{}) {
+func (l *Fmt) Printf(format string, a ...any) {
 	l.Print(fmt.Sprintf(format, a...))
 }
 
-func (l *Fmt) Success(a ...interface{}) {
+func (l *Fmt) Success(a ...any) {
 	fmt.Println(l.prefix("success", a)...)
 }
 
-func (l *Fmt) Successf(format string, a ...interface{}) {
+func (l *Fmt) Successf(format string, a ...any) {
 	l.Success(fmt.Sprintf(format, a...))
 }
 
-func (l *Fmt) Trace(a ...interface{}) {
+func (l *Fmt) Trace(a ...any) {
 	if l.IsLevel(LevelTrace) {
 		fmt.Println(l.prefix("trace", a)...)
 	}
 }
 
-func (l *Fmt) Tracef(format string, a ...interface{}) {
+func (l *Fmt) Tracef(format string, a ...any) {
 	l.Trace(fmt.Sprintf(format, a...))
 }
 
-func (l *Fmt) Debug(a ...interface{}) {
+func (l *Fmt) Debug(a ...any) {
 	if l.IsLevel(LevelDebug) {
 		fmt.Println(l.prefix("debug", a)...)
 	}
 }
 
-func (l *Fmt) Debugf(format string, a ...interface{}) {
+func (l *Fmt) Debugf(format string, a ...any) {
 	l.Debug(fmt.Sprintf(format, a...))
 }
 
-func (l *Fmt) Info(a ...interface{}) {
+func (l *Fmt) Info(a ...any) {
 	if l.IsLevel(LevelInfo) {
 		fmt.Println(l.prefix("info", a)...)
 	}
 }
 
-func (l *Fmt) Infof(format string, a ...interface{}) {
+func (l *Fmt) Infof(format string, a ...any) {
 	l.Info(fmt.Sprintf(format, a...))
 }
 
-func (l *Fmt) Warn(a ...interface{}) {
+func (l *Fmt) Warn(a ...any) {
 	if l.IsLevel(LevelWarn) {
 		fmt.Println(l.prefix("warn", a)...)
 	}
 }
 
-func (l *Fmt) Warnf(format string, a ...interface{}) {
+func (l *Fmt) Warnf(format string, a ...any) {
 	l.Warn(fmt.Sprintf(format, a...))
 }
 
-func (l *Fmt) Error(a ...interface{}) {
+func (l *Fmt) Error(a ...any) {
 	if l.IsLevel(LevelError) {
 		fmt.Println(l.prefix("error", a)...)
 	}
 }
 
-func (l *Fmt) Errorf(format string, a ...interface{}) {
+func (l *Fmt) Errorf(format string, a ...any) {
 	l.Error(fmt.Sprintf(format, a...))
 }
 
-func (l *Fmt) Fatal(a ...interface{}) {
+func (l *Fmt) Fatal(a ...any) {
 	fmt.Println(l.prefix("fatal", a)...)
 	os.Exit(1)
 }
 
-func (l *Fmt) Fatalf(format string, a ...interface{}) {
+func (l *Fmt) Fatalf(format string, a ...any) {
 	l.Fatal(fmt.Sprintf(format, a...))
 }
 
@@ -151,7 +151,7 @@ func (l *Fmt) SlogHandler() slog.Handler {
 // ------------------------------------------------------------------------------------------------
 
 func (l *Fmt) prefix(level string, a []any) []any {
-	var ret []interface{}
+	var ret []any
 	if level != "" {
 		ret = append(ret, level+":")
 	}

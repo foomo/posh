@@ -73,18 +73,20 @@ func (c *Help) Validate(ctx context.Context, r *readline.Readline) error {
 func (c *Help) Execute(ctx context.Context, r *readline.Readline) error {
 	switch r.Args().Len() {
 	case 0:
-		ret := `Help about all available commands.
+		var ret strings.Builder
+		ret.WriteString(`Help about all available commands.
 
 Usage:
   help [command]
 
 Available Commands:
-`
+`)
+
 		for _, value := range c.list() {
-			ret += c.format(value.Name(), value.Description())
+			ret.WriteString(c.format(value.Name(), value.Description()))
 		}
 
-		c.l.Print(ret)
+		c.l.Print(ret.String())
 	default:
 		if helper, ok := c.commands.Get(r.Args().At(0)).(Helper); ok {
 			c.l.Print(helper.Help(ctx, r))
