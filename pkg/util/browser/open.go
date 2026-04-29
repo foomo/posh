@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -24,6 +25,9 @@ func OpenURL(ctx context.Context, u *url.URL) error {
 
 	switch runtime.GOOS {
 	case "linux":
+		if isWSL() {
+			return exec.CommandContext(ctx, "powershell.exe", "Start-Process", u.String()).Start()
+		}
 		return exec.CommandContext(ctx, "xdg-open", u.String()).Start()
 	case "windows":
 		return exec.CommandContext(ctx, "rundll32", "url.dll,FileProtocolHandler", u.String()).Start()
@@ -32,4 +36,12 @@ func OpenURL(ctx context.Context, u *url.URL) error {
 	default:
 		return errors.New("unsupported platform")
 	}
+}
+
+func isWSL() bool {
+	data, err := exec.Command("uname", "-r").Output()
+	if err != nil {
+		return false
+	}
+	return strings.Contains(strings.ToLower(string(data)), "microsoft")
 }
