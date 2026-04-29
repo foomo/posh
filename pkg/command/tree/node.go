@@ -146,6 +146,7 @@ func (c *Node) find(ctx context.Context, r *readline.Readline, i int) (*Node, in
 
 func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 	pad := "      "
+
 	var ret strings.Builder
 	ret.WriteString(c.Description)
 
@@ -154,6 +155,7 @@ func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 		ret.WriteString(pad + c.Name + " [command]")
 
 		ret.WriteString("\n\nAvailable Commands:\n")
+
 		for _, node := range c.Nodes {
 			ret.WriteString(pad + xstrings.PadEnd(node.Name, " ", 30) + node.Description + "\n")
 		}
@@ -163,6 +165,7 @@ func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 
 		for _, arg := range c.Args {
 			ret.WriteString(" ")
+
 			if arg.Optional {
 				ret.WriteString("<")
 			} else {
@@ -170,6 +173,7 @@ func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 			}
 
 			ret.WriteString(arg.Name)
+
 			if arg.Optional {
 				ret.WriteString(">")
 			} else {
@@ -181,6 +185,7 @@ func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 
 		if len(c.Args) > 0 {
 			ret.WriteString("\n\nArguments:\n")
+
 			for _, arg := range c.Args {
 				ret.WriteString(pad + xstrings.PadEnd(arg.Name, " ", 30) + arg.Description + "\n")
 			}

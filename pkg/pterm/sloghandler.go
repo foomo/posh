@@ -31,6 +31,7 @@ func (s *SlogHandler) Enabled(ctx context.Context, level slog.Level) bool {
 // Handle handles the given record.
 func (s *SlogHandler) Handle(ctx context.Context, record slog.Record) error {
 	level := record.Level
+
 	var message strings.Builder
 	message.WriteString(record.Message)
 

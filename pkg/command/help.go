@@ -81,6 +81,7 @@ Usage:
 
 Available Commands:
 `)
+
 		for _, value := range c.list() {
 			ret.WriteString(c.format(value.Name(), value.Description()))
 		}
