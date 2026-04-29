@@ -1,6 +1,9 @@
-[![Build Status](https://github.com/foomo/posh/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/foomo/posh/actions/workflows/test.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/foomo/posh)](https://goreportcard.com/report/github.com/foomo/posh)
 [![GoDoc](https://godoc.org/github.com/foomo/posh?status.svg)](https://godoc.org/github.com/foomo/posh)
+[![Github All Releases](https://img.shields.io/github/downloads/foomo/posh/total.svg?style=flat-square)](https://github.com/foomo/posh/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/foomo/posh?style=flat-square)](https://hub.docker.com/r/foomo/posh)
+[![GitHub stars](https://img.shields.io/github/stars/foomo/posh.svg?style=flat-square)](https://github.com/foomo/posh)
+
 
 <p align="center">
   <img alt="posh-providers" src="docs/public/logo.png" width="400" height="400"/>
