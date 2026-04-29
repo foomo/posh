@@ -146,53 +146,54 @@ func (c *Node) find(ctx context.Context, r *readline.Readline, i int) (*Node, in
 
 func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 	pad := "      "
-	ret := c.Description
+	var ret strings.Builder
+	ret.WriteString(c.Description)
 
 	if len(c.Nodes) > 0 {
-		ret += "\n\nUsage:\n"
-		ret += pad + c.Name + " [command]"
+		ret.WriteString("\n\nUsage:\n")
+		ret.WriteString(pad + c.Name + " [command]")
 
-		ret += "\n\nAvailable Commands:\n"
+		ret.WriteString("\n\nAvailable Commands:\n")
 		for _, node := range c.Nodes {
-			ret += pad + xstrings.PadEnd(node.Name, " ", 30) + node.Description + "\n"
+			ret.WriteString(pad + xstrings.PadEnd(node.Name, " ", 30) + node.Description + "\n")
 		}
 	} else {
-		ret += "\n\nUsage:\n"
-		ret += pad + c.Name
+		ret.WriteString("\n\nUsage:\n")
+		ret.WriteString(pad + c.Name)
 
 		for _, arg := range c.Args {
-			ret += " "
+			ret.WriteString(" ")
 			if arg.Optional {
-				ret += "<"
+				ret.WriteString("<")
 			} else {
-				ret += "["
+				ret.WriteString("[")
 			}
 
-			ret += arg.Name
+			ret.WriteString(arg.Name)
 			if arg.Optional {
-				ret += ">"
+				ret.WriteString(">")
 			} else {
-				ret += "]"
+				ret.WriteString("]")
 			}
 
-			ret += "\n"
+			ret.WriteString("\n")
 		}
 
 		if len(c.Args) > 0 {
-			ret += "\n\nArguments:\n"
+			ret.WriteString("\n\nArguments:\n")
 			for _, arg := range c.Args {
-				ret += pad + xstrings.PadEnd(arg.Name, " ", 30) + arg.Description + "\n"
+				ret.WriteString(pad + xstrings.PadEnd(arg.Name, " ", 30) + arg.Description + "\n")
 			}
 		}
 
 		if c.Flags != nil {
 			fs := readline.NewFlagSets()
 			if err := c.Flags(ctx, r, fs); err == nil {
-				ret += "\n\nFlags:\n"
-				ret += fs.All().FlagUsages()
+				ret.WriteString("\n\nFlags:\n")
+				ret.WriteString(fs.All().FlagUsages())
 			}
 		}
 	}
 
-	return ret
+	return ret.String()
 }

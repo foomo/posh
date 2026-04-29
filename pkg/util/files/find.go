@@ -55,6 +55,7 @@ func Find(ctx context.Context, root, pattern string, opts ...FindOption) ([]stri
 	}
 
 	var ret []string
+
 	if err := fastwalk.Walk(&fastwalk.Config{
 		Follow: o.follow,
 	}, root, func(p string, d fs.DirEntry, err error) error {
@@ -79,6 +80,7 @@ func Find(ctx context.Context, root, pattern string, opts ...FindOption) ([]stri
 		if o.isDir && !d.IsDir() {
 			return nil
 		}
+
 		if o.isFile && d.IsDir() {
 			return nil
 		}

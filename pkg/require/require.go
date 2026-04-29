@@ -8,7 +8,7 @@ import (
 	"github.com/foomo/posh/pkg/log"
 )
 
-func First(ctx context.Context, l log.Logger, fends ...interface{}) error {
+func First(ctx context.Context, l log.Logger, fends ...any) error {
 	var allFends fend.Fends
 
 	for _, value := range fends {

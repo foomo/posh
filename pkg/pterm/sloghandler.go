@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/pterm/pterm"
 )
@@ -30,7 +31,8 @@ func (s *SlogHandler) Enabled(ctx context.Context, level slog.Level) bool {
 // Handle handles the given record.
 func (s *SlogHandler) Handle(ctx context.Context, record slog.Record) error {
 	level := record.Level
-	message := record.Message
+	var message strings.Builder
+	message.WriteString(record.Message)
 
 	// Convert slog Attrs to a map.
 	keyValsMap := make(map[string]any)
@@ -51,21 +53,21 @@ func (s *SlogHandler) Handle(ctx context.Context, record slog.Record) error {
 
 	for _, arg := range argsWrapped {
 		for _, attr := range arg {
-			message += " " + attr.Key + ": " + fmt.Sprintf("%v", attr.Value)
+			message.WriteString(" " + attr.Key + ": " + fmt.Sprintf("%v", attr.Value))
 		}
 	}
 
 	switch level {
 	case slog.LevelDebug:
-		pterm.Debug.Println(message)
+		pterm.Debug.Println(message.String())
 	case slog.LevelInfo:
-		pterm.Info.Println(message)
+		pterm.Info.Println(message.String())
 	case slog.LevelWarn:
-		pterm.Warning.Println(message)
+		pterm.Warning.Println(message.String())
 	case slog.LevelError:
-		pterm.Error.Println(message)
+		pterm.Error.Println(message.String())
 	default:
-		pterm.Info.Println(message)
+		pterm.Info.Println(message.String())
 	}
 
 	return nil

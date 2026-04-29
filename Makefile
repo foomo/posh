@@ -32,7 +32,7 @@ endif
 
 .PHONY: check
 ## Run lint & tests
-check: tidy lint test test.demo audit
+check: tidy generate lint test test.demo audit
 
 .PHONY: lint
 ## Run linter

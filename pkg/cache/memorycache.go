@@ -16,7 +16,7 @@ func NewMemoryCache() *MemoryCache {
 
 func (c *MemoryCache) Clear(namespaces ...string) {
 	if len(namespaces) == 0 {
-		c.store.Range(func(key, value interface{}) bool {
+		c.store.Range(func(key, value any) bool {
 			namespaces = append(namespaces, key.(string)) //nolint:forcetypeassert
 			return true
 		})
@@ -38,7 +38,7 @@ func (c *MemoryCache) Get(namespace string) Namespace {
 func (c *MemoryCache) List() map[string]Namespace {
 	ret := map[string]Namespace{}
 
-	c.store.Range(func(k, v interface{}) bool {
+	c.store.Range(func(k, v any) bool {
 		ret[k.(string)] = v.(*MemoryNamespace) //nolint:forcetypeassert
 		return true
 	})
