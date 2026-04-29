@@ -273,8 +273,8 @@ func (s *Prompt) Run() error {
 
 func (s *Prompt) alias(input string, aliases map[string]string) string {
 	for key, value := range aliases {
-		if strings.HasPrefix(input, key) {
-			input = value + strings.TrimPrefix(input, key)
+		if after, ok := strings.CutPrefix(input, key); ok {
+			input = value + after
 			return input
 		}
 	}

@@ -33,7 +33,7 @@ func (c *MemoryNamespace) Get(key string, cb func() any) any {
 func (c *MemoryNamespace) Keys() []string {
 	var keys []string
 
-	c.store.Range(func(k, v interface{}) bool {
+	c.store.Range(func(k, v any) bool {
 		keys = append(keys, k.(string)) //nolint:forcetypeassert
 		return true
 	})

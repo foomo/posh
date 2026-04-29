@@ -122,13 +122,13 @@ func (c *Env) list(ctx context.Context, r *readline.Readline) error {
 	maxValueLen := pterm.GetTerminalWidth() - maxKeyLen - 5
 
 	for i, pair := range pairs {
-		var value string
+		var value strings.Builder
 		for len(pair[1]) > maxValueLen {
-			value += pair[1][:maxValueLen] + "\n"
+			value.WriteString(pair[1][:maxValueLen] + "\n")
 			pair[1] = pair[1][maxValueLen:]
 		}
 
-		pairs[i][1] = value + pair[1]
+		pairs[i][1] = value.String() + pair[1]
 	}
 
 	data = append(data, pairs...)

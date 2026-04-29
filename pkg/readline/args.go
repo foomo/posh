@@ -1,5 +1,7 @@
 package readline
 
+import "slices"
+
 type Args []string
 
 // ------------------------------------------------------------------------------------------------
@@ -35,13 +37,7 @@ func (a Args) Empty() bool {
 }
 
 func (a Args) Has(v string) bool {
-	for _, arg := range a {
-		if arg == v {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(a, v)
 }
 
 func (a Args) HasIndex(v int) bool {
