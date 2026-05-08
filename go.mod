@@ -10,7 +10,7 @@ replace (
 require (
 	dario.cat/mergo v1.0.2
 	github.com/Code-Hex/Neo-cowsay/v2 v2.0.4
-	github.com/Masterminds/semver/v3 v3.4.0
+	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/alecthomas/chroma v0.10.0
 	github.com/c-bata/go-prompt v0.2.6
