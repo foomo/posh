@@ -24,7 +24,7 @@ Posh init must be run inside of a go module (please run "go mod init <MODNAME> f
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			l := intcmd.NewLogger()
-			data := map[string]interface{}{}
+			data := map[string]any{}
 
 			// define module
 			if value, err := git.OriginURL(); err != nil {
