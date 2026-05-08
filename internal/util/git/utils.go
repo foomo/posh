@@ -6,7 +6,9 @@ import (
 )
 
 func OriginURL() (string, error) {
-	r, err := git.PlainOpen(".")
+	r, err := git.PlainOpenWithOptions(".", &git.PlainOpenOptions{
+		EnableDotGitCommonDir: true,
+	})
 	if err != nil {
 		return "", err
 	}
