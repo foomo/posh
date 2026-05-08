@@ -111,7 +111,9 @@ func (t *root) Execute(ctx context.Context, r *readline.Readline) error {
 
 	if err := cmd.setFlags(ctx, r, true); err != nil {
 		return err
-	} else if err := cmd.execute(ctx, r, index); err != nil {
+	}
+
+	if err := cmd.execute(ctx, r, index); err != nil {
 		return err
 	}
 

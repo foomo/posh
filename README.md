@@ -4,7 +4,6 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/foomo/posh?style=flat-square)](https://hub.docker.com/r/foomo/posh)
 [![GitHub stars](https://img.shields.io/github/stars/foomo/posh.svg?style=flat-square)](https://github.com/foomo/posh)
 
-
 <p align="center">
   <img alt="posh-providers" src="docs/public/logo.png" width="400" height="400"/>
 </p>
@@ -65,7 +64,7 @@ Download the archive for your OS/arch from the [releases page](https://github.co
 <summary><b>go install</b></summary>
 
 ```shell
-go install github.com/foomo/posh/cmd/posh@latest
+go install github.com/foomo/posh@latest
 ```
 
 Requires Go 1.26+.
@@ -226,6 +225,6 @@ Contributions are welcome! Please read the [contributing guide](docs/CONTRIBUTIN
 
 ## License
 
-Distributed under MIT License, please see the [license](LICENSE) file within the code for more details.
+Distributed under MIT License, please see the [license](./LICENSE) file within the code for more details.
 
 _Made with ♥ [foomo](https://www.foomo.org) by [bestbytes](https://www.bestbytes.com)_

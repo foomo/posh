@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"os"
 
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/readline"
@@ -37,9 +36,6 @@ func (c *Exit) Description() string {
 }
 
 func (c *Exit) Execute(ctx context.Context, args *readline.Readline) error {
-	c.l.Print("Bye.")
-	os.Exit(0)
-
 	return nil
 }
 

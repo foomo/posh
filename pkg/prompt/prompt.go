@@ -3,6 +3,7 @@ package prompt
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/c-bata/go-prompt"
 	"github.com/c-bata/go-prompt/completer"
@@ -17,6 +18,7 @@ import (
 	"github.com/foomo/posh/pkg/shell"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"golang.org/x/sync/errgroup"
 )
 
 type (
@@ -251,6 +253,9 @@ func (s *Prompt) Run() error {
 				prompt.OptionInputTextColor(prompt.DefaultColor),
 				prompt.OptionCompletionWordSeparator(completer.FilePathCompletionSeparator),
 				prompt.OptionHistoryIgnoreDuplicates(),
+				prompt.OptionSetExitCheckerOnInput(func(in string, breakline bool) bool {
+					return breakline && in == "exit"
+				}),
 				prompt.OptionHistory(histories),
 				// macos alt+left fix
 				prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
@@ -277,7 +282,20 @@ func (s *Prompt) Run() error {
 
 	p.Run()
 
-	return nil
+	ctx, cancel := context.WithTimeout(s.ctx, 3*time.Second)
+	defer cancel()
+
+	wg, ctx := errgroup.WithContext(ctx)
+
+	for _, value := range s.commands {
+		if v, ok := value.(command.Shutdowner); ok {
+			wg.Go(func() error {
+				return v.Shutdown(ctx)
+			})
+		}
+	}
+
+	return wg.Wait()
 }
 
 // ------------------------------------------------------------------------------------------------
