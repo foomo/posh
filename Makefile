@@ -56,7 +56,7 @@ generate:
 ## Run tests
 test:
 	@echo "〉go test"
-	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out --tags=safe ./...
+	@GO_TEST_TAGS=-skip go test -coverprofile=coverage.out -tags=safe ./...
 
 .PHONY: test.race
 ## Run tests
@@ -108,12 +108,6 @@ install.debug:
 
 ### Security
 
-.PHONY: tidy
-## Run go mod tidy
-tidy:
-	@echo "〉go mod tidy"
-	@go mod tidy
-
 .PHONY: audit
 ## Run security audit
 audit:
@@ -122,6 +116,12 @@ audit:
 	@govulncheck ./...
 
 ### Dependencies
+
+.PHONY: tidy
+## Run go mod tidy
+tidy:
+	@echo "〉go mod tidy"
+	@go mod tidy
 
 .PHONY: outdated
 ## Show outdated direct dependencies
@@ -133,7 +133,7 @@ outdated:
 ## Show outdated direct dependencies
 upgrade:
 	@echo "〉go mod upgrade"
-	@go get -u ./...)
+	@go list -u -m -f '{{if and (not .Indirect) .Update}}{{.Path}}{{end}}' all | xargs -n1 -I{} go get {}@latest
 	@$(Make) tidy
 
 ### Documentation
@@ -159,22 +159,32 @@ godocs:
 ### Utils
 
 .PHONY: help
+# https://patorjk.com/software/taag/#p=display&f=Tmplr&t=posh&x=none&v=4&h=4&w=80&we=false
+help: g=\033[0;32m
+help: b=\033[0;34m
+help: w=\033[0;90m
+help: e=\033[0m
 ## Show help text
 help:
-	@echo ""
-	@echo "Project Oriented SHELL (posh)"
-	@echo ""
-	@echo "Usage:\n  make [task]"
+	@echo "$(g)"
+	@echo "     ┓"
+	@echo "┏┓┏┓┏┣┓"
+	@echo "┣┛┗┛┛┛┗"
+	@echo "┛"
+	@echo "with ❤ foomo by bestbytes"
+	@echo "$(e)"
+	@echo "$(b)Usage:$(e)\n  make [task]"
 	@awk '{ \
 		if($$0 ~ /^### /){ \
-			if(help) printf "%-23s %s\n\n", cmd, help; help=""; \
-			printf "\n%s:\n", substr($$0,5); \
+			if(help) printf "  %-21s $(w)%s$(e)\n\n", cmd, help; help=""; \
+			printf "$(b)\n%s:$(e)\n", substr($$0,5); \
 		} else if($$0 ~ /^[a-zA-Z0-9._-]+:/){ \
 			cmd = substr($$0, 1, index($$0, ":")-1); \
-			if(help) printf "  %-23s %s\n", cmd, help; help=""; \
+			if(help) printf "  %-21s $(w)%s$(e)\n", cmd, help; help=""; \
 		} else if($$0 ~ /^##/){ \
 			help = help ? help "\n                        " substr($$0,3) : substr($$0,3); \
 		} else if(help){ \
-			print "\n                        " help "\n"; help=""; \
+			print "\n                        $(w)" help "$(e)\n"; help=""; \
 		} \
 	}' $(MAKEFILE_LIST)
+	@echo ""

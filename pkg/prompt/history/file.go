@@ -3,6 +3,7 @@ package history
 import (
 	"context"
 	"os"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -152,15 +153,15 @@ func (h *File) unique(lines []string) []string {
 	)
 
 	keys := make(map[string]bool)
-	for i := len(lines) - 1; i >= 0; i-- {
-		if _, ok := keys[lines[i]]; !ok {
-			revList = append(revList, lines[i])
-			keys[lines[i]] = true
+	for _, v := range slices.Backward(lines) {
+		if _, ok := keys[v]; !ok {
+			revList = append(revList, v)
+			keys[v] = true
 		}
 	}
 
-	for i := len(revList) - 1; i >= 0; i-- {
-		list = append(list, revList[i])
+	for _, v := range slices.Backward(revList) {
+		list = append(list, v)
 	}
 
 	return list

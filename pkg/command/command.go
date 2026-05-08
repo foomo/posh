@@ -16,6 +16,9 @@ type (
 	Helper interface {
 		Help(ctx context.Context, r *readline.Readline) string
 	}
+	Shutdowner interface {
+		Shutdown(ctx context.Context) error
+	}
 	Validator interface {
 		Validate(ctx context.Context, r *readline.Readline) error
 	}
