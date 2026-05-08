@@ -239,7 +239,7 @@ func (s *Prompt) Run() error {
 						}
 
 						if len(tags) > 0 {
-							name += "  " + strings.Join(tags, ", ")
+							name += " \uF412 " + strings.Join(tags, ", ")
 						}
 
 						return s.prefix[:len(s.prefix)-4] + "(" + name + ") › ", true
