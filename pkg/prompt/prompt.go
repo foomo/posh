@@ -17,7 +17,6 @@ import (
 	"github.com/foomo/posh/pkg/shell"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/pkg/errors"
 )
 
 type (
@@ -223,16 +222,24 @@ func (s *Prompt) Run() error {
 						}
 
 						name := ref.Name().Short()
+						if !ref.Name().IsBranch() {
+							name = ref.Hash().String()[:7]
+						}
+
+						var tags []string
 
 						if t, err := r.Tags(); err == nil {
 							_ = t.ForEach(func(reference *plumbing.Reference) error {
 								if ref.Hash() == reference.Hash() {
-									name = "\uF412" + reference.Name().Short()
-									return errors.New("break")
+									tags = append(tags, reference.Name().Short())
 								}
 
 								return nil
 							})
+						}
+
+						if len(tags) > 0 {
+							name += "  " + strings.Join(tags, ", ")
 						}
 
 						return s.prefix[:len(s.prefix)-4] + "(" + name + ") › ", true
@@ -279,8 +286,8 @@ func (s *Prompt) Run() error {
 
 func (s *Prompt) alias(input string, aliases map[string]string) string {
 	for key, value := range aliases {
-		if strings.HasPrefix(input, key) {
-			input = value + strings.TrimPrefix(input, key)
+		if after, ok := strings.CutPrefix(input, key); ok {
+			input = value + after
 			return input
 		}
 	}
