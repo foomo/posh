@@ -27,6 +27,7 @@ import (
 
 func main() {
 	out := flag.String("output", "docs/reference/cli", "output directory")
+
 	flag.Parse()
 
 	if err := os.MkdirAll(*out, 0o755); err != nil {
@@ -39,6 +40,7 @@ func main() {
 	prepender := func(filename string) string {
 		base := strings.TrimSuffix(filepath.Base(filename), ".md")
 		title := strings.ReplaceAll(base, "_", " ")
+
 		return fmt.Sprintf("---\ntitle: %s\n---\n\n", title)
 	}
 
@@ -71,23 +73,29 @@ func escapeAngleBrackets(dir string) error {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") {
 			continue
 		}
+
 		if !strings.HasPrefix(e.Name(), "posh") {
 			continue
 		}
 
 		path := filepath.Join(dir, e.Name())
+
 		raw, err := os.ReadFile(path)
 		if err != nil {
 			return err
 		}
 
 		var b strings.Builder
+
 		inFence := false
+
 		for _, line := range strings.SplitAfter(string(raw), "\n") {
 			trimmed := strings.TrimLeft(line, " \t")
 			if strings.HasPrefix(trimmed, "```") {
 				inFence = !inFence
+
 				b.WriteString(line)
+
 				continue
 			}
 
@@ -101,7 +109,7 @@ func escapeAngleBrackets(dir string) error {
 			b.WriteString(line)
 		}
 
-		if err := os.WriteFile(path, []byte(b.String()), 0o644); err != nil {
+		if err := os.WriteFile(path, []byte(b.String()), 0o600); err != nil {
 			return err
 		}
 	}
@@ -125,5 +133,6 @@ func buildFullTree() *cobra.Command {
 	cmd.NewRequire(root)
 
 	root.DisableAutoGenTag = true
+
 	return root
 }
