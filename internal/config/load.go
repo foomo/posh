@@ -13,7 +13,7 @@ import (
 func Load(l log.Logger) error {
 	var (
 		errNotFound viper.ConfigFileNotFoundError
-		settings    map[string]interface{}
+		settings    map[string]any
 	)
 
 	if value := os.Getenv("POSH_ROOT_CONFIG_PATH"); value != "" {

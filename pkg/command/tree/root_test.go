@@ -91,67 +91,67 @@ func TestRoot(t *testing.T) {
 	}{
 		{
 			name: "tree",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errRoot)
 			},
 		},
 		{
 			name: "tree first",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errFirst)
 			},
 		},
 		{
 			name: "tree first foo",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errFirst)
 			},
 		},
 		{
 			name: "tree second",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errSecond)
 			},
 		},
 		{
 			name: "tree second second-1",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errSecond1)
 			},
 		},
 		{
 			name: "tree second second-2",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errSecond2)
 			},
 		},
 		{
 			name: "tree second second-3",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errSecond)
 			},
 		},
 		{
 			name: "tree third-a",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errThird)
 			},
 		},
 		{
 			name: "tree third-b",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errThird)
 			},
 		},
 		{
 			name: "tree third-c",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errRoot)
 			},
 		},
 		{
 			name: "tree third-a third-1",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errThird1)
 			},
 		},
@@ -185,7 +185,7 @@ func TestRoot_Node(t *testing.T) {
 		{
 			name: "tree",
 			root: tree.New(&tree.Node{}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, tree.ErrNoop)
 			},
 		},
@@ -196,7 +196,7 @@ func TestRoot_Node(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errOK)
 			},
 		},
@@ -208,7 +208,7 @@ func TestRoot_Node(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errOK)
 			},
 		},
@@ -251,7 +251,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
@@ -268,7 +268,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errOK)
 			},
 		},
@@ -287,7 +287,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
@@ -306,7 +306,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
@@ -328,7 +328,7 @@ func TestRoot_NodeArgs(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errOK)
 			},
 		},
@@ -385,7 +385,7 @@ func TestRoot_NodeFlags(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errOK)
 			},
 		},
@@ -415,7 +415,7 @@ func TestRoot_NodeFlags(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			wantErr: func(t assert.TestingT, err error, i ...any) bool {
 				return assert.ErrorIs(t, err, errOK)
 			},
 		},

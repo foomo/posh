@@ -27,8 +27,9 @@ type Shell struct {
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
 
-func New(ctx context.Context, l log.Logger, inputs ...interface{}) *Shell {
+func New(ctx context.Context, l log.Logger, inputs ...any) *Shell {
 	var args []string
+
 	for _, input := range inputs {
 		if value, ok := input.(string); ok {
 			args = append(args, value)
