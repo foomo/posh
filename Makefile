@@ -140,7 +140,7 @@ upgrade:
 
 .PHONY: docs
 ## Open docs
-docs:
+docs: docs.cli
 	@echo "〉starting docs"
 	@cd docs && bun install && bun run dev
 
@@ -149,6 +149,14 @@ docs:
 docs.build:
 	@echo "〉building docs"
 	@cd docs && bun install && bun run build
+
+.PHONY: docs.cli
+## Generate CLI reference markdown
+docs.cli:
+	@echo "〉generating docs/reference/cli"
+	@mkdir -p docs/reference/cli
+	@find docs/reference/cli -maxdepth 1 -name 'posh*.md' -delete
+	@go run ./cmd/docgen --output docs/reference/cli
 
 .PHONY: godocs
 ## Open go docs
