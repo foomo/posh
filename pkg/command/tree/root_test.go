@@ -5,20 +5,36 @@ import (
 	"testing"
 
 	"github.com/foomo/posh/pkg/command/tree"
-	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-var errOK = errors.New("ok")
+var (
+	errOK   = errors.New("ok")
+	errBoom = errors.New("boom")
+)
 
-func TestRoot(t *testing.T) {
-	l := log.NewTest(t, log.TestWithLevel(log.LevelInfo))
-	ctx := t.Context()
+// ------------------------------------------------------------------------------------------------
+// ~ New / Node accessor
+// ------------------------------------------------------------------------------------------------
 
+func TestNew(t *testing.T) {
+	n := &tree.Node{Name: "root"}
+	r := tree.New(n)
+	assert.Same(t, n, r.Node(), "Node() should return the node passed to New")
+
+	assert.NotPanics(t, func() {
+		_ = tree.New(nil).Node()
+	})
+}
+
+// ------------------------------------------------------------------------------------------------
+// ~ Execute
+// ------------------------------------------------------------------------------------------------
+
+func TestRoot_Execute_TreeTraversal(t *testing.T) {
 	var (
 		errRoot    = errors.New("root")
 		errFirst   = errors.New("first")
@@ -26,301 +42,180 @@ func TestRoot(t *testing.T) {
 		errSecond1 = errors.New("second-1")
 		errSecond2 = errors.New("second-2")
 		errThird   = errors.New("third")
-		errThird1  = errors.New("third1")
+		errThird1  = errors.New("third-1")
 	)
 
 	r := tree.New(&tree.Node{
 		Name:        "root",
 		Description: "Root tree",
-		Execute: func(ctx context.Context, r *readline.Readline) error {
-			return errRoot
-		},
+		Execute:     func(ctx context.Context, r *readline.Readline) error { return errRoot },
 		Nodes: tree.Nodes{
 			{
-				Name: "first",
-				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return errFirst
-				},
+				Name:    "first",
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errFirst },
 			},
 			{
 				Name: "second",
 				Nodes: tree.Nodes{
-					{
-						Name: "second-1",
-						Execute: func(ctx context.Context, r *readline.Readline) error {
-							return errSecond1
-						},
-					},
-					{
-						Name: "second-2",
-						Execute: func(ctx context.Context, r *readline.Readline) error {
-							return errSecond2
-						},
-					},
+					{Name: "second-1", Execute: func(ctx context.Context, r *readline.Readline) error { return errSecond1 }},
+					{Name: "second-2", Execute: func(ctx context.Context, r *readline.Readline) error { return errSecond2 }},
 				},
-				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return errSecond
-				},
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errSecond },
 			},
 			{
 				Name: "third",
 				Values: func(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
-					return []goprompt.Suggest{
-						{Text: "third-a"},
-						{Text: "third-b"},
-					}
+					return []goprompt.Suggest{{Text: "third-a"}, {Text: "third-b"}}
 				},
 				Nodes: tree.Nodes{
-					{
-						Name: "third-1",
-						Execute: func(ctx context.Context, r *readline.Readline) error {
-							return errThird1
-						},
-					},
+					{Name: "third-1", Execute: func(ctx context.Context, r *readline.Readline) error { return errThird1 }},
 				},
-				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return errThird
-				},
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errThird },
 			},
 		},
 	})
 
 	tests := []struct {
-		name    string
-		wantErr assert.ErrorAssertionFunc
+		input string
+		want  error
 	}{
-		{
-			name: "tree",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errRoot)
-			},
-		},
-		{
-			name: "tree first",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errFirst)
-			},
-		},
-		{
-			name: "tree first foo",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errFirst)
-			},
-		},
-		{
-			name: "tree second",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errSecond)
-			},
-		},
-		{
-			name: "tree second second-1",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errSecond1)
-			},
-		},
-		{
-			name: "tree second second-2",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errSecond2)
-			},
-		},
-		{
-			name: "tree second second-3",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errSecond)
-			},
-		},
-		{
-			name: "tree third-a",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errThird)
-			},
-		},
-		{
-			name: "tree third-b",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errThird)
-			},
-		},
-		{
-			name: "tree third-c",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errRoot)
-			},
-		},
-		{
-			name: "tree third-a third-1",
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errThird1)
-			},
-		},
+		{"tree", errRoot},
+		{"tree first", errFirst},
+		{"tree first unknown-extra", errFirst},
+		{"tree second", errSecond},
+		{"tree second second-1", errSecond1},
+		{"tree second second-2", errSecond2},
+		{"tree second second-3", errSecond}, // unknown sub falls back to second
+		{"tree third-a", errThird},          // dynamic Values() match
+		{"tree third-b", errThird},
+		{"tree third-c", errRoot}, // dynamic miss falls back to root
+		{"tree third-a third-1", errThird1},
 	}
 
-	rl, err := readline.New(l)
-	require.NoError(t, err)
-
 	for _, tt := range tests {
-		t.Run(tt.name, func(t1 *testing.T) {
-			require.NoError(t1, rl.Parse(tt.name))
-
-			if !tt.wantErr(t1, r.Execute(SetT(ctx, t1), rl)) {
-				l.Warn(rl.String())
-			} else {
-				l.Debug(rl.String())
-			}
+		t.Run(tt.input, func(t *testing.T) {
+			rl := newReadline(t, tt.input)
+			assert.ErrorIs(t, r.Execute(t.Context(), rl), tt.want)
 		})
 	}
 }
 
-func TestRoot_Node(t *testing.T) {
-	l := log.NewTest(t, log.TestWithLevel(log.LevelInfo))
-	ctx := t.Context()
-
+func TestRoot_Execute_Node(t *testing.T) {
 	tests := []struct {
 		name    string
 		root    tree.Root
+		input   string
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
-			name: "tree",
-			root: tree.New(&tree.Node{}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, tree.ErrNoop)
-			},
+			name:    "nil node returns ErrNoop",
+			root:    tree.New(nil),
+			input:   "anything",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, tree.ErrNoop) },
 		},
 		{
-			name: "tree",
+			name:    "empty node returns ErrNoop",
+			root:    tree.New(&tree.Node{}),
+			input:   "tree",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, tree.ErrNoop) },
+		},
+		{
+			name: "node with execute returns its error",
 			root: tree.New(&tree.Node{
-				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return errOK
-				},
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errOK },
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errOK)
-			},
+			input:   "tree",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, errOK) },
 		},
 		{
-			name: "tree one",
+			name: "execute sees parsed args",
 			root: tree.New(&tree.Node{
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					assert.Equal(T(ctx), "one", r.Args().At(0))
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errOK)
+			input:   "tree one",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, errOK) },
+		},
+		{
+			name: "node with children but no input returns ErrMissingCommand",
+			root: tree.New(&tree.Node{
+				Nodes: tree.Nodes{
+					{Name: "child", Execute: func(ctx context.Context, r *readline.Readline) error { return errOK }},
+				},
+			}),
+			input: "tree",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool {
+				return assert.ErrorIs(t, err, tree.ErrMissingCommand)
 			},
 		},
 	}
 
-	rl, err := readline.New(l)
-	require.NoError(t, err)
-
 	for _, tt := range tests {
-		t.Run(tt.name, func(t1 *testing.T) {
-			require.NoError(t1, rl.Parse(tt.name))
-
-			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
-				l.Warn(rl.String())
-			} else {
-				l.Debug(rl.String())
-			}
+		t.Run(tt.name, func(t *testing.T) {
+			rl := newReadline(t, tt.input)
+			tt.wantErr(t, tt.root.Execute(SetT(t.Context(), t), rl))
 		})
 	}
 }
 
-func TestRoot_NodeArgs(t *testing.T) {
-	l := log.NewTest(t, log.TestWithLevel(log.LevelInfo))
-	ctx := t.Context()
-
+func TestRoot_Execute_NodeArgs(t *testing.T) {
 	tests := []struct {
 		name    string
 		root    tree.Root
+		input   string
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
-			name: "tree",
+			name: "required missing",
 			root: tree.New(&tree.Node{
-				Args: tree.Args{
-					{
-						Name: "first",
-					},
-				},
-				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return errOK
-				},
+				Args:    tree.Args{{Name: "first"}},
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errOK },
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
+			input: "tree",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
 		{
-			name: "tree one",
+			name: "required supplied",
 			root: tree.New(&tree.Node{
-				Args: tree.Args{
-					{
-						Name: "first",
-					},
-				},
+				Args: tree.Args{{Name: "first"}},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					assert.Equal(T(ctx), "one", r.Args().At(0))
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errOK)
-			},
+			input:   "tree one",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, errOK) },
 		},
 		{
-			name: "tree",
+			name: "two required, none supplied",
 			root: tree.New(&tree.Node{
-				Args: tree.Args{
-					{
-						Name: "first",
-					},
-					{
-						Name: "second",
-					},
-				},
-				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return errOK
-				},
+				Args:    tree.Args{{Name: "first"}, {Name: "second"}},
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errOK },
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
+			input: "tree",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
 		{
-			name: "tree one",
+			name: "two required, one supplied",
 			root: tree.New(&tree.Node{
-				Args: tree.Args{
-					{
-						Name: "first",
-					},
-					{
-						Name: "second",
-					},
-				},
-				Execute: func(ctx context.Context, r *readline.Readline) error {
-					return errOK
-				},
+				Args:    tree.Args{{Name: "first"}, {Name: "second"}},
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errOK },
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
+			input: "tree one",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool {
 				return assert.ErrorIs(t, err, tree.ErrMissingArgument)
 			},
 		},
 		{
-			name: "tree one two",
+			name: "two required, both supplied",
 			root: tree.New(&tree.Node{
-				Args: tree.Args{
-					{
-						Name: "first",
-					},
-					{
-						Name: "second",
-					},
-				},
+				Args: tree.Args{{Name: "first"}, {Name: "second"}},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
 					assert.Equal(T(ctx), "one", r.Args().At(0))
 					assert.Equal(T(ctx), "two", r.Args().At(1))
@@ -328,39 +223,37 @@ func TestRoot_NodeArgs(t *testing.T) {
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errOK)
-			},
+			input:   "tree one two",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, errOK) },
+		},
+		{
+			name: "optional missing is ok",
+			root: tree.New(&tree.Node{
+				Args:    tree.Args{{Name: "first", Optional: true}},
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errOK },
+			}),
+			input:   "tree",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, errOK) },
 		},
 	}
 
-	rl, err := readline.New(l)
-	require.NoError(t, err)
-
 	for _, tt := range tests {
-		t.Run(tt.name, func(t1 *testing.T) {
-			require.NoError(t1, rl.Parse(tt.name))
-
-			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
-				l.Warn(rl.String())
-			} else {
-				l.Debug(rl.String())
-			}
+		t.Run(tt.name, func(t *testing.T) {
+			rl := newReadline(t, tt.input)
+			tt.wantErr(t, tt.root.Execute(SetT(t.Context(), t), rl))
 		})
 	}
 }
 
-func TestRoot_NodeFlags(t *testing.T) {
-	l := log.NewTest(t, log.TestWithLevel(log.LevelDebug))
-	ctx := t.Context()
-
+func TestRoot_Execute_NodeFlags(t *testing.T) {
 	tests := []struct {
 		name    string
 		root    tree.Root
+		input   string
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
-			name: "tree",
+			name: "defaults when no flags supplied",
 			root: tree.New(&tree.Node{
 				Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSets) error {
 					fs.Default().String("first", "first", "first")
@@ -370,27 +263,26 @@ func TestRoot_NodeFlags(t *testing.T) {
 					return nil
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					if value, err := r.FlagSets().Default().GetString("first"); assert.NoError(T(ctx), err) {
-						assert.Equal(T(ctx), "first", value)
+					if v, err := r.FlagSets().Default().GetString("first"); assert.NoError(T(ctx), err) {
+						assert.Equal(T(ctx), "first", v)
 					}
 
-					if value, err := r.FlagSets().Default().GetBool("second"); assert.NoError(T(ctx), err) {
-						assert.False(T(ctx), value)
+					if v, err := r.FlagSets().Default().GetBool("second"); assert.NoError(T(ctx), err) {
+						assert.False(T(ctx), v)
 					}
 
-					if value, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
-						assert.Equal(T(ctx), int64(0), value)
+					if v, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
+						assert.Equal(T(ctx), int64(0), v)
 					}
 
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errOK)
-			},
+			input:   "tree",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, errOK) },
 		},
 		{
-			name: "tree --first one --second --third 13",
+			name: "supplied flags parsed",
 			root: tree.New(&tree.Node{
 				Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSets) error {
 					fs.Default().String("first", "first", "first")
@@ -400,48 +292,41 @@ func TestRoot_NodeFlags(t *testing.T) {
 					return nil
 				},
 				Execute: func(ctx context.Context, r *readline.Readline) error {
-					if value, err := r.FlagSets().Default().GetString("first"); assert.NoError(T(ctx), err) {
-						assert.Equal(T(ctx), "one", value)
+					if v, err := r.FlagSets().Default().GetString("first"); assert.NoError(T(ctx), err) {
+						assert.Equal(T(ctx), "one", v)
 					}
 
-					if value, err := r.FlagSets().Default().GetBool("second"); assert.NoError(T(ctx), err) {
-						assert.True(T(ctx), value)
+					if v, err := r.FlagSets().Default().GetBool("second"); assert.NoError(T(ctx), err) {
+						assert.True(T(ctx), v)
 					}
 
-					if value, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
-						assert.Equal(T(ctx), int64(13), value)
+					if v, err := r.FlagSets().Default().GetInt64("third"); assert.NoError(T(ctx), err) {
+						assert.Equal(T(ctx), int64(13), v)
 					}
 
 					return errOK
 				},
 			}),
-			wantErr: func(t assert.TestingT, err error, i ...any) bool {
-				return assert.ErrorIs(t, err, errOK)
-			},
+			input:   "tree --first one --second --third 13",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, errOK) },
+		},
+		{
+			name: "flags callback error propagates",
+			root: tree.New(&tree.Node{
+				Flags: func(ctx context.Context, r *readline.Readline, fs *readline.FlagSets) error {
+					return errBoom
+				},
+				Execute: func(ctx context.Context, r *readline.Readline) error { return errOK },
+			}),
+			input:   "tree",
+			wantErr: func(t assert.TestingT, err error, _ ...any) bool { return assert.ErrorIs(t, err, errBoom) },
 		},
 	}
 
-	rl, err := readline.New(l)
-	require.NoError(t, err)
-
 	for _, tt := range tests {
-		t.Run(tt.name, func(t1 *testing.T) {
-			require.NoError(t1, rl.Parse(tt.name))
-
-			if !tt.wantErr(t1, tt.root.Execute(SetT(ctx, t1), rl)) {
-				l.Warn(rl.String())
-			} else {
-				l.Debug(rl.String())
-			}
+		t.Run(tt.name, func(t *testing.T) {
+			rl := newReadline(t, tt.input)
+			tt.wantErr(t, tt.root.Execute(SetT(t.Context(), t), rl))
 		})
 	}
-}
-
-func T(ctx context.Context) *testing.T {
-	return ctx.Value("t").(*testing.T)
-}
-
-func SetT(ctx context.Context, t *testing.T) context.Context {
-	t.Helper()
-	return context.WithValue(ctx, "t", t) //nolint:staticcheck
 }
