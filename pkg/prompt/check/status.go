@@ -3,9 +3,10 @@ package check
 type Status string
 
 const (
-	StatusNote    = "⬜️️"
-	StatusSuccess = "✅"
-	StatusFailure = "❌"
+	StatusNote    = "note"
+	StatusWarning = "warning"
+	StatusSuccess = "success"
+	StatusFailure = "failure"
 )
 
 func (s Status) String() string {

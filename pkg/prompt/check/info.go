@@ -1,31 +1,33 @@
 package check
 
 type Info struct {
+	Icon   string
 	Name   string
 	Note   string
 	Status Status
 }
 
-func NewNoteInfo(name, note string) Info {
+func NewInfo(icon, name, note string, status Status) Info {
 	return Info{
+		Icon:   icon,
 		Name:   name,
 		Note:   note,
-		Status: StatusNote,
+		Status: status,
 	}
 }
 
-func NewSuccessInfo(name, note string) Info {
-	return Info{
-		Name:   name,
-		Note:   note,
-		Status: StatusSuccess,
-	}
+func NewNoteInfo(icon, name, note string) Info {
+	return NewInfo(icon, name, note, StatusNote)
 }
 
-func NewFailureInfo(name, note string) Info {
-	return Info{
-		Name:   name,
-		Note:   note,
-		Status: StatusFailure,
-	}
+func NewSuccessInfo(icon, name, note string) Info {
+	return NewInfo(icon, name, note, StatusSuccess)
+}
+
+func NewWarningInfo(icon, name, note string) Info {
+	return NewInfo(icon, name, note, StatusWarning)
+}
+
+func NewFailureInfo(icon, name, note string) Info {
+	return NewInfo(icon, name, note, StatusFailure)
 }
