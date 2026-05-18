@@ -10,6 +10,7 @@ import (
 	ownbrewconfig "github.com/foomo/ownbrew/pkg/config"
 	"github.com/foomo/ownbrew/pkg/ownbrew"
 	"github.com/foomo/posh/pkg/command"
+	"github.com/foomo/posh/pkg/complete"
 	"github.com/foomo/posh/pkg/config"
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/plugin"
@@ -74,6 +75,10 @@ func (p *Plugin) Require(ctx context.Context, cfg config.Require) error {
 		require.Packages(p.l, cfg.Packages),
 		require.Scripts(p.l, cfg.Scripts),
 	)
+}
+
+func (p *Plugin) Complete(ctx context.Context, args []string, toComplete string) []string {
+	return complete.Suggest(ctx, p.l, p.commands, args, toComplete)
 }
 
 func (p *Plugin) Execute(ctx context.Context, args []string) error {
