@@ -73,7 +73,6 @@ test.demo: install
 	@cd tmp/test && \
 		git init . && \
 		git remote add origin https://github.com/foomo/posh-test-demo && \
-		touch README.md && git add README.md && git commit -m "initial commit" && \
 		posh init && \
 		echo "replace github.com/foomo/posh => ../../../" >> .posh/go.mod && \
 		make shell.build && \
