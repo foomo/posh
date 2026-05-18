@@ -1,14 +1,12 @@
 package git
 
 import (
-	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v6"
 	giturl "github.com/kubescape/go-git-url"
 )
 
 func OriginURL() (string, error) {
-	r, err := git.PlainOpenWithOptions(".", &git.PlainOpenOptions{
-		EnableDotGitCommonDir: true,
-	})
+	r, err := git.PlainOpenWithOptions(".", &git.PlainOpenOptions{})
 	if err != nil {
 		return "", err
 	}
