@@ -18,7 +18,7 @@ require (
 	github.com/foomo/fender v1.1.0
 	github.com/foomo/go v0.11.0
 	github.com/foomo/ownbrew v0.2.3
-	github.com/go-git/go-git/v5 v5.19.0
+	github.com/go-git/go-git/v5 v5.19.1
 	github.com/gofrs/flock v0.13.0
 	github.com/invopop/jsonschema v0.14.0
 	github.com/joho/godotenv v1.5.1
