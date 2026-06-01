@@ -16,8 +16,8 @@ import (
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/shell"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -207,9 +207,7 @@ func (s *Prompt) Run() error {
 				prompt.OptionPrefix(s.prefix),
 				prompt.OptionLivePrefix(func() (string, bool) {
 					if s.prefixGit {
-						r, err := git.PlainOpenWithOptions(env.ProjectRoot(), &git.PlainOpenOptions{
-							EnableDotGitCommonDir: true,
-						})
+						r, err := git.PlainOpenWithOptions(env.ProjectRoot(), &git.PlainOpenOptions{})
 						if err != nil {
 							s.l.Debug("failed to open git repository", "error", err)
 						}
@@ -241,7 +239,7 @@ func (s *Prompt) Run() error {
 						}
 
 						if len(tags) > 0 {
-							name += " \uF412 " + strings.Join(tags, ", ")
+							name += " ∘ " + strings.Join(tags, ", ")
 						}
 
 						return s.prefix[:len(s.prefix)-4] + "(" + name + ") › ", true

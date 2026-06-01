@@ -112,6 +112,7 @@ func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {
 		prompt.WithContext(ctx),
 		prompt.WithTitle(cfg.Title),
 		prompt.WithPrefix(cfg.Prefix),
+		prompt.WithPrefixGit(cfg.PrefixGit),
 		prompt.WithAliases(cfg.Aliases),
 		prompt.WithCommands(p.commands),
 		prompt.WithCheckers(

@@ -4,7 +4,8 @@ version: v1.0
 ## Prompt settings
 prompt:
   title: "Posh"
-  prefix: "posh >"
+  prefix: "posh"
+  prefixGit: true
   history:
     limit: 100
     filename: .posh/.history
