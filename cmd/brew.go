@@ -13,6 +13,7 @@ func NewBrew(root *cobra.Command) {
 	cmd := &cobra.Command{
 		Use:           "brew",
 		Short:         "Check and install required packages.",
+		Aliases:       []string{"i"},
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
