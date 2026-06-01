@@ -1,8 +1,9 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/foomo/posh)](https://goreportcard.com/report/github.com/foomo/posh)
-[![GoDoc](https://godoc.org/github.com/foomo/posh?status.svg)](https://godoc.org/github.com/foomo/posh)
-[![Github All Releases](https://img.shields.io/github/downloads/foomo/posh/total.svg?style=flat-square)](https://github.com/foomo/posh/releases)
-[![Docker Pulls](https://img.shields.io/docker/pulls/foomo/posh?style=flat-square)](https://hub.docker.com/r/foomo/posh)
-[![GitHub stars](https://img.shields.io/github/stars/foomo/posh.svg?style=flat-square)](https://github.com/foomo/posh)
+[![Go Report Card](https://goreportcard.com/badge/github.com/foomo/posh?style=flat-square)](https://goreportcard.com/report/github.com/foomo/posh)
+[![GoDoc](https://img.shields.io/badge/GoDoc-✓-informational.svg?style=flat-square&logo=go)](https://godoc.org/github.com/foomo/posh)
+[![Coverage](https://img.shields.io/codecov/c/github/foomo/posh?style=flat-square&logo=github)](https://app.codecov.io/gh/foomo/posh)
+[![GitHub Downloads](https://img.shields.io/github/downloads/foomo/posh/total.svg?style=flat-square&logo=github)](https://github.com/foomo/posh/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/foomo/posh.svg?style=flat-square&logo=docker)](https://hub.docker.com/r/foomo/posh)
+[![GitHub Stars](https://img.shields.io/github/stars/foomo/posh.svg?style=flat-square&logo=github)](https://github.com/foomo/posh)
 
 <p align="center">
   <img alt="posh-providers" src="docs/public/logo.png" width="400" height="400"/>
