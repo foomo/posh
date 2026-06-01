@@ -13,6 +13,7 @@ func NewExecute(root *cobra.Command) {
 	cmd := &cobra.Command{
 		Use:                "execute",
 		Short:              "Execute a single Project Oriented Shell command",
+		Aliases:            []string{"x"},
 		Args:               cobra.ArbitraryArgs,
 		DisableFlagParsing: true,
 		SilenceUsage:       true,
