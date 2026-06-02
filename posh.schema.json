@@ -52,6 +52,9 @@
         "history": {
           "$ref": "#/$defs/PromptHistory"
         },
+        "historySearch": {
+          "type": "boolean"
+        },
         "aliases": {
           "additionalProperties": {
             "type": "string"

@@ -2,6 +2,7 @@ package prompt
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"time"
 
@@ -18,24 +19,31 @@ import (
 	"github.com/foomo/posh/pkg/shell"
 	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"golang.org/x/sync/errgroup"
+)
+
+const (
+	historySearchPrefix     = "⏩︎"
+	historySearchMaxResults = 10
 )
 
 type (
 	Prompt struct {
-		l         log.Logger
-		ctx       context.Context
-		title     string
-		flair     flair.Flair
-		prefix    string
-		prefixGit bool
-		check     check.Check
-		checkers  check.Checkers
-		filter    goprompt.Filter
-		readline  *readline.Readline
-		history   history.History
-		commands  command.Commands
-		aliases   map[string]string
+		l             log.Logger
+		ctx           context.Context
+		title         string
+		flair         flair.Flair
+		prefix        string
+		prefixGit     bool
+		check         check.Check
+		checkers      check.Checkers
+		filter        goprompt.Filter
+		readline      *readline.Readline
+		history       history.History
+		historySearch bool
+		commands      command.Commands
+		aliases       map[string]string
 		// inputRegex - split cmd into args
 		promptOptions []prompt.Option
 	}
@@ -141,6 +149,13 @@ func WithPromptOptions(v ...prompt.Option) Option {
 	}
 }
 
+func WithHistorySearch(v bool) Option {
+	return func(o *Prompt) error {
+		o.historySearch = v
+		return nil
+	}
+}
+
 // ------------------------------------------------------------------------------------------------
 // ~ Constructor
 // ------------------------------------------------------------------------------------------------
@@ -198,76 +213,82 @@ func (s *Prompt) Run() error {
 		return err
 	}
 
+	baseOptions := []prompt.Option{
+		prompt.OptionTitle(s.title),
+		prompt.OptionPrefix(s.prefix),
+		prompt.OptionLivePrefix(func() (string, bool) {
+			if s.prefixGit {
+				r, err := git.PlainOpenWithOptions(env.ProjectRoot(), &git.PlainOpenOptions{})
+				if err != nil {
+					s.l.Debug("failed to open git repository", "error", err)
+				}
+
+				ref, err := r.Head()
+				if err != nil {
+					s.l.Debug("failed to fetch HEAD", "error", err)
+				}
+
+				if ref == nil {
+					return s.prefix, false
+				}
+
+				name := ref.Name().Short()
+				if !ref.Name().IsBranch() {
+					name = ref.Hash().String()[:7]
+				}
+
+				var tags []string
+
+				if t, err := r.Tags(); err == nil {
+					_ = t.ForEach(func(reference *plumbing.Reference) error {
+						if ref.Hash() == reference.Hash() {
+							tags = append(tags, reference.Name().Short())
+						}
+
+						return nil
+					})
+				}
+
+				if len(tags) > 0 {
+					name += " ∘ " + strings.Join(tags, ", ")
+				}
+
+				return s.prefix[:len(s.prefix)-4] + "(" + name + ") › ", true
+			}
+
+			return "", false
+		}),
+		prompt.OptionPrefixTextColor(prompt.Cyan),
+		prompt.OptionInputTextColor(prompt.DefaultColor),
+		prompt.OptionCompletionWordSeparator(completer.FilePathCompletionSeparator),
+		prompt.OptionHistoryIgnoreDuplicates(),
+		prompt.OptionSetExitCheckerOnInput(func(in string, breakline bool) bool {
+			return breakline && in == "exit"
+		}),
+		prompt.OptionHistory(histories),
+		// macos alt+left fix
+		prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
+			ASCIICode: []byte{0x1b, 0x62},
+			Fn:        prompt.GoLeftWord,
+		}),
+		// macos alt+right fix
+		prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
+			ASCIICode: []byte{0x1b, 0x66},
+			Fn:        prompt.GoRightWord,
+		}),
+	}
+
+	if s.historySearch {
+		baseOptions = append(baseOptions, prompt.OptionAddKeyBind(prompt.KeyBind{
+			Key: prompt.ControlR,
+			Fn:  s.activateHistorySearch,
+		}))
+	}
+
 	p := prompt.New(
 		s.execute,
 		s.complete,
-		append(
-			[]prompt.Option{
-				prompt.OptionTitle(s.title),
-				prompt.OptionPrefix(s.prefix),
-				prompt.OptionLivePrefix(func() (string, bool) {
-					if s.prefixGit {
-						r, err := git.PlainOpenWithOptions(env.ProjectRoot(), &git.PlainOpenOptions{})
-						if err != nil {
-							s.l.Debug("failed to open git repository", "error", err)
-						}
-
-						ref, err := r.Head()
-						if err != nil {
-							s.l.Debug("failed to fetch HEAD", "error", err)
-						}
-
-						if ref == nil {
-							return s.prefix, false
-						}
-
-						name := ref.Name().Short()
-						if !ref.Name().IsBranch() {
-							name = ref.Hash().String()[:7]
-						}
-
-						var tags []string
-
-						if t, err := r.Tags(); err == nil {
-							_ = t.ForEach(func(reference *plumbing.Reference) error {
-								if ref.Hash() == reference.Hash() {
-									tags = append(tags, reference.Name().Short())
-								}
-
-								return nil
-							})
-						}
-
-						if len(tags) > 0 {
-							name += " ∘ " + strings.Join(tags, ", ")
-						}
-
-						return s.prefix[:len(s.prefix)-4] + "(" + name + ") › ", true
-					}
-
-					return "", false
-				}),
-				prompt.OptionPrefixTextColor(prompt.Cyan),
-				prompt.OptionInputTextColor(prompt.DefaultColor),
-				prompt.OptionCompletionWordSeparator(completer.FilePathCompletionSeparator),
-				prompt.OptionHistoryIgnoreDuplicates(),
-				prompt.OptionSetExitCheckerOnInput(func(in string, breakline bool) bool {
-					return breakline && in == "exit"
-				}),
-				prompt.OptionHistory(histories),
-				// macos alt+left fix
-				prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
-					ASCIICode: []byte{0x1b, 0x62},
-					Fn:        prompt.GoLeftWord,
-				}),
-				// macos alt+right fix
-				prompt.OptionAddASCIICodeBind(prompt.ASCIICodeBind{
-					ASCIICode: []byte{0x1b, 0x66},
-					Fn:        prompt.GoRightWord,
-				}),
-			},
-			s.promptOptions...,
-		)...,
+		append(baseOptions, s.promptOptions...)...,
 	)
 
 	if err := s.flair(s.title); err != nil {
@@ -312,6 +333,10 @@ func (s *Prompt) alias(input string, aliases map[string]string) string {
 }
 
 func (s *Prompt) execute(input string) {
+	for strings.HasPrefix(input, historySearchPrefix) {
+		input = strings.TrimPrefix(input, historySearchPrefix)
+	}
+
 	input = strings.TrimSpace(input)
 	if input == "" {
 		return
@@ -360,6 +385,12 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 	input := d.TextBeforeCursor()
 	if input == "" {
 		return nil
+	}
+
+	if s.historySearch {
+		if rest, ok := strings.CutPrefix(input, historySearchPrefix); ok {
+			return s.completeHistory(rest)
+		}
 	}
 
 	input = s.alias(input, s.aliases)
@@ -415,6 +446,55 @@ func (s *Prompt) complete(d prompt.Document) []prompt.Suggest {
 	}
 
 	return nil
+}
+
+func (s *Prompt) activateHistorySearch(buf *prompt.Buffer) {
+	if strings.HasPrefix(buf.Text(), historySearchPrefix) {
+		return
+	}
+
+	if n := len([]rune(buf.Text())); n > 0 {
+		buf.DeleteBeforeCursor(n)
+	}
+
+	buf.InsertText(historySearchPrefix, false, true)
+}
+
+func (s *Prompt) completeHistory(query string) []prompt.Suggest {
+	h, err := s.history.Load(context.Background())
+	if err != nil {
+		return nil
+	}
+
+	if len(h) == 0 {
+		return nil
+	}
+
+	seen := make(map[string]struct{}, len(h))
+	suggests := make([]prompt.Suggest, 0, historySearchMaxResults)
+
+	for _, line := range slices.Backward(h) {
+		if line == "" {
+			continue
+		}
+
+		if _, dup := seen[line]; dup {
+			continue
+		}
+
+		if query != "" && !fuzzy.MatchFold(query, line) {
+			continue
+		}
+
+		seen[line] = struct{}{}
+		suggests = append(suggests, prompt.Suggest{Text: line, Description: ""})
+
+		if len(suggests) >= historySearchMaxResults {
+			break
+		}
+	}
+
+	return suggests
 }
 
 // context returns and watches over a new context

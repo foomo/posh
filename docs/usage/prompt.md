@@ -43,6 +43,10 @@ posh › history
 
 The `history` command is added automatically whenever a non-noop history is configured.
 
+### History search
+
+Set `prompt.historySearch: true` in `.posh.yaml` to enable incremental fuzzy search over the history file. Press `Ctrl+R` from the prompt to swap the buffer to a `⏩︎` marker; subsequent keystrokes filter previous entries via `lithammer/fuzzysearch` and surface up to 10 suggestions, deduplicated and listed newest-first. Select one with `<Tab>`/`<Enter>` to run it — the marker is stripped before execution. Backspace through the marker (or clear the line) to leave the search mode.
+
 ## Aliases
 
 Aliases are longest-prefix string substitutions defined in `.posh.yaml`:
@@ -64,6 +68,7 @@ Typing `gco main` is rewritten to `git checkout main` before the line is parsed,
 | `Ctrl+C` | Cancels the **active command** (its `ctx.Done()` fires). The prompt itself stays open. |
 | `Ctrl+D` / `exit` | Cleanly exits the prompt. Triggers `Shutdown(ctx)` on every command implementing `Shutdowner`, with a 3-second deadline. |
 | `Ctrl+L` | Clears the screen. |
+| `Ctrl+R` | Opens fuzzy [history search](#history-search) when `prompt.historySearch: true`. |
 | `Alt+←` / `Alt+→` | Word-wise cursor movement (the macOS bindings are wired for you). |
 
 The shutdown phase is parallel: every `Shutdowner` runs in its own goroutine inside an `errgroup`. If any returns an error, the prompt exits with a non-zero status. If a shutdown exceeds 3 seconds, the parent context is cancelled — your handlers should respect that.

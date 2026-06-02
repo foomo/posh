@@ -129,6 +129,7 @@ func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {
 			history.FileWithFilename(cfg.History.Filename),
 			history.FileWithLockFilename(cfg.History.LockFilename),
 		),
+		prompt.WithHistorySearch(cfg.HistorySearch),
 	)
 	if err != nil {
 		return err

@@ -16,13 +16,14 @@ require (
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/charlievieth/fastwalk v1.0.14
 	github.com/foomo/fender v1.1.0
-	github.com/foomo/go v0.11.0
+	github.com/foomo/go v0.12.0
 	github.com/foomo/ownbrew v0.3.0
 	github.com/go-git/go-git/v6 v6.0.0-alpha.4
 	github.com/gofrs/flock v0.13.0
 	github.com/invopop/jsonschema v0.14.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kubescape/go-git-url v0.0.32
+	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/neilotoole/slogt v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/pterm/pterm v0.12.83
@@ -69,7 +70,6 @@ require (
 	github.com/kevinburke/ssh_config v1.6.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lithammer/fuzzysearch v1.1.8 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
