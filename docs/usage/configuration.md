@@ -26,6 +26,7 @@ prompt:
     limit: 100                # max lines kept in the history file
     filename: .posh/.history
     lockFilename: .posh/.history.lock
+  historySearch: true         # enable Ctrl+R fuzzy history search
   aliases:
     k: kubectl
     gco: git checkout
@@ -39,6 +40,7 @@ prompt:
 | `history.limit` | int | Lines retained on disk. |
 | `history.filename` | string | Relative to `${PROJECT_ROOT}`. |
 | `history.lockFilename` | string | Lock file for concurrent shells. |
+| `historySearch` | bool | If true, `Ctrl+R` opens fuzzy history search (see [Prompt → History search](/usage/prompt#history-search)). |
 | `aliases` | map[string]string | Longest-prefix substitution. Suggested on `<Tab>`. |
 
 ## `env`
