@@ -71,7 +71,7 @@ func (c *Welcome) Execute(ctx context.Context, r *readline.Readline) error {
 	return nil
 }
 
-func (c *Welcome) Help() string {
+func (c *Welcome) Help(ctx context.Context, r *readline.Readline) string {
 	return `Print a welcome message
 
 Usage:

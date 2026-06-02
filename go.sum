@@ -57,8 +57,8 @@ github.com/emirpasic/gods v1.18.1 h1:FXtiHYKDGKCW2KzwZKx0iC0PQmdlorYgdFG9jPXJ1Bc
 github.com/emirpasic/gods v1.18.1/go.mod h1:8tpGGwCnJ5H4r6BWwaV6OrWmMoPhUl5jm/FMNAnJvWQ=
 github.com/foomo/fender v1.1.0 h1:iWlLjAhIuofKuo2DFpQvnLU78VNjK7nuVbXTmpHO2jw=
 github.com/foomo/fender v1.1.0/go.mod h1:Ufk4NLv4bgBihcUd9w//AatADC8bIPT+HNHLU7k8IyI=
-github.com/foomo/go v0.11.0 h1:YSKHryh9+F/b9NKxmwySZGYdzINsNZNFHwaGZU3pmng=
-github.com/foomo/go v0.11.0/go.mod h1:jeSB/atkoqSoJ3+ak0+b/Xtj7IMyDj1odzJroudT7Dw=
+github.com/foomo/go v0.12.0 h1:Y5mKeLVll1yzM8UGsPdNc/z7Rrr4J7QVwNVO65ZbnE0=
+github.com/foomo/go v0.12.0/go.mod h1:jeSB/atkoqSoJ3+ak0+b/Xtj7IMyDj1odzJroudT7Dw=
 github.com/foomo/ownbrew v0.3.0 h1:MQQt6DF4o7dScHm9oxshhNEgFpUfymGctgdJim37r7s=
 github.com/foomo/ownbrew v0.3.0/go.mod h1:Lq9AC0lteflKj0/OBoZThoK5yMVu+nmI1ZM/iJfApFQ=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=

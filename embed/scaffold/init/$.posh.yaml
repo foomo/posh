@@ -10,6 +10,7 @@ prompt:
     limit: 100
     filename: .posh/.history
     lockFilename: .posh/.history.lock
+  historySearch: true
 
 ## Environment variables
 env:
