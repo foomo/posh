@@ -38,25 +38,25 @@ func DefaultCheck(ctx context.Context, l log.Logger, checkers []Checker) error {
 					color = pterm.FgRed
 
 					if info.Icon == "" {
-						info.Icon = "\uF467"
+						info.Icon = "⚡︎"
 					}
 				case StatusWarning:
 					color = pterm.FgYellow
 
 					if info.Icon == "" {
-						info.Icon = "\uEA74"
+						info.Icon = "◉"
 					}
 				case StatusSuccess:
 					color = pterm.FgGreen
 
 					if info.Icon == "" {
-						info.Icon = "\uEAB2"
+						info.Icon = "⚫︎"
 					}
 				default:
 					color = pterm.FgGray
 
 					if info.Icon == "" {
-						info.Icon = "\U000F0131"
+						info.Icon = "○"
 					}
 				}
 
