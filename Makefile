@@ -127,15 +127,14 @@ tidy:
 ## Show outdated direct dependencies
 outdated:
 	@echo "〉go mod outdated"
-	@go list -u -m -json all | go-mod-outdated -update -direct
+	@GOWORK=off go-mod-upgrade --list
 
 .PHONY: upgrade
-## Show outdated direct dependencies
+## Upgrade direct dependencies
 upgrade:
 	@echo "〉go mod upgrade"
-	@go list -u -m -f '{{if and (not .Indirect) .Update}}{{.Path}}{{end}}' all | xargs -n1 -I{} go get {}@latest
-	@$(Make) tidy
-
+	@GOWORK=off go-mod-upgrade
+	@$(MAKE) tidy
 ### Documentation
 
 .PHONY: docs
