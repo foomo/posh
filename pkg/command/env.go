@@ -10,6 +10,7 @@ import (
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
+	"github.com/foomo/posh/pkg/util/suggests"
 	"github.com/pterm/pterm"
 )
 
@@ -34,6 +35,20 @@ func NewEnv(l log.Logger) *Env {
 				Name:        "list",
 				Description: "List all environment variables",
 				Execute:     inst.list,
+			},
+			{
+				Name:        "get",
+				Description: "Get an environment variable",
+				Args: tree.Args{
+					{
+						Name:        "Key",
+						Description: "Key of the environment variable.",
+						Suggest: func(ctx context.Context, t tree.Root, r *readline.Readline) []goprompt.Suggest {
+							return suggests.List(inst.envKeys())
+						},
+					},
+				},
+				Execute: inst.get,
 			},
 			{
 				Name:        "set",
@@ -96,6 +111,11 @@ func (c *Env) Help(ctx context.Context, r *readline.Readline) string {
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
 
+func (c *Env) get(ctx context.Context, r *readline.Readline) error {
+	c.l.Info(os.Getenv(r.Args().At(1)))
+	return nil
+}
+
 func (c *Env) set(ctx context.Context, r *readline.Readline) error {
 	return os.Setenv(r.Args().At(1), r.Args().AtDefault(2, ""))
 }
@@ -134,4 +154,13 @@ func (c *Env) list(ctx context.Context, r *readline.Readline) error {
 	data = append(data, pairs...)
 
 	return pterm.DefaultTable.WithHasHeader(true).WithHeaderRowSeparator("-").WithData(data).Render()
+}
+
+func (c *Env) envKeys() []string {
+	var ret []string
+	for _, s := range os.Environ() {
+		ret = append(ret, strings.SplitN(s, "=", 2)[0])
+	}
+
+	return ret
 }
