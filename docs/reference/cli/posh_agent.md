@@ -1,21 +1,15 @@
 ---
-title: posh brew
+title: posh agent
 ---
 
-## posh brew
+## posh agent
 
-Check and install required packages.
-
-```
-posh brew [flags]
-```
+Tooling for AI coding agents driving this project's posh shell
 
 ### Options
 
 ```
-      --dry            print out the taps that will be installed
-  -h, --help           help for brew
-      --tags strings   filter by tags (e.g. ci,-test)
+  -h, --help   help for agent
 ```
 
 ### Options inherited from parent commands
@@ -29,4 +23,6 @@ posh brew [flags]
 ### SEE ALSO
 
 * [posh](posh.md)	 - Project Oriented Shell (posh)
+* [posh agent catalog](posh_agent_catalog.md)	 - Print this project's command catalog as JSON
+* [posh agent skill](posh_agent_skill.md)	 - Generate a Claude Code skill describing this project's posh shell
 

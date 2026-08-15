@@ -94,3 +94,12 @@ These aren't always-on built-ins, but the package ships a few more constructors 
 | `command.NewCheck(...)` | Wraps a `check.Checker` as a callable command          |
 
 See the godoc for current signatures: <https://pkg.go.dev/github.com/foomo/posh/pkg/command>.
+
+## Agent-facing output
+
+Every built-in above describes itself to [`posh agent catalog`](/usage/agents#posh-agent-catalog) and contributes prose
+to the generated skill. `cache` and `env` additionally print JSON instead of tables when
+[agent mode](/usage/agents#agent-mode) is active — so the same command serves a human at the prompt and an AI agent in
+CI. Your own commands opt in the same way, via
+[`Describer`](/plugin/writing-commands#describer-agent-catalog) and
+[`Skiller`](/plugin/writing-commands#skiller-agent-skill-prose).

@@ -1,21 +1,19 @@
 ---
-title: posh brew
+title: posh agent skill install
 ---
 
-## posh brew
+## posh agent skill install
 
-Check and install required packages.
+Write the generated skill to disk
 
 ```
-posh brew [flags]
+posh agent skill install [path] [flags]
 ```
 
 ### Options
 
 ```
-      --dry            print out the taps that will be installed
-  -h, --help           help for brew
-      --tags strings   filter by tags (e.g. ci,-test)
+  -h, --help   help for install
 ```
 
 ### Options inherited from parent commands
@@ -28,5 +26,5 @@ posh brew [flags]
 
 ### SEE ALSO
 
-* [posh](posh.md)	 - Project Oriented Shell (posh)
+* [posh agent skill](posh_agent_skill.md)	 - Generate a Claude Code skill describing this project's posh shell
 

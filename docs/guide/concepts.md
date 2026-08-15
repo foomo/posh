@@ -87,8 +87,12 @@ The base interface is intentionally minimal. Layer in extra capabilities by also
 | `FlagCompleter` | Completion when typing `--something` |
 | `AdditionalArgsCompleter` | Anything after `--` |
 | `PassThroughFlagsCompleter` | Flags passed through to a wrapped tool |
+| `Describer` | `posh agent catalog`, to describe the command's structure |
+| `Skiller` | `posh agent skill`, to contribute extra markdown |
 
 The prompt uses Go type assertions to detect what each command supports. There is no super-interface to implement — pick what you need. See [Writing Commands](/plugin/writing-commands) for examples.
+
+The same rule holds one level up: `Plugin` stays at four methods, and agent-facing capabilities are opt-in interfaces beside it. See [AI Agents](/usage/agents).
 
 ## The prompt loop
 

@@ -1,21 +1,19 @@
 ---
-title: posh brew
+title: posh agent skill update
 ---
 
-## posh brew
+## posh agent skill update
 
-Check and install required packages.
+Regenerate the skill file after this project's commands changed
 
 ```
-posh brew [flags]
+posh agent skill update [path] [flags]
 ```
 
 ### Options
 
 ```
-      --dry            print out the taps that will be installed
-  -h, --help           help for brew
-      --tags strings   filter by tags (e.g. ci,-test)
+  -h, --help   help for update
 ```
 
 ### Options inherited from parent commands
@@ -28,5 +26,5 @@ posh brew [flags]
 
 ### SEE ALSO
 
-* [posh](posh.md)	 - Project Oriented Shell (posh)
+* [posh agent skill](posh_agent_skill.md)	 - Generate a Claude Code skill describing this project's posh shell
 
