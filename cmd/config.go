@@ -6,6 +6,7 @@ import (
 	"github.com/foomo/ownbrew/pkg/util"
 	intcmd "github.com/foomo/posh/internal/cmd"
 	intconfig "github.com/foomo/posh/internal/config"
+	"github.com/foomo/posh/pkg/agent"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
@@ -27,14 +28,29 @@ func NewConfig(root *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			out, err := yaml.Marshal(viper.AllSettings())
-			if err != nil {
-				return err
-			}
+			// The settings map is already what an agent wants, so it is encoded
+			// as-is rather than through a payload struct: the config shape is
+			// open ended and defined by each project, not by posh.
+			return agent.Render(
+				func() any { return viper.AllSettings() },
+				func() error {
+					out, err := yaml.Marshal(viper.AllSettings())
+					if err != nil {
+						return err
+					}
 
-			fmt.Println(util.Highlight(string(out), "yaml"))
+					// Highlight colors via chroma, which --no-color does not
+					// reach: the flag only toggles a pterm global, and this
+					// command writes to stdout rather than through the logger.
+					if viper.GetBool("no-color") {
+						fmt.Println(string(out))
+					} else {
+						fmt.Println(util.Highlight(string(out), "yaml"))
+					}
 
-			return nil
+					return nil
+				},
+			)
 		},
 	}
 

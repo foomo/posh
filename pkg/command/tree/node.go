@@ -193,7 +193,9 @@ func (c *Node) help(ctx context.Context, r *readline.Readline) string {
 
 		if c.Flags != nil {
 			fs := readline.NewFlagSets()
-			if err := c.Flags(ctx, r, fs); err == nil {
+			if err := c.Flags(ctx, r, fs); err != nil {
+				ret.WriteString("\n\nFlags:\n" + pad + "error: " + err.Error() + "\n")
+			} else {
 				ret.WriteString("\n\nFlags:\n")
 				ret.WriteString(fs.All().FlagUsages())
 			}
