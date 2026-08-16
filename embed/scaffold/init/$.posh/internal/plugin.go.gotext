@@ -152,6 +152,7 @@ func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {
 	sh, err := prompt.New(p.l,
 		prompt.WithContext(ctx),
 		prompt.WithTitle(cfg.Title),
+		prompt.WithTheme(cfg.Theme),
 		prompt.WithPrefix(cfg.Prefix),
 		prompt.WithPrefixGit(cfg.PrefixGit),
 		prompt.WithAliases(cfg.Aliases),

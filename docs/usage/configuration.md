@@ -20,6 +20,7 @@ Consumed by `Plugin.Prompt`.
 ```yaml
 prompt:
   title: "Posh"               # window title and banner text
+  theme: mocha                # optional Catppuccin palette for the prompt
   prefix: "posh >"            # cursor prefix; framework appends ' › '
   prefixGit: false            # show git branch & tags in prefix
   history:
@@ -35,6 +36,7 @@ prompt:
 | Field | Type | Notes |
 | --- | --- | --- |
 | `title` | string | Window/banner title. Pass-through to `prompt.OptionTitle`. |
+| `theme` | string | Optional. `mocha`, `macchiato`, `frappe` or `latte`. Colors the prompt only — omit to keep the default colors. See [Theming](/usage/theming). |
 | `prefix` | string | Static prefix. Framework appends ` › `. |
 | `prefixGit` | bool | If true, the prefix becomes `prefix (branch  tag) ›`. |
 | `history.limit` | int | Lines retained on disk. |

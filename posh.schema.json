@@ -43,6 +43,10 @@
         "title": {
           "type": "string"
         },
+        "theme": {
+          "type": "string",
+          "description": "Theme selects a Catppuccin palette for the prompt: mocha, macchiato, frappe or latte"
+        },
         "prefix": {
           "type": "string"
         },

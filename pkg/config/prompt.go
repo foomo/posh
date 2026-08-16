@@ -2,7 +2,9 @@ package config
 
 type (
 	Prompt struct {
-		Title         string            `json:"title" yaml:"title"`
+		Title string `json:"title" yaml:"title"`
+		// Theme selects a Catppuccin palette for the prompt: mocha, macchiato, frappe or latte
+		Theme         string            `json:"theme" yaml:"theme"`
 		Prefix        string            `json:"prefix" yaml:"prefix"`
 		PrefixGit     bool              `json:"prefixGit" yaml:"prefixGit"`
 		History       PromptHistory     `json:"history" yaml:"history"`
