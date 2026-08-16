@@ -79,5 +79,8 @@ func DefaultCheck(ctx context.Context, l log.Logger, checkers []Checker) error {
 		return strings.Compare(a[1], b[1])
 	})
 
+	// Rendered directly rather than via agent.Table: cells here carry PTerm
+	// color escapes, and command.Check handles the agent path from the
+	// structured []Info before any of this formatting is applied.
 	return pterm.DefaultTable.WithData(data).Render()
 }

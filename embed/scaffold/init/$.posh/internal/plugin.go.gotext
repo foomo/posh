@@ -91,20 +91,61 @@ func (p *Plugin) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	if cmd := p.commands.Get(r.Cmd()); cmd == nil {
+	cmd := p.commands.Get(r.Cmd())
+	if cmd == nil {
 		return fmt.Errorf("invalid [cmd] argument: %s", r.Cmd())
-	} else {
-		if value, ok := cmd.(command.Validator); ok {
-			if err := value.Validate(ctx, r); err != nil {
-				return err
-			}
-		}
-		if err := cmd.Execute(ctx, r); err != nil {
+	}
+
+	if value, ok := cmd.(command.Validator); ok {
+		if err := value.Validate(ctx, r); err != nil {
 			return err
 		}
 	}
 
-	return nil
+	return cmd.Execute(ctx, r)
+}
+
+// List implements the optional plugin.Lister interface, used by
+// `posh agent catalog`.
+func (p *Plugin) List(ctx context.Context) []plugin.CommandInfo {
+	ret := make([]plugin.CommandInfo, 0, len(p.commands))
+	for _, cmd := range p.commands.List() {
+		ret = append(ret, plugin.Describe(ctx, cmd.Name(), cmd.Description(), cmd))
+	}
+
+	return ret
+}
+
+// ListSkill implements the optional plugin.SkillLister interface, used by
+// `posh agent skill`. It is List plus the extra markdown each command
+// contributes through the optional command.Skiller interface.
+func (p *Plugin) ListSkill(ctx context.Context) []plugin.SkillCommand {
+	ret := make([]plugin.SkillCommand, 0, len(p.commands))
+	for _, cmd := range p.commands.List() {
+		ret = append(ret, plugin.SkillCommand{
+			CommandInfo: plugin.Describe(ctx, cmd.Name(), cmd.Description(), cmd),
+			Skill:       plugin.Skill(ctx, cmd),
+		})
+	}
+
+	return ret
+}
+
+// SkillMetadata implements the optional plugin.SkillMetadataer interface,
+// supplying the generated SKILL.md frontmatter.
+//
+// Describe what this project's shell is for: the description is what makes an
+// agent reach for the skill, so project vocabulary beats a generic summary.
+// AllowedTools lets posh run without a permission prompt - drop it if the
+// commands here should stay gated.
+func (p *Plugin) SkillMetadata(ctx context.Context) plugin.SkillMetadata {
+	return plugin.SkillMetadata{
+		Description: "Drive the {{.module}} project shell: run project tasks via posh instead of guessing shell commands.",
+		AllowedTools: []string{
+			"Bash(posh execute:*)",
+			"Bash(posh x:*)",
+		},
+	}
 }
 
 func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {

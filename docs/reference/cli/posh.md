@@ -9,6 +9,7 @@ Project Oriented Shell (posh)
 ### Options
 
 ```
+      --agent          force agent mode: JSON output, no interactive prompts (default: auto-detected)
   -h, --help           help for posh
       --level string   set log level (default: info) (default "info")
       --no-color       disabled colors (default: false)
@@ -16,6 +17,7 @@ Project Oriented Shell (posh)
 
 ### SEE ALSO
 
+* [posh agent](posh_agent.md)	 - Tooling for AI coding agents driving this project's posh shell
 * [posh brew](posh_brew.md)	 - Check and install required packages.
 * [posh config](posh_config.md)	 - Print loaded configuration
 * [posh execute](posh_execute.md)	 - Execute a single Project Oriented Shell command

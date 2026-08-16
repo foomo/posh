@@ -4,12 +4,14 @@ import (
 	"context"
 	"sort"
 
+	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
 )
 
 type Root interface {
 	Node() *Node
+	Describe(ctx context.Context) CommandInfo
 	Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest
 	Execute(ctx context.Context, r *readline.Readline) error
 	Help(ctx context.Context, r *readline.Readline) string
@@ -138,4 +140,30 @@ func (t *root) Help(ctx context.Context, r *readline.Readline) string {
 	}
 
 	return cmd.help(ctx, r)
+}
+
+// Describe walks the whole tree into a CommandInfo - subcommands, arguments and
+// flags - for `posh agent catalog`. It is the one-line implementation of the
+// optional command.Describer interface for a tree based command:
+//
+//	func (c *Cache) Describe(ctx context.Context) tree.CommandInfo {
+//		return c.tree.Describe(ctx)
+//	}
+//
+// The walk is deliberately offline: a node's Values callback resolves dynamic
+// names against live state (kubeconfig, cloud APIs, the cache), so it is never
+// invoked. Such nodes are emitted as a placeholder with Dynamic set.
+func (t *root) Describe(ctx context.Context) CommandInfo {
+	if t.node == nil {
+		return CommandInfo{}
+	}
+
+	// Flags are enumerated, never parsed, so the readline only needs to exist:
+	// it requires no terminal, never logs, and is shared across the subtree.
+	r, err := readline.New(log.NewFmt())
+	if err != nil {
+		return CommandInfo{FullPath: t.node.Name, Description: t.node.Description}
+	}
+
+	return t.node.describe(ctx, r, "")
 }

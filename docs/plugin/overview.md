@@ -25,6 +25,19 @@ Each method backs one cobra subcommand on `bin/posh`:
 
 The framework wires each cobra command, parses flags, loads config, and hands you a typed struct. Your job is to wire the implementation — usually **just composition** of helpers from `pkg/...`.
 
+### Optional extensions
+
+Like commands, plugins gain capabilities by *also* implementing an optional interface. Each is detected by type assertion, so leaving one out is never a breaking change:
+
+| Interface | Method | Backs |
+| --- | --- | --- |
+| `Completer` | `Complete(ctx, args, toComplete) []string` | Shell completion for `posh execute` |
+| `Lister` | `List(ctx) []CommandInfo` | [`posh agent catalog`](/usage/agents#posh-agent-catalog) |
+| `SkillLister` | `ListSkill(ctx) []SkillCommand` | [`posh agent skill`](/usage/agents#posh-agent-skill) |
+| `SkillMetadataer` | `SkillMetadata(ctx) SkillMetadata` | The generated skill's frontmatter |
+
+The scaffolded plugin implements the last three out of the box — see [AI Agents](/usage/agents) for what they produce.
+
 ## The scaffolded plugin
 
 `posh init` writes `.posh/internal/plugin.go`, a near-canonical implementation:
@@ -60,7 +73,7 @@ The constructor:
 2. Registers always-on built-ins (`exit`, `help`)
 3. Registers your custom commands
 
-`Prompt`, `Execute`, `Brew`, `Require` are all implemented in the same file — about 70 LOC total. Read it once, then come back here to extend.
+`Prompt`, `Execute`, `Brew`, `Require` are all implemented in the same file, along with the agent-facing `List`, `ListSkill` and `SkillMetadata`. Read it once, then come back here to extend.
 
 ### `Prompt`
 

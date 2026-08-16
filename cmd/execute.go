@@ -3,7 +3,9 @@ package cmd
 import (
 	intcmd "github.com/foomo/posh/internal/cmd"
 	intconfig "github.com/foomo/posh/internal/config"
+	"github.com/foomo/posh/pkg/agent"
 	"github.com/foomo/posh/pkg/plugin"
+	"github.com/foomo/posh/pkg/readline"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -27,6 +29,14 @@ func NewExecute(root *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// DisableFlagParsing means cobra never populates this command's
+			// flags, so posh's own are scanned off the front by hand.
+			args = readline.ExtractFlags(args, map[string]func(){
+				agent.Flag: func() { agent.SetFlag(true) },
+			})
+
+			// Logger must be built after ExtractFlags, which may have set
+			// agent mode via a leading --agent.
 			l := intcmd.NewLogger()
 
 			if len(args) == 0 {

@@ -1,7 +1,7 @@
 // Command docgen generates Markdown documentation for every cobra command
 // shipped by posh — both the binary-only commands (init, config, version) and
-// the downstream-only commands that require a Plugin (prompt, execute, brew,
-// require).
+// the downstream-only commands that require a Plugin (agent, prompt, execute,
+// brew, require).
 //
 // Output is one Markdown file per command, suitable for VitePress. The file
 // header is rewritten so each page has a `# posh <subcommand>` title and a
@@ -127,6 +127,7 @@ func buildFullTree() *cobra.Command {
 	cmd.NewInit(root)
 	cmd.NewConfig(root)
 	cmd.NewVersion(root)
+	cmd.NewAgent(root)
 	cmd.NewBrew(root)
 	cmd.NewExecute(root)
 	cmd.NewPrompt(root)

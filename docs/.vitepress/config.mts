@@ -37,6 +37,7 @@ export default defineConfig({
 				items: [
 					{text: 'The Interactive Prompt', link: '/usage/prompt'},
 					{text: 'Built-in Commands', link: '/usage/builtins'},
+					{text: 'AI Agents', link: '/usage/agents'},
 					{text: 'Configuration', link: '/usage/configuration'},
 					{text: 'Project Layout', link: '/usage/layout'},
 				],
@@ -50,6 +51,7 @@ export default defineConfig({
 					{text: 'posh init', link: '/reference/cli/posh_init'},
 					{text: 'posh config', link: '/reference/cli/posh_config'},
 					{text: 'posh version', link: '/reference/cli/posh_version'},
+					{text: 'posh agent', link: '/reference/cli/posh_agent'},
 					{text: 'posh prompt', link: '/reference/cli/posh_prompt'},
 					{text: 'posh execute', link: '/reference/cli/posh_execute'},
 					{text: 'posh require', link: '/reference/cli/posh_require'},

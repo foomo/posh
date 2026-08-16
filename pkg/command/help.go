@@ -41,6 +41,37 @@ func (c *Help) Description() string {
 	return "print help"
 }
 
+// Describe implements the optional Describer interface. Help is not tree based,
+// so it builds its own CommandInfo - otherwise it would be listed as a bare
+// leaf and its optional [command] argument would not show up at all.
+func (c *Help) Describe(ctx context.Context) CommandInfo {
+	return CommandInfo{
+		FullPath:    c.name,
+		Description: c.Description(),
+		Arguments: []ArgInfo{
+			{
+				Name:        "command",
+				Description: "Name of the command to print help for.",
+				Optional:    true,
+			},
+		},
+	}
+}
+
+// Skill implements the optional Skiller interface, mainly to steer an agent
+// away from this command: the catalog it already has is strictly better
+// structured than the prose this prints.
+func (c *Help) Skill(ctx context.Context) string {
+	return "#### Notes\n\n" +
+		"Prints human-formatted help: with no argument, the list of commands that\n" +
+		"provide help; with one, that command's own help text.\n\n" +
+		"As an agent you rarely need this. `posh agent catalog` covers the same\n" +
+		"ground as structured JSON - every command, its arguments and its flags,\n" +
+		"including the many commands that provide no help text and so never appear\n" +
+		"in the list here. Reach for `help [command]` only for prose a specific\n" +
+		"command wrote that the catalog does not carry."
+}
+
 func (c *Help) Complete(ctx context.Context, r *readline.Readline) []goprompt.Suggest {
 	var suggests []goprompt.Suggest
 

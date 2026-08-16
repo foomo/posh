@@ -2,6 +2,7 @@ package cmd
 
 import (
 	intconfig "github.com/foomo/posh/internal/config"
+	"github.com/foomo/posh/pkg/agent"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,6 +19,7 @@ func NewRoot() *cobra.Command {
 		Use:   "posh",
 		Short: "Project Oriented Shell (posh)",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			agent.SetFlag(viper.GetBool("agent"))
 			return intconfig.Dotenv()
 		},
 	}
@@ -27,6 +29,9 @@ func NewRoot() *cobra.Command {
 
 	cmd.PersistentFlags().String("level", "info", "set log level (default: info)")
 	_ = viper.BindPFlag("level", cmd.PersistentFlags().Lookup("level"))
+
+	cmd.PersistentFlags().Bool("agent", false, "force agent mode: JSON output, no interactive prompts (default: auto-detected)")
+	_ = viper.BindPFlag("agent", cmd.PersistentFlags().Lookup("agent"))
 
 	return cmd
 }

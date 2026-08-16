@@ -21,6 +21,7 @@ posh brew [flags]
 ### Options inherited from parent commands
 
 ```
+      --agent          force agent mode: JSON output, no interactive prompts (default: auto-detected)
       --level string   set log level (default: info) (default "info")
       --no-color       disabled colors (default: false)
 ```

@@ -110,6 +110,53 @@ func (c *Server) Shutdown(ctx context.Context) error {
 
 Called when the prompt loop exits. Every `Shutdowner` runs in parallel with a 3-second deadline. If you hold long-running resources (HTTP servers, database connections, watchers), implement this.
 
+### `Describer` — agent catalog
+
+```go
+func (c *Hello) Describe(ctx context.Context) command.CommandInfo {
+    return command.CommandInfo{
+        FullPath:    "hello",
+        Description: "say hello",
+        Arguments: []command.ArgInfo{
+            {Name: "name", Description: "who to greet", Optional: true},
+        },
+    }
+}
+```
+
+Backs [`posh agent catalog`](/usage/agents#posh-agent-catalog), which gives an AI coding agent a machine-readable
+answer to "what can I run" instead of making it parse help text. Commands that don't implement it are still listed —
+just as leaves with only a name and description.
+
+Tree-based commands delegate like every other tree method:
+
+```go
+func (c *Kube) Describe(ctx context.Context) command.CommandInfo {
+    return c.tree.Describe(ctx)
+}
+```
+
+The contract is `CommandInfo`, not `*tree.Node` — you stay free to change how you model your command's structure, or to
+build the info by hand, without breaking the catalog.
+
+### `Skiller` — agent skill prose
+
+```go
+func (c *Hello) Skill(ctx context.Context) string {
+    return `#### When to use
+
+Prefer this over ` + "`echo`" + ` — it reads the greeting format from .posh.yaml.
+`
+}
+```
+
+Extra markdown for [`posh agent skill`](/usage/agents#posh-agent-skill), appended verbatim under this command's `###`
+heading — extended instructions, worked config examples, links. Use heading level 4 (`####`) or deeper; level 3 is the
+command heading itself.
+
+It's free-form text rather than a struct because what's worth telling an agent varies per command, and the destination
+is markdown either way. Top-level commands only — nested subcommands keep their compact indented listing.
+
 ### Completion
 
 Three flavours, picked by the parser's mode:

@@ -11,6 +11,7 @@ import (
 	cowsay "github.com/Code-Hex/Neo-cowsay/v2"
 	"github.com/foomo/posh/internal/cmd"
 	intenv "github.com/foomo/posh/internal/env"
+	"github.com/foomo/posh/pkg/agent"
 	"github.com/foomo/posh/pkg/plugin"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -23,6 +24,7 @@ func Init(provider plugin.Provider) {
 	NewVersion(rootCmd)
 
 	if provider != nil {
+		NewAgent(rootCmd)
 		NewBrew(rootCmd)
 		NewExecute(rootCmd)
 		NewPrompt(rootCmd)
@@ -50,7 +52,13 @@ func Execute() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
+	// Guarded here rather than at each call site, so both the panic and the
+	// error path below are covered: ASCII art is noise in a JSON message field.
 	say := func(msg string) string {
+		if agent.IsAgentMode() {
+			return msg
+		}
+
 		if say, err := cowsay.Say(msg, cowsay.BallonWidth(80)); err == nil {
 			msg = say
 		}

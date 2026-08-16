@@ -10,7 +10,7 @@ This section is auto-generated from the cobra command tree by `cmd/docgen`. Rege
 make docs.cli
 ```
 
-The output is committed to git, so the docs site builds without Go installed. CI verifies the generated tree matches the current command definitions.
+The output is committed to git, so the docs site builds without Go installed. Re-run `make docs.cli` and commit the result whenever you add, remove or reflag a cobra command.
 
 ## Two flavours
 
@@ -19,12 +19,13 @@ The output is committed to git, so the docs site builds without Go installed. CI
 | [`posh init`](./posh_init) | ✅ | — |
 | [`posh config`](./posh_config) | ✅ | ✅ |
 | [`posh version`](./posh_version) | ✅ | ✅ |
+| [`posh agent`](./posh_agent) | — | ✅ |
 | [`posh prompt`](./posh_prompt) | — | ✅ |
 | [`posh execute`](./posh_execute) | — | ✅ |
 | [`posh require`](./posh_require) | — | ✅ |
 | [`posh brew`](./posh_brew) | — | ✅ |
 
-The split exists because `prompt`, `execute`, `require` and `brew` delegate to the [`Plugin`](/plugin/overview) compiled into the project binary. The global `posh` has no plugin to delegate to.
+The split exists because `agent`, `prompt`, `execute`, `require` and `brew` delegate to the [`Plugin`](/plugin/overview) compiled into the project binary. The global `posh` has no plugin to delegate to.
 
 ## All commands
 
@@ -32,6 +33,9 @@ The split exists because `prompt`, `execute`, `require` and `brew` delegate to t
 - [posh init](./posh_init)
 - [posh config](./posh_config)
 - [posh version](./posh_version)
+- [posh agent](./posh_agent)
+  - [posh agent catalog](./posh_agent_catalog)
+  - [posh agent skill](./posh_agent_skill)
 - [posh prompt](./posh_prompt)
 - [posh execute](./posh_execute)
 - [posh require](./posh_require)

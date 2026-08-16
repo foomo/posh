@@ -79,7 +79,7 @@ func TestRoot_Help(t *testing.T) {
 			contains: []string{"Flags:", "--foo", "foo desc"},
 		},
 		{
-			name: "leaf with flags callback error omits Flags section",
+			name: "leaf with flags callback error surfaces the error in Flags section",
 			root: tree.New(&tree.Node{
 				Name:        "root",
 				Description: "root desc",
@@ -87,9 +87,8 @@ func TestRoot_Help(t *testing.T) {
 					return errBoom
 				},
 			}),
-			input:       "root self",
-			contains:    []string{"Usage:", "root"},
-			notContains: []string{"Flags:"},
+			input:    "root self",
+			contains: []string{"Usage:", "root", "Flags:", "error:", "boom"},
 		},
 		{
 			name: "descends to matched child",
