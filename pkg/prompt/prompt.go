@@ -17,6 +17,7 @@ import (
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/shell"
+	"github.com/foomo/posh/pkg/theme"
 	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/lithammer/fuzzysearch/fuzzy"
@@ -44,6 +45,7 @@ type (
 		historySearch bool
 		commands      command.Commands
 		aliases       map[string]string
+		theme         *theme.Theme
 		// inputRegex - split cmd into args
 		promptOptions []prompt.Option
 	}
@@ -152,6 +154,21 @@ func WithPromptOptions(v ...prompt.Option) Option {
 func WithHistorySearch(v bool) Option {
 	return func(o *Prompt) error {
 		o.historySearch = v
+		return nil
+	}
+}
+
+// WithTheme colors the prompt using a Catppuccin flavor: mocha, macchiato,
+// frappe or latte. An empty value leaves the prompt's default colors alone.
+func WithTheme(v string) Option {
+	return func(o *Prompt) error {
+		value, err := theme.Resolve(v)
+		if err != nil {
+			return err
+		}
+
+		o.theme = value
+
 		return nil
 	}
 }
@@ -285,6 +302,11 @@ func (s *Prompt) Run() error {
 		}))
 	}
 
+	// Appended rather than folded into baseOptions so that an unconfigured
+	// shell keeps exactly the colors it had before theming existed: with no
+	// theme, not one color option changes.
+	baseOptions = append(baseOptions, s.themeOptions()...)
+
 	p := prompt.New(
 		s.execute,
 		s.complete,
@@ -320,6 +342,35 @@ func (s *Prompt) Run() error {
 // ------------------------------------------------------------------------------------------------
 // ~ Private methods
 // ------------------------------------------------------------------------------------------------
+
+// themeOptions returns the color options for the configured theme, or nothing
+// at all when none is configured.
+//
+// go-prompt is limited to the 16 ANSI colors — its color type has no 256-color
+// or truecolor path — so these are nearest-slot approximations rather than
+// exact Catppuccin values. In practice that usually still lands right: a user
+// running a Catppuccin terminal theme has those slots remapped already.
+func (s *Prompt) themeOptions() []prompt.Option {
+	if s.theme == nil {
+		return nil
+	}
+
+	return []prompt.Option{
+		prompt.OptionPrefixTextColor(s.theme.Prompt(theme.RolePrimary)),
+		prompt.OptionInputTextColor(s.theme.Prompt(theme.RoleText)),
+		prompt.OptionSuggestionTextColor(s.theme.Prompt(theme.RoleText)),
+		prompt.OptionSuggestionBGColor(s.theme.Prompt(theme.RoleMuted)),
+		prompt.OptionSelectedSuggestionTextColor(s.theme.Prompt(theme.RoleText)),
+		prompt.OptionSelectedSuggestionBGColor(s.theme.Prompt(theme.RolePrimary)),
+		prompt.OptionDescriptionTextColor(s.theme.Prompt(theme.RoleMuted)),
+		prompt.OptionDescriptionBGColor(s.theme.Prompt(theme.RoleMuted)),
+		prompt.OptionSelectedDescriptionTextColor(s.theme.Prompt(theme.RoleText)),
+		prompt.OptionSelectedDescriptionBGColor(s.theme.Prompt(theme.RolePrimary)),
+		prompt.OptionPreviewSuggestionTextColor(s.theme.Prompt(theme.RoleSuccess)),
+		prompt.OptionScrollbarThumbColor(s.theme.Prompt(theme.RoleMuted)),
+		prompt.OptionScrollbarBGColor(s.theme.Prompt(theme.RoleMuted)),
+	}
+}
 
 func (s *Prompt) alias(input string, aliases map[string]string) string {
 	for key, value := range aliases {

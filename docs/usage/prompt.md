@@ -105,4 +105,8 @@ Use this to surface anything the operator should know about *before* they start 
 
 ## Custom prompt options
 
-The plugin can pass arbitrary `c-bata/go-prompt` options through `prompt.WithPromptOptions(...)`, e.g. for changing the suggestion colour scheme, the maximum suggestion list length, or the keybinding for autocomplete. See `pkg/prompt/prompt.go` for the option list applied by default.
+The plugin can pass arbitrary `c-bata/go-prompt` options through `prompt.WithPromptOptions(...)`, e.g. for changing the suggestion colour scheme, the maximum suggestion list length, or the keybinding for autocomplete. See `pkg/prompt/prompt.go` for the option list applied by default. Your options are applied *after* the defaults, so they win.
+
+For colours specifically there is a shortcut: set `prompt.theme` in `.posh.yaml` to
+one of the [Catppuccin flavours](/usage/theming) and the prefix, input line and
+completion dropdown are recoloured for you. It is off unless configured.

@@ -159,6 +159,15 @@ In practice, 90 % of plugin authoring is:
 2. Tweak `prompt.With*` options to taste
 3. Add custom checkers to `Require`/`Prompt`
 
+To let a project recolor its prompt, pass the config key through — the
+scaffolded plugin already does:
+
+```go
+prompt.WithTheme(cfg.Theme)
+```
+
+See [Theming](/usage/theming). Without it the prompt keeps its default colors.
+
 For everything else, see:
 
 - [Writing Commands](./writing-commands) — the Command interface and its optional siblings

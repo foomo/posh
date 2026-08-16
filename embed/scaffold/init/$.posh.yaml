@@ -11,6 +11,9 @@ prompt:
     filename: .posh/.history
     lockFilename: .posh/.history.lock
   historySearch: true
+  ## Catppuccin palette for the prompt: mocha, macchiato, frappe or latte.
+  ## Omit to keep the default colors.
+  # theme: mocha
 
 ## Environment variables
 env:

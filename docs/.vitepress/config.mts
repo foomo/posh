@@ -38,6 +38,7 @@ export default defineConfig({
 					{text: 'The Interactive Prompt', link: '/usage/prompt'},
 					{text: 'Built-in Commands', link: '/usage/builtins'},
 					{text: 'AI Agents', link: '/usage/agents'},
+					{text: 'Theming', link: '/usage/theming'},
 					{text: 'Configuration', link: '/usage/configuration'},
 					{text: 'Project Layout', link: '/usage/layout'},
 				],
