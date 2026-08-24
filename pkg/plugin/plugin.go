@@ -80,6 +80,9 @@ type (
 	ArgInfo = command.ArgInfo
 	// FlagInfo describes a single flag of a command.
 	FlagInfo = command.FlagInfo
+	// SkillMetadata is the frontmatter of a generated SKILL.md. It lives in
+	// pkg/command so a command can supply its own, see command.SkillMetadataer.
+	SkillMetadata = command.SkillMetadata
 )
 
 // ------------------------------------------------------------------------------------------------
@@ -91,8 +94,18 @@ func Describe(ctx context.Context, name, description string, v any) CommandInfo 
 	return command.Describe(ctx, name, description, v)
 }
 
-// Skill returns the extra SKILL.md markdown a command contributes, see
-// command.Skill.
-func Skill(ctx context.Context, v any) string {
-	return command.Skill(ctx, v)
+// Skill returns the extra SKILL.md markdown a command contributes under name,
+// see command.Skill.
+func Skill(ctx context.Context, v any, name string) string {
+	return command.Skill(ctx, v, name)
+}
+
+// SkillMetadataFor returns the frontmatter a command supplies for its own
+// generated skill, see command.SkillMetadataOf.
+//
+// It is named apart from SkillMetadataOf, which answers the same question for a
+// plugin: both take an `any`, so one name for both would resolve by accident
+// rather than by intent.
+func SkillMetadataFor(ctx context.Context, v any, name string) SkillMetadata {
+	return command.SkillMetadataOf(ctx, v, name)
 }

@@ -104,7 +104,7 @@ func (c *Cache) Describe(ctx context.Context) CommandInfo {
 // Skill implements the optional Skiller interface. The catalog already carries
 // the structure; what it cannot show is that the namespaces are populated at
 // runtime, which is what makes `cache list` the necessary first step.
-func (c *Cache) Skill(ctx context.Context) string {
+func (c *Cache) Skill(ctx context.Context, name string) string {
 	return "#### Notes\n\n" +
 		"The cache is in-memory and per shell process: it is empty on start and is\n" +
 		"lost on exit, so it never needs clearing between sessions.\n\n" +

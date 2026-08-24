@@ -5,6 +5,7 @@ import (
 
 	"{{.module}}/posh/internal/config"
 	"github.com/foomo/posh/pkg/log"
+	"github.com/foomo/posh/pkg/plugin"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/spf13/viper"
 )
@@ -71,22 +72,39 @@ func (c *Welcome) Execute(ctx context.Context, r *readline.Readline) error {
 	return nil
 }
 
-// Skill implements the optional command.Skiller interface: markdown appended
-// under this command's heading in the generated SKILL.md, for anything an AI
-// coding agent cannot infer from the command's structure alone.
+// Skill implements the optional command.Skiller interface: markdown appended to
+// this command's own generated skill, for anything an AI coding agent cannot
+// infer from the command's structure alone.
 //
 // Use it for what is genuinely non-obvious - side effects, prerequisites, which
 // of several similar commands to reach for, why an empty result is normal. The
 // name, description, arguments and flags are already in the catalog, so
 // repeating them here only costs the agent tokens. Delete this method if a
-// command has nothing to add. Start headings at level 4 (####): level 3 is the
-// command's own.
-func (c *Welcome) Skill(ctx context.Context) string {
+// command has nothing to add. Start headings at level 4 (####).
+//
+// Write the prose against name rather than hardcoding the command's default
+// name: the same command can be registered under another one, and then a
+// hardcoded literal tells the agent to run something that does not exist here.
+func (c *Welcome) Skill(ctx context.Context, name string) string {
 	return `#### Notes
 
 Prints the welcome message configured under ` + "`welcome.message`" + ` in
-` + "`.posh.yaml`" + `. It has no side effects and is a good first command to
-run to confirm the shell is wired up correctly.`
+` + "`.posh.yaml`" + `. It has no side effects, so ` + "`posh x " + name + "`" + ` is a
+good first command to run to confirm the shell is wired up correctly.`
+}
+
+// SkillMetadata implements the optional command.SkillMetadataer interface: the
+// frontmatter of this command's own generated skill.
+//
+// Spend the description on the conditions that should reach for this command.
+// It is the only thing an agent runtime sees when deciding whether to load the
+// skill at all, so "use when running welcome commands" - which is what posh
+// falls back to without this method - means it effectively never loads.
+func (c *Welcome) SkillMetadata(ctx context.Context, name string) plugin.SkillMetadata {
+	return plugin.SkillMetadata{
+		Description: "Use when verifying that the {{.module}} project shell works at all, " +
+			"or when a first, side-effect-free command is needed to confirm setup.",
+	}
 }
 
 func (c *Welcome) Help(ctx context.Context, r *readline.Readline) string {

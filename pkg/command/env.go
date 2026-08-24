@@ -109,7 +109,7 @@ func (c *Env) Describe(ctx context.Context) CommandInfo {
 // Skill implements the optional Skiller interface. The scope of a `set` - this
 // process only - is the thing an agent gets wrong, and no amount of structure
 // conveys it.
-func (c *Env) Skill(ctx context.Context) string {
+func (c *Env) Skill(ctx context.Context, name string) string {
 	return "#### Notes\n\n" +
 		"These are the environment variables of the running shell process. `env set`\n" +
 		"and `env unset` affect that process and the commands it goes on to run;\n" +

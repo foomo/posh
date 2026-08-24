@@ -4,7 +4,7 @@ title: posh agent skill uninstall
 
 ## posh agent skill uninstall
 
-Remove the generated skill from disk
+Remove the generated skills from disk
 
 ```
 posh agent skill uninstall [path] [flags]

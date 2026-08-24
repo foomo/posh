@@ -4,7 +4,7 @@ title: posh agent skill install
 
 ## posh agent skill install
 
-Write the generated skill to disk
+Write the generated skills to disk
 
 ```
 posh agent skill install [path] [flags]

@@ -64,7 +64,7 @@ func (c *Check) Describe(ctx context.Context) CommandInfo {
 // arguments, so its structure says nothing - what an agent needs is that this
 // is the diagnostic to reach for first, and that the checks are project
 // defined.
-func (c *Check) Skill(ctx context.Context) string {
+func (c *Check) Skill(ctx context.Context, name string) string {
 	return "#### Notes\n\n" +
 		"Runs this project's environment checks - the same ones the interactive\n" +
 		"shell prints on startup - reporting each as `success`, `failure`,\n" +

@@ -117,14 +117,20 @@ func (p *Plugin) List(ctx context.Context) []plugin.CommandInfo {
 }
 
 // ListSkill implements the optional plugin.SkillLister interface, used by
-// `posh agent skill`. It is List plus the extra markdown each command
-// contributes through the optional command.Skiller interface.
+// `posh agent skill`. It is List plus, per command, the extra markdown and the
+// skill frontmatter it contributes through the optional command.Skiller and
+// command.SkillMetadataer interfaces.
+//
+// Both are passed the name the command is registered under, which is not
+// necessarily its default one - the same command can be registered twice under
+// different names - so its prose can refer to the name an agent actually types.
 func (p *Plugin) ListSkill(ctx context.Context) []plugin.SkillCommand {
 	ret := make([]plugin.SkillCommand, 0, len(p.commands))
 	for _, cmd := range p.commands.List() {
 		ret = append(ret, plugin.SkillCommand{
 			CommandInfo: plugin.Describe(ctx, cmd.Name(), cmd.Description(), cmd),
-			Skill:       plugin.Skill(ctx, cmd),
+			Skill:       plugin.Skill(ctx, cmd, cmd.Name()),
+			Metadata:    plugin.SkillMetadataFor(ctx, cmd, cmd.Name()),
 		})
 	}
 
@@ -132,15 +138,22 @@ func (p *Plugin) ListSkill(ctx context.Context) []plugin.SkillCommand {
 }
 
 // SkillMetadata implements the optional plugin.SkillMetadataer interface,
-// supplying the generated SKILL.md frontmatter.
+// supplying the frontmatter of the generated root skill. Each command supplies
+// its own through command.SkillMetadataer.
 //
-// Describe what this project's shell is for: the description is what makes an
-// agent reach for the skill, so project vocabulary beats a generic summary.
+// Spend the description on the conditions that should reach for this shell, in
+// this project's own vocabulary - the names of its services, clusters and
+// environments. It is the only thing an agent runtime sees when deciding whether
+// to load the skill, so a description of what the shell *is* gives it nothing to
+// match a request against and the skill never loads.
+//
 // AllowedTools lets posh run without a permission prompt - drop it if the
 // commands here should stay gated.
 func (p *Plugin) SkillMetadata(ctx context.Context) plugin.SkillMetadata {
 	return plugin.SkillMetadata{
-		Description: "Drive the {{.module}} project shell: run project tasks via posh instead of guessing shell commands.",
+		Description: "Use when running any task in the {{.module}} project - building, testing, " +
+			"deploying, or inspecting its services - and when asking how such a task is run here. " +
+			"List the project's own services and environments to make this match.",
 		AllowedTools: []string{
 			"Bash(posh execute:*)",
 			"Bash(posh x:*)",
