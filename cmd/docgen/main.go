@@ -130,6 +130,7 @@ func buildFullTree() *cobra.Command {
 	cmd.NewAgent(root)
 	cmd.NewBrew(root)
 	cmd.NewExecute(root)
+	cmd.NewMCP(root)
 	cmd.NewPrompt(root)
 	cmd.NewRequire(root)
 

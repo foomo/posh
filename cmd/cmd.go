@@ -27,6 +27,7 @@ func Init(provider plugin.Provider) {
 		NewAgent(rootCmd)
 		NewBrew(rootCmd)
 		NewExecute(rootCmd)
+		NewMCP(rootCmd)
 		NewPrompt(rootCmd)
 		NewRequire(rootCmd)
 	} else {

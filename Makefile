@@ -77,6 +77,9 @@ test.demo: install
 		echo "replace github.com/foomo/posh => ../../../" >> .posh/go.mod && \
 		make shell.build && \
 		bin/posh execute welcome demo
+	@echo "〉testing demo mcp"
+	@go build -o tmp/mcpcheck ./integration/mcpcheck
+	@tmp/mcpcheck tmp/test/bin/posh
 
 .PHONY: build
 ## Build binary
