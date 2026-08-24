@@ -4,7 +4,7 @@ title: posh agent skill get
 
 ## posh agent skill get
 
-Print the generated skill to stdout
+Print the generated skills to stdout
 
 ```
 posh agent skill get [flags]

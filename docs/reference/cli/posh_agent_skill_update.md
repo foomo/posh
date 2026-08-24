@@ -4,7 +4,7 @@ title: posh agent skill update
 
 ## posh agent skill update
 
-Regenerate the skill file after this project's commands changed
+Regenerate the skill files after this project's commands changed
 
 ```
 posh agent skill update [path] [flags]

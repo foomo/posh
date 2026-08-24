@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -47,9 +48,12 @@ func ListSkill(ctx context.Context, plg any) ([]SkillCommand, error) {
 	return ret, nil
 }
 
-// SkillMetadataOf returns the SKILL.md frontmatter plg supplies, or the zero
-// value - which renders posh's defaults - when it does not implement
+// SkillMetadataOf returns the root SKILL.md frontmatter plg supplies, or the
+// zero value - which renders posh's defaults - when it does not implement
 // SkillMetadataer.
+//
+// This is the plugin-level frontmatter, covering the root skill only. A command
+// supplies its own through command.SkillMetadataer.
 func SkillMetadataOf(ctx context.Context, plg any) SkillMetadata {
 	if value, ok := plg.(SkillMetadataer); ok {
 		return value.SkillMetadata(ctx)
@@ -58,39 +62,97 @@ func SkillMetadataOf(ctx context.Context, plg any) SkillMetadata {
 	return SkillMetadata{}
 }
 
-// WriteSkill renders commands as a Claude Code SKILL.md and writes it to path,
-// creating any missing parent directories.
+// WriteSkill generates the root skill and one skill per command into the skills
+// directory at path, creating it if needed. Passing an empty path writes to
+// DefaultSkillsPath.
 //
-// Passing an empty path writes to DefaultSkillPath. The file is regenerated in
-// full every time, so re-running after a project's commands change always
-// produces an up-to-date skill.
-func WriteSkill(path string, meta SkillMetadata, commands []SkillCommand) error {
-	path = SkillPath(path)
+// One skill per command rather than one file for all of them: a single file
+// means an agent pays for every command in the project in order to use one. Only
+// commands that Describes() get their own; the rest are covered by the root
+// skill's index.
+//
+// Previously generated skills are removed first, so a command that was renamed
+// or dropped since the last run leaves nothing behind - regenerating is what
+// keeps the result honest, and a stale directory would otherwise survive
+// indefinitely because nothing ever revisits it. Hand-written skills alongside
+// them are untouched, see CommandSkillPrefix.
+//
+// It returns the paths written, in the order written.
+func WriteSkill(path string, meta SkillMetadata, commands []SkillCommand) ([]string, error) {
+	root := SkillsPath(path)
 
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return errors.Wrapf(err, "failed to create directory for %s", path)
+	if err := RemoveSkill(root); err != nil {
+		return nil, err
 	}
 
-	return os.WriteFile(path, []byte(RenderSkill(meta, commands)), 0o644) //nolint:gosec
+	ret := []string{filepath.Join(root, RootSkillName, "SKILL.md")}
+
+	contents := []string{RenderRootSkill(meta, commands)}
+
+	for _, c := range commands {
+		if !c.Describes() {
+			continue
+		}
+
+		ret = append(ret, filepath.Join(root, c.SkillName(), "SKILL.md"))
+		contents = append(contents, RenderCommandSkill(c))
+	}
+
+	for i, name := range ret {
+		if err := os.MkdirAll(filepath.Dir(name), 0o755); err != nil {
+			return nil, errors.Wrapf(err, "failed to create directory for %s", name)
+		}
+
+		if err := os.WriteFile(name, []byte(contents[i]), 0o644); err != nil { //nolint:gosec
+			return nil, errors.Wrapf(err, "failed to write %s", name)
+		}
+	}
+
+	return ret, nil
 }
 
-// RemoveSkill deletes the skill file at path, falling back to DefaultSkillPath
-// when empty. A missing file is not an error, so uninstall is idempotent.
+// RemoveSkill deletes every generated skill directory under the skills
+// directory at path, falling back to DefaultSkillsPath when empty.
+//
+// Only the root skill and directories carrying CommandSkillPrefix are removed,
+// so a hand-written skill in the same directory survives. A missing directory is
+// not an error, so uninstall is idempotent - and it deliberately needs no
+// config or resolved plugin, so cleanup still works when the shell itself is
+// broken.
 func RemoveSkill(path string) error {
-	path = SkillPath(path)
+	root := SkillsPath(path)
 
-	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-		return errors.Wrapf(err, "failed to remove %s", path)
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+
+		return errors.Wrapf(err, "failed to read %s", root)
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		if name := entry.Name(); name != RootSkillName && !strings.HasPrefix(name, CommandSkillPrefix) {
+			continue
+		}
+
+		if err := os.RemoveAll(filepath.Join(root, entry.Name())); err != nil {
+			return errors.Wrapf(err, "failed to remove %s", filepath.Join(root, entry.Name()))
+		}
 	}
 
 	return nil
 }
 
-// SkillPath resolves a user supplied skill path, falling back to
-// DefaultSkillPath when empty.
-func SkillPath(path string) string {
+// SkillsPath resolves a user supplied skills directory, falling back to
+// DefaultSkillsPath when empty.
+func SkillsPath(path string) string {
 	if path == "" {
-		return DefaultSkillPath
+		return DefaultSkillsPath
 	}
 
 	return path

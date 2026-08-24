@@ -42,7 +42,7 @@ func (c *History) Description() string {
 // Skill implements the optional Skiller interface. What the one-line
 // description cannot say is whose history this is, and that it is a record of
 // intent rather than of success.
-func (c *History) Skill(ctx context.Context) string {
+func (c *History) Skill(ctx context.Context, name string) string {
 	return "#### Notes\n\n" +
 		"Prints the commands previously entered in this project's interactive posh\n" +
 		"shell, oldest last. It is normally file-backed (`.posh/history`) and so\n" +

@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"path/filepath"
+	"strings"
 
 	intcmd "github.com/foomo/posh/internal/cmd"
 	intconfig "github.com/foomo/posh/internal/config"
@@ -57,7 +60,7 @@ func newAgentSkill(root *cobra.Command) {
 
 	install := &cobra.Command{
 		Use:           "install [path]",
-		Short:         "Write the generated skill to disk",
+		Short:         "Write the generated skills to disk",
 		Args:          cobra.MaximumNArgs(1),
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -68,11 +71,14 @@ func newAgentSkill(root *cobra.Command) {
 		RunE: runAgentSkillInstall,
 	}
 
-	// get renders the same skill install would write, but to stdout - so an
-	// agent can read it without touching the working tree.
+	// get renders the same skills install would write, but to stdout - so an
+	// agent can read them without touching the working tree.
+	//
+	// Each one is preceded by its path, since there are now several: without it
+	// the frontmatter of the next skill is the only clue a new file started.
 	get := &cobra.Command{
 		Use:           "get",
-		Short:         "Print the generated skill to stdout",
+		Short:         "Print the generated skills to stdout",
 		Args:          cobra.NoArgs,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -83,15 +89,37 @@ func newAgentSkill(root *cobra.Command) {
 				return err
 			}
 
-			_, err = cmd.OutOrStdout().Write([]byte(plugin.RenderSkill(meta, commands)))
+			out := cmd.OutOrStdout()
 
-			return err
+			skills := []struct{ path, content string }{{
+				path:    filepath.Join(plugin.RootSkillName, "SKILL.md"),
+				content: plugin.RenderRootSkill(meta, commands),
+			}}
+
+			for _, c := range commands {
+				if !c.Describes() {
+					continue
+				}
+
+				skills = append(skills, struct{ path, content string }{
+					path:    filepath.Join(c.SkillName(), "SKILL.md"),
+					content: plugin.RenderCommandSkill(c),
+				})
+			}
+
+			for _, skill := range skills {
+				if _, err := fmt.Fprintf(out, "==> %s\n\n%s\n", skill.path, skill.content); err != nil {
+					return err
+				}
+			}
+
+			return nil
 		},
 	}
 
 	uninstall := &cobra.Command{
 		Use:           "uninstall [path]",
-		Short:         "Remove the generated skill from disk",
+		Short:         "Remove the generated skills from disk",
 		Args:          cobra.MaximumNArgs(1),
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -105,12 +133,12 @@ func newAgentSkill(root *cobra.Command) {
 		},
 	}
 
-	// update is install by another name: both (re-)generate the skill from
+	// update is install by another name: both (re-)generate the skills from
 	// this project's live command catalog, so re-running after adding or
-	// changing providers always produces an up-to-date file.
+	// changing providers always produces up-to-date files.
 	update := &cobra.Command{
 		Use:           "update [path]",
-		Short:         "Regenerate the skill file after this project's commands changed",
+		Short:         "Regenerate the skill files after this project's commands changed",
 		Args:          cobra.MaximumNArgs(1),
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -133,7 +161,29 @@ func runAgentSkillInstall(cmd *cobra.Command, args []string) error {
 		path = args[0]
 	}
 
-	return plugin.WriteSkill(path, meta, commands)
+	written, err := plugin.WriteSkill(path, meta, commands)
+	if err != nil {
+		return err
+	}
+
+	l := intcmd.NewLogger()
+
+	l.Successf("wrote %d skills to %s", len(written), plugin.SkillsPath(path))
+
+	// A command without its own description gets one derived from its one-line
+	// description, which says what it is rather than when to use it - and the
+	// description is the only thing an agent runtime matches against when
+	// deciding to load a skill. Report it: the skill is generated either way, so
+	// the gap is otherwise invisible.
+	if fallback := plugin.FallbackSkillDescriptions(commands); len(fallback) > 0 {
+		l.Warnf(
+			"%d commands have no skill description and fell back to a generated one, so their skills may never load: %s",
+			len(fallback), strings.Join(fallback, ", "),
+		)
+		l.Info("implement command.SkillMetadataer on these commands to name the conditions that should reach for them")
+	}
+
+	return nil
 }
 
 // loadCatalog resolves this project's plugin and asks it for the command

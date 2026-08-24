@@ -34,7 +34,7 @@ Like commands, plugins gain capabilities by *also* implementing an optional inte
 | `Completer` | `Complete(ctx, args, toComplete) []string` | Shell completion for `posh execute` |
 | `Lister` | `List(ctx) []CommandInfo` | [`posh agent catalog`](/usage/agents#posh-agent-catalog) |
 | `SkillLister` | `ListSkill(ctx) []SkillCommand` | [`posh agent skill`](/usage/agents#posh-agent-skill) |
-| `SkillMetadataer` | `SkillMetadata(ctx) SkillMetadata` | The generated skill's frontmatter |
+| `SkillMetadataer` | `SkillMetadata(ctx) SkillMetadata` | The generated root skill's frontmatter |
 
 The scaffolded plugin implements the last three out of the box — see [AI Agents](/usage/agents) for what they produce.
 

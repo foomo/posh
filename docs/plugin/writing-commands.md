@@ -142,20 +142,43 @@ build the info by hand, without breaking the catalog.
 ### `Skiller` — agent skill prose
 
 ```go
-func (c *Hello) Skill(ctx context.Context) string {
+func (c *Hello) Skill(ctx context.Context, name string) string {
     return `#### When to use
 
-Prefer this over ` + "`echo`" + ` — it reads the greeting format from .posh.yaml.
+Prefer ` + "`posh x " + name + "`" + ` over ` + "`echo`" + ` — it reads the greeting format from .posh.yaml.
 `
 }
 ```
 
-Extra markdown for [`posh agent skill`](/usage/agents#posh-agent-skill), appended verbatim under this command's `###`
-heading — extended instructions, worked config examples, links. Use heading level 4 (`####`) or deeper; level 3 is the
-command heading itself.
+Extra markdown for [`posh agent skill`](/usage/agents#posh-agent-skill), appended verbatim to this command's own
+generated skill — extended instructions, worked config examples, links. Use heading level 4 (`####`) or deeper.
 
 It's free-form text rather than a struct because what's worth telling an agent varies per command, and the destination
 is markdown either way. Top-level commands only — nested subcommands keep their compact indented listing.
+
+`name` is the name the command is **registered** under, which isn't necessarily its default one — the same command can
+be registered under another name via `CommandWithName`. Write the prose against `name` instead of hardcoding a literal,
+or the generated skill tells the agent to run a command that doesn't exist in this project.
+
+Don't list flags and arguments here: they're already structured on the command, and the generated skill points at
+`posh agent catalog` and `posh help <command>` for them.
+
+### `SkillMetadataer` — agent skill frontmatter
+
+```go
+func (c *Hello) SkillMetadata(ctx context.Context, name string) command.SkillMetadata {
+    return command.SkillMetadata{
+        Description: "Use when greeting a user, or when checking the configured greeting format.",
+    }
+}
+```
+
+The frontmatter of this command's own generated skill. Fields are restricted to the same Agent Skills allowlist as
+[the plugin-level metadata](/usage/agents#frontmatter); unset ones are derived from the command.
+
+Spend the description on the **conditions that should reach for this command**. It's the only thing an agent runtime
+sees when deciding whether to load a skill, so the derived fallback — `Use when running <name> commands.` — means the
+skill effectively never loads. `posh agent skill install` warns and names every command that fell back.
 
 ### Completion
 

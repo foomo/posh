@@ -35,16 +35,11 @@ func (c *Exit) Description() string {
 	return "exit shell"
 }
 
-// Skill implements the optional Skiller interface. It exists to say the command
-// is pointless outside the interactive shell, which its description implies to
-// a human but not to an agent.
-func (c *Exit) Skill(ctx context.Context) string {
-	return "#### Notes\n\n" +
-		"Leaves the interactive posh shell. There is nothing to exit under\n" +
-		"`posh execute`, where each invocation is its own process, so running it\n" +
-		"that way does nothing and succeeds - it is never the way to stop a\n" +
-		"running command."
-}
+// Skiller is deliberately not implemented: the command is inapplicable under
+// `posh execute`, where each invocation is its own process and there is nothing
+// to exit. A skill whose content is "do not use this" still has to be loaded
+// before an agent can learn that, so it costs more than it saves - the root
+// skill's index carries the name and description, which is all this warrants.
 
 func (c *Exit) Execute(ctx context.Context, args *readline.Readline) error {
 	return nil
