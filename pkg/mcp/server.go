@@ -30,12 +30,12 @@ func (s *Server) Run(ctx context.Context) error {
 	server := sdkmcp.NewServer(&sdkmcp.Implementation{Name: "posh", Version: "1"}, nil)
 
 	sdkmcp.AddTool(server, &sdkmcp.Tool{
-		Name:        "list_commands",
+		Name:        "posh_list_commands",
 		Description: "List this project's posh commands, the same catalog `posh agent catalog` prints.",
 	}, s.listCommands)
 
 	sdkmcp.AddTool(server, &sdkmcp.Tool{
-		Name:        "run_command",
+		Name:        "posh_run_command",
 		Description: "Run a posh command, the same as `posh execute <args...>`, and return its output.",
 	}, s.runCommand)
 

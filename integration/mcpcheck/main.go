@@ -1,5 +1,5 @@
 // Command mcpcheck drives a built posh binary's `mcp` subcommand over stdio,
-// calling list_commands and run_command, and exits non-zero if either call
+// calling posh_list_commands and posh_run_command, and exits non-zero if either call
 // fails or returns an unexpected shape. It exists for make test.demo, which
 // otherwise only exercises `posh execute` directly - not the MCP server this
 // binary also serves once a provider is wired up.
@@ -51,28 +51,33 @@ func run(binary string) error {
 	}
 	defer session.Close()
 
-	listRes, err := session.CallTool(ctx, &mcp.CallToolParams{Name: "list_commands"})
+	listRes, err := session.CallTool(ctx, &mcp.CallToolParams{Name: "posh_list_commands"})
 	if err != nil {
-		return fmt.Errorf("list_commands: %w", err)
+		return fmt.Errorf("posh_list_commands: %w", err)
 	}
 
 	if listRes.IsError {
-		return fmt.Errorf("list_commands returned an error result: %+v", listRes.Content)
+		return fmt.Errorf("posh_list_commands returned an error result: %+v", listRes.Content)
+	}
+
+	for _, content := range listRes.Content {
+		s, _ := content.MarshalJSON()
+		fmt.Println(string(s))
 	}
 
 	runRes, err := session.CallTool(ctx, &mcp.CallToolParams{
-		Name:      "run_command",
+		Name:      "posh_run_command",
 		Arguments: map[string]any{"args": []string{"welcome", "demo"}},
 	})
 	if err != nil {
-		return fmt.Errorf("run_command: %w", err)
+		return fmt.Errorf("posh_run_command: %w", err)
 	}
 
 	if runRes.IsError {
-		return fmt.Errorf("run_command returned an error result: %+v", runRes.Content)
+		return fmt.Errorf("posh_run_command returned an error result: %+v", runRes.Content)
 	}
 
-	fmt.Println("mcpcheck: list_commands and run_command both succeeded")
+	fmt.Println("mcpcheck: posh_list_commands and posh_run_command both succeeded")
 
 	return nil
 }
