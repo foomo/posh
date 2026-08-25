@@ -2,7 +2,6 @@ package mcp
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/foomo/posh/pkg/log"
 	"github.com/foomo/posh/pkg/plugin"
@@ -44,31 +43,26 @@ func (s *Server) Run(ctx context.Context) error {
 
 type listCommandsInput struct{}
 
-// listCommandsOutput is left empty deliberately: plugin.CommandInfo nests
-// itself through Subcommands, and the SDK's AddTool derives a JSON schema for
-// Out by reflection, which panics on that cycle. The catalog is emitted as
-// unstructured TextContent (JSON) instead of a typed Out.
-type listCommandsOutput struct{}
-
-func (s *Server) listCommands(ctx context.Context, req *sdkmcp.CallToolRequest, input listCommandsInput) (*sdkmcp.CallToolResult, listCommandsOutput, error) {
+// listCommands returns Out as `any`: plugin.CommandInfo nests itself through
+// Subcommands, and the SDK's AddTool derives an output JSON schema for a
+// concrete Out type by reflection, which panics on that cycle. `any` is the
+// one case AddTool special-cases to skip schema derivation entirely (see
+// go-sdk's toolForErr), while still marshaling the returned value into
+// CallToolResult.StructuredContent and adding a JSON TextContent fallback -
+// which is what a client that only reads Content (not StructuredContent)
+// needs to see the catalog at all.
+func (s *Server) listCommands(ctx context.Context, req *sdkmcp.CallToolRequest, input listCommandsInput) (*sdkmcp.CallToolResult, any, error) {
 	plg, err := s.provider(s.l)
 	if err != nil {
-		return errorResult(err), listCommandsOutput{}, nil
+		return errorResult(err), nil, nil
 	}
 
 	catalog, err := ListCommands(ctx, plg)
 	if err != nil {
-		return errorResult(err), listCommandsOutput{}, nil
+		return errorResult(err), nil, nil
 	}
 
-	out, err := json.Marshal(catalog)
-	if err != nil {
-		return errorResult(err), listCommandsOutput{}, nil
-	}
-
-	return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{
-		&sdkmcp.TextContent{Text: string(out)},
-	}}, listCommandsOutput{}, nil
+	return nil, catalog, nil
 }
 
 func errorResult(err error) *sdkmcp.CallToolResult {
