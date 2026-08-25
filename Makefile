@@ -78,7 +78,7 @@ test.demo: install
 		make shell.build && \
 		bin/posh execute welcome demo
 	@echo "〉testing demo mcp"
-	@go build -o tmp/mcpcheck ./integration/mcpcheck
+	@go build -o tmp/mcpcheck ./cmd/mcpcheck
 	@tmp/mcpcheck tmp/test/bin/posh
 
 .PHONY: build
