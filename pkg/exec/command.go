@@ -18,8 +18,11 @@ type (
 func NewCommand(ctx context.Context, name string, arg ...string) *Command {
 	cmd := exec.CommandContext(ctx, name, arg...)
 	cmd.Env = os.Environ()
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+
+	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+	if stdout, stderr, ok := StdioFrom(ctx); ok {
+		cmd.Stdout, cmd.Stderr = stdout, stderr
+	}
 
 	return &Command{
 		ctx: ctx,

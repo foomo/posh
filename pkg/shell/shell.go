@@ -5,16 +5,22 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
+	stdexec "os/exec"
 	"strings"
 
+	"github.com/foomo/posh/pkg/exec"
 	"github.com/foomo/posh/pkg/log"
 )
 
-// Shell struct
+// Shell builds a single `sh -c` invocation. All inputs are joined with spaces
+// into one shell string and are NOT escaped — for argv-style execution without
+// shell interpretation, use pkg/exec.
+//
+// A Shell is single-use: exactly one of Run, Output, CombinedOutput or Wait may
+// be called, once. Build a new Shell for each invocation.
 type Shell struct {
 	l      log.Logger
-	cmd    *exec.Cmd
+	cmd    *stdexec.Cmd
 	quiet  bool
 	debug  bool
 	args   []string
@@ -36,20 +42,25 @@ func New(ctx context.Context, l log.Logger, inputs ...any) *Shell {
 		} else if value, ok := input.([]string); ok {
 			args = append(args, value...)
 		} else {
-			args = append(args, fmt.Sprintf("%v", args))
+			args = append(args, fmt.Sprintf("%v", input))
 		}
 	}
 
-	cmd := exec.CommandContext(ctx, "sh", "-c")
+	cmd := stdexec.CommandContext(ctx, "sh", "-c")
 	cmd.Env = os.Environ()
+
+	stdout, stderr := io.Writer(os.Stdout), io.Writer(os.Stderr)
+	if o, e, ok := exec.StdioFrom(ctx); ok {
+		stdout, stderr = o, e
+	}
 
 	return &Shell{
 		l:      l.Named("shell"),
 		cmd:    cmd,
 		args:   args,
 		stdin:  os.Stdin,
-		stdout: os.Stdout,
-		stderr: os.Stderr,
+		stdout: stdout,
+		stderr: stderr,
 	}
 }
 

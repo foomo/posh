@@ -55,6 +55,7 @@ export default defineConfig({
 					{text: 'posh agent', link: '/reference/cli/posh_agent'},
 					{text: 'posh prompt', link: '/reference/cli/posh_prompt'},
 					{text: 'posh execute', link: '/reference/cli/posh_execute'},
+					{text: 'posh mcp', link: '/reference/cli/posh_mcp'},
 					{text: 'posh require', link: '/reference/cli/posh_require'},
 					{text: 'posh brew', link: '/reference/cli/posh_brew'},
 				],

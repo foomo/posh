@@ -22,10 +22,11 @@ The output is committed to git, so the docs site builds without Go installed. Re
 | [`posh agent`](./posh_agent) | — | ✅ |
 | [`posh prompt`](./posh_prompt) | — | ✅ |
 | [`posh execute`](./posh_execute) | — | ✅ |
+| [`posh mcp`](./posh_mcp) | — | ✅ |
 | [`posh require`](./posh_require) | — | ✅ |
 | [`posh brew`](./posh_brew) | — | ✅ |
 
-The split exists because `agent`, `prompt`, `execute`, `require` and `brew` delegate to the [`Plugin`](/plugin/overview) compiled into the project binary. The global `posh` has no plugin to delegate to.
+The split exists because `agent`, `prompt`, `execute`, `mcp`, `require` and `brew` delegate to the [`Plugin`](/plugin/overview) compiled into the project binary. The global `posh` has no plugin to delegate to.
 
 ## All commands
 
@@ -42,5 +43,6 @@ The split exists because `agent`, `prompt`, `execute`, `require` and `brew` dele
     - [posh agent skill uninstall](./posh_agent_skill_uninstall)
 - [posh prompt](./posh_prompt)
 - [posh execute](./posh_execute)
+- [posh mcp](./posh_mcp)
 - [posh require](./posh_require)
 - [posh brew](./posh_brew)
